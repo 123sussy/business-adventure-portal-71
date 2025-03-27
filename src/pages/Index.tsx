@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Rocket, Users, Trophy, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,22 @@ const FeatureCard = ({
 );
 
 const Index = () => {
+  const [textIndex, setTextIndex] = useState(0);
+  const rotatingTexts = [
+    "Business Bootcamp",
+    "Entrepreneurship Program",
+    "Startup Academy",
+    "Innovation Workshop"
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTextIndex(prevIndex => (prevIndex + 1) % rotatingTexts.length);
+    }, 3000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -42,19 +58,27 @@ const Index = () => {
           <div className="inline-block animate-fade-in">
             <span className="badge-primary mb-4">Summer 2023</span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in" style={{animationDelay: '0.1s'}}>
-            OLL Summer Business <span className="text-primary">Bootcamp</span>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in relative" style={{animationDelay: '0.1s'}}>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500">
+              OLL Summer <br />
+              <span className="relative">
+                <span className="opacity-0">Business Bootcamp</span>
+                <span className="absolute left-0 right-0 top-0 bottom-0 flex justify-center items-center overflow-hidden transition-all duration-500">
+                  {rotatingTexts[textIndex]}
+                </span>
+              </span>
+            </span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-in" style={{animationDelay: '0.2s'}}>
             Join our entrepreneurship program where students learn to create, market, and sell their own products.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{animationDelay: '0.3s'}}>
-            <Button size="lg" asChild>
+            <Button size="lg" asChild className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all">
               <Link to="/dashboard">
                 Get Started <ArrowRight className="ml-2" size={16} />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild>
+            <Button size="lg" variant="outline" asChild className="border-2 hover:bg-gray-50 transition-all">
               <Link to="/login">Log In</Link>
             </Button>
           </div>
@@ -119,7 +143,7 @@ const Index = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your Business Journey?</h2>
           <p className="text-muted-foreground mb-8">Join hundreds of students who are building their entrepreneurial skills.</p>
-          <Button size="lg" asChild>
+          <Button size="lg" asChild className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all">
             <Link to="/register">
               Register Now <ArrowRight className="ml-2" size={16} />
             </Link>
