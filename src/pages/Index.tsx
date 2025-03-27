@@ -9,17 +9,22 @@ const FeatureCard = ({
   icon, 
   title, 
   description, 
-  className 
+  className,
+  style
 }: { 
   icon: React.ReactNode; 
   title: string; 
   description: string;
   className?: string;
+  style?: React.CSSProperties;
 }) => (
-  <div className={cn(
-    "glass-card p-6 rounded-xl hover-card", 
-    className
-  )}>
+  <div 
+    className={cn(
+      "glass-card p-6 rounded-xl hover-card", 
+      className
+    )}
+    style={style}
+  >
     <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4">
       {icon}
     </div>
