@@ -4,8 +4,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TaskCard from '@/components/student/TaskCard';
 
+// Define the task type to match TaskCard props
+type TaskStatus = 'pending' | 'submitted' | 'completed' | 'overdue' | 'resubmit';
+
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  deadline: string;
+  submittedAt?: string;
+  feedback?: string;
+  rating?: number;
+}
+
 // Mock data
-const mockTasks = [
+const mockTasks: Task[] = [
   { id: 1, title: "Business Idea Submission", description: "Submit your initial business concept", status: "pending", deadline: "2023-07-10" },
   { id: 2, title: "Sales Projection", description: "Create your sales forecast for the month", status: "submitted", deadline: "2023-07-05", submittedAt: "2023-07-04" },
   { id: 3, title: "Marketing Strategy", description: "Document your marketing approach", status: "completed", deadline: "2023-06-25", feedback: "Great job thinking through customer acquisition!", rating: 4.5 },

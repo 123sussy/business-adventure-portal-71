@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AlertCircle, CheckCircle, Clock, Upload } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -36,7 +35,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
       case 'overdue':
         return <Badge variant="destructive">Overdue</Badge>;
       case 'resubmit':
-        return <Badge variant="warning" className="bg-warning text-warning-foreground">Resubmit</Badge>;
+        return <Badge variant="warning">Resubmit</Badge>;
       default:
         return null;
     }
