@@ -69,7 +69,7 @@ const studentData = {
   phone: '+1 234-567-8901',
   batch: 'Business Bootcamp - Batch 1',
   business: 'Eco Crafts',
-  attendance: 90,
+  attendanceRate: 90, // Renamed from attendance to attendanceRate to avoid duplicate property
   tasksCompleted: 8,
   totalTasks: 10,
   points: 1250,
@@ -163,6 +163,10 @@ const MentorStudentDetails = () => {
       </div>
     );
   };
+
+  // Calculate attendance percentage
+  const attendancePercentage = studentData.attendance.filter(session => session.attended).length / 
+                               studentData.attendance.length * 100;
 
   return (
     <div className="space-y-6">
@@ -262,13 +266,13 @@ const MentorStudentDetails = () => {
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm font-medium">Attendance</span>
                       <span className="text-sm text-muted-foreground">
-                        {studentData.attendance}%
+                        {attendancePercentage.toFixed(0)}%
                       </span>
                     </div>
                     <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
                       <div 
-                        className={`h-full ${studentData.attendance >= 90 ? 'bg-success' : studentData.attendance >= 75 ? 'bg-warning' : 'bg-destructive'}`}
-                        style={{ width: `${studentData.attendance}%` }}
+                        className={`h-full ${attendancePercentage >= 90 ? 'bg-success' : attendancePercentage >= 75 ? 'bg-warning' : 'bg-destructive'}`}
+                        style={{ width: `${attendancePercentage}%` }}
                       />
                     </div>
                   </div>
@@ -445,7 +449,7 @@ const MentorStudentDetails = () => {
             <CardHeader>
               <CardTitle>Attendance Record</CardTitle>
               <CardDescription>
-                Overall attendance: {studentData.attendance}%
+                Overall attendance: {attendancePercentage.toFixed(0)}%
               </CardDescription>
             </CardHeader>
             <CardContent>

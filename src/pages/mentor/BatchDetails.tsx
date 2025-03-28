@@ -549,7 +549,7 @@ const MentorBatchDetails = () => {
                               key={student.id} 
                               className="flex items-center gap-2 p-2 rounded-md border"
                             >
-                              <UserAvatar name={student.name} size="xs" />
+                              <UserAvatar name={student.name} size="sm" />
                               <span className="text-sm">{student.name}</span>
                               {record.attended ? (
                                 <Check className="h-4 w-4 text-success ml-auto" />
@@ -625,7 +625,7 @@ const MentorBatchDetails = () => {
                             <TableRow key={`${task.id}-${student.id}`}>
                               <TableCell>
                                 <div className="flex items-center gap-3">
-                                  <UserAvatar name={student.name} size="xs" />
+                                  <UserAvatar name={student.name} size="sm" />
                                   <span className="font-medium">{student.name}</span>
                                 </div>
                               </TableCell>
