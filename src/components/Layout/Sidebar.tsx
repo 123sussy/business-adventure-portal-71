@@ -16,7 +16,10 @@ import {
   CheckSquare,
   Calendar,
   DollarSign,
-  Video
+  Video,
+  PieChart,
+  School,
+  Briefcase
 } from 'lucide-react';
 
 const roleBasedNavItems = {
@@ -29,10 +32,10 @@ const roleBasedNavItems = {
     { to: '/profile', icon: <User size={18} />, label: 'My Profile' },
   ],
   mentor: [
-    { to: '/dashboard', icon: <Home size={18} />, label: 'Dashboard' },
-    { to: '/batches', icon: <Users size={18} />, label: 'Batches' },
-    { to: '/earnings', icon: <DollarSign size={18} />, label: 'Earnings' },
-    { to: '/leaderboard', icon: <Trophy size={18} />, label: 'Leaderboard' },
+    { to: '/mentor/dashboard', icon: <Home size={18} />, label: 'Dashboard' },
+    { to: '/mentor/batches', icon: <Briefcase size={18} />, label: 'Batches' },
+    { to: '/mentor/earnings', icon: <DollarSign size={18} />, label: 'Earnings' },
+    { to: '/mentor/leaderboard', icon: <Trophy size={18} />, label: 'Leaderboard' },
     { to: '/profile', icon: <User size={18} />, label: 'My Profile' },
   ],
   admin: [

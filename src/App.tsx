@@ -19,6 +19,14 @@ import StudentSessions from "./pages/student/Sessions";
 import StudentSales from "./pages/student/Sales";
 import StudentLeaderboard from "./pages/student/Leaderboard";
 
+// Mentor Pages
+import MentorDashboard from "./pages/mentor/Dashboard";
+import MentorBatches from "./pages/mentor/Batches";
+import MentorBatchDetails from "./pages/mentor/BatchDetails";
+import MentorEarnings from "./pages/mentor/Earnings";
+import MentorLeaderboard from "./pages/mentor/Leaderboard";
+import MentorStudentDetails from "./pages/mentor/StudentDetails";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -43,6 +51,14 @@ const App = () => (
             <Route path="/student/sessions" element={<StudentSessions />} />
             <Route path="/student/sales" element={<StudentSales />} />
             <Route path="/student/leaderboard" element={<StudentLeaderboard />} />
+            
+            {/* Mentor Routes */}
+            <Route path="/mentor/dashboard" element={<MentorDashboard />} />
+            <Route path="/mentor/batches" element={<MentorBatches />} />
+            <Route path="/mentor/batches/:batchId" element={<MentorBatchDetails />} />
+            <Route path="/mentor/students/:studentId" element={<MentorStudentDetails />} />
+            <Route path="/mentor/earnings" element={<MentorEarnings />} />
+            <Route path="/mentor/leaderboard" element={<MentorLeaderboard />} />
           </Route>
           
           {/* Catch-all route */}
