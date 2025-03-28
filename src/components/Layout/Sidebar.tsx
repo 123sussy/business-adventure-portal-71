@@ -12,20 +12,26 @@ import {
   Stars,
   BookOpen,
   Users,
-  Settings
+  Settings,
+  CheckSquare,
+  Calendar,
+  DollarSign,
+  Video
 } from 'lucide-react';
 
 const roleBasedNavItems = {
   student: [
-    { to: '/dashboard', icon: <Home size={18} />, label: 'Dashboard' },
-    { to: '/my-business', icon: <BookOpen size={18} />, label: 'My Business' },
-    { to: '/leaderboard', icon: <Trophy size={18} />, label: 'Leaderboard' },
+    { to: '/student/dashboard', icon: <Home size={18} />, label: 'Dashboard' },
+    { to: '/student/tasks', icon: <CheckSquare size={18} />, label: 'Tasks' },
+    { to: '/student/sessions', icon: <Video size={18} />, label: 'Sessions' },
+    { to: '/student/sales', icon: <DollarSign size={18} />, label: 'Sales' },
+    { to: '/student/leaderboard', icon: <Trophy size={18} />, label: 'Leaderboard' },
     { to: '/profile', icon: <User size={18} />, label: 'My Profile' },
-    { to: '/rewards', icon: <Gift size={18} />, label: 'Rewards' },
   ],
   mentor: [
     { to: '/dashboard', icon: <Home size={18} />, label: 'Dashboard' },
-    { to: '/students', icon: <Users size={18} />, label: 'My Students' },
+    { to: '/batches', icon: <Users size={18} />, label: 'Batches' },
+    { to: '/earnings', icon: <DollarSign size={18} />, label: 'Earnings' },
     { to: '/leaderboard', icon: <Trophy size={18} />, label: 'Leaderboard' },
     { to: '/profile', icon: <User size={18} />, label: 'My Profile' },
   ],

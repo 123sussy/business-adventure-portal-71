@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Calendar, CheckCircle, Clock, DollarSign, Link, Plus, Star } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +10,7 @@ import TaskCard from '@/components/student/TaskCard';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format } from 'date-fns';
+import { Link as RouterLink } from 'react-router-dom';
 
 // Define the task type to match TaskCard props
 type TaskStatus = 'pending' | 'submitted' | 'completed' | 'overdue' | 'resubmit';
@@ -91,9 +93,11 @@ const StudentDashboard = () => {
               </div>
             </div>
             <div>
-              <Button size="sm" onClick={handleAddSale} className="gap-1">
-                <DollarSign size={16} />
-                Record Sale
+              <Button size="sm" asChild className="gap-1">
+                <RouterLink to="/student/sales">
+                  <DollarSign size={16} />
+                  Record Sale
+                </RouterLink>
               </Button>
             </div>
           </div>
@@ -152,14 +156,20 @@ const StudentDashboard = () => {
 
       {/* Tasks Section */}
       <Card>
-        <CardHeader>
-          <CardTitle>Pending Tasks</CardTitle>
-          <CardDescription>Tasks that need your attention</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Pending Tasks</CardTitle>
+            <CardDescription>Tasks that need your attention</CardDescription>
+          </div>
+          <Button size="sm" variant="outline" asChild>
+            <RouterLink to="/student/tasks">View All Tasks</RouterLink>
+          </Button>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {mockTasks
               .filter(task => ["pending", "overdue", "resubmit"].includes(task.status))
+              .slice(0, 3)
               .map(task => (
                 <TaskCard key={task.id} task={task} />
               ))}
@@ -175,11 +185,13 @@ const StudentDashboard = () => {
 
       {/* Add Sale Button - Fixed at bottom right */}
       <Button 
-        onClick={handleAddSale}
+        asChild
         size="icon" 
         className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg"
       >
-        <Plus size={24} />
+        <RouterLink to="/student/sales">
+          <Plus size={24} />
+        </RouterLink>
       </Button>
     </div>
   );

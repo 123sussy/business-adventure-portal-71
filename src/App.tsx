@@ -12,6 +12,13 @@ import Rewards from "./pages/Rewards";
 import NotFound from "./pages/NotFound";
 import MainLayout from "./components/Layout/MainLayout";
 
+// Student Pages
+import StudentDashboard from "./pages/student/Dashboard";
+import StudentTasks from "./pages/student/Tasks";
+import StudentSessions from "./pages/student/Sessions";
+import StudentSales from "./pages/student/Sales";
+import StudentLeaderboard from "./pages/student/Leaderboard";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -29,6 +36,13 @@ const App = () => (
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/rewards" element={<Rewards />} />
+            
+            {/* Student Routes */}
+            <Route path="/student/dashboard" element={<StudentDashboard />} />
+            <Route path="/student/tasks" element={<StudentTasks />} />
+            <Route path="/student/sessions" element={<StudentSessions />} />
+            <Route path="/student/sales" element={<StudentSales />} />
+            <Route path="/student/leaderboard" element={<StudentLeaderboard />} />
           </Route>
           
           {/* Catch-all route */}

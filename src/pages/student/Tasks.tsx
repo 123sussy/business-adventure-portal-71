@@ -25,9 +25,9 @@ const mockTasks: Task[] = [
   { id: 3, title: "Marketing Strategy", description: "Document your marketing approach", status: "completed", deadline: "2023-06-25", feedback: "Great job thinking through customer acquisition!", rating: 4.5 },
   { id: 4, title: "Expense Report", description: "Submit your business expenses", status: "overdue", deadline: "2023-06-15" },
   { id: 5, title: "Prototype Design", description: "Submit images of your product prototype", status: "resubmit", deadline: "2023-06-20", feedback: "Please provide clearer images and include dimensions" },
-  { id: 6, title: "Customer Interview", description: "Interview 5 potential customers and document feedback", status: "pending", deadline: "2023-07-15" },
-  { id: 7, title: "Financial Plan", description: "Create a 3-month financial plan", status: "completed", deadline: "2023-06-10", feedback: "Well thought out projections and good attention to detail", rating: 5 },
-  { id: 8, title: "Logo Design", description: "Design a logo for your business", status: "completed", deadline: "2023-05-20", feedback: "Creative design that represents your brand well", rating: 4 },
+  { id: 6, title: "Customer Testimonials", description: "Collect and submit at least 3 customer testimonials", status: "pending", deadline: "2023-07-15" },
+  { id: 7, title: "Social Media Plan", description: "Create a 30-day social media content plan", status: "pending", deadline: "2023-07-20" },
+  { id: 8, title: "Financial Analysis", description: "Complete the profit and loss analysis worksheet", status: "completed", deadline: "2023-06-10", feedback: "Excellent analysis of your cost structure!", rating: 5 }
 ];
 
 const StudentTasks = () => {
@@ -36,51 +36,102 @@ const StudentTasks = () => {
   const filteredTasks = () => {
     switch (activeTab) {
       case "pending":
-        return mockTasks.filter(task => task.status === "pending");
+        return mockTasks.filter(task => ["pending", "overdue"].includes(task.status));
       case "submitted":
         return mockTasks.filter(task => task.status === "submitted");
       case "completed":
         return mockTasks.filter(task => task.status === "completed");
-      case "overdue":
-        return mockTasks.filter(task => task.status === "overdue");
+      case "resubmit":
+        return mockTasks.filter(task => task.status === "resubmit");
       default:
         return mockTasks;
     }
   };
+  
+  // Calculate statistics
+  const completedCount = mockTasks.filter(task => task.status === "completed").length;
+  const pendingCount = mockTasks.filter(task => task.status === "pending").length;
+  const overdueCount = mockTasks.filter(task => task.status === "overdue").length;
+  const submittedCount = mockTasks.filter(task => task.status === "submitted").length;
+  const resubmitCount = mockTasks.filter(task => task.status === "resubmit").length;
+  const totalCount = mockTasks.length;
+  const completionRate = Math.round((completedCount / totalCount) * 100);
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">My Tasks</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">My Tasks</h1>
+        <div className="text-sm text-muted-foreground">
+          Task Completion: <span className="font-medium text-primary">{completionRate}%</span>
+        </div>
+      </div>
       
+      {/* Task Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        <Card className="bg-muted/30">
+          <CardContent className="p-4 text-center">
+            <p className="text-sm text-muted-foreground">Total</p>
+            <p className="text-2xl font-bold">{totalCount}</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-muted/30">
+          <CardContent className="p-4 text-center">
+            <p className="text-sm text-muted-foreground">Pending</p>
+            <p className="text-2xl font-bold">{pendingCount}</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-muted/30">
+          <CardContent className="p-4 text-center">
+            <p className="text-sm text-muted-foreground">Submitted</p>
+            <p className="text-2xl font-bold">{submittedCount}</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-muted/30">
+          <CardContent className="p-4 text-center">
+            <p className="text-sm text-muted-foreground">Completed</p>
+            <p className="text-2xl font-bold">{completedCount}</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-muted/30">
+          <CardContent className="p-4 text-center">
+            <p className="text-sm text-muted-foreground">Overdue</p>
+            <p className="text-2xl font-bold text-destructive">{overdueCount}</p>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Tasks List */}
       <Card>
         <CardHeader>
           <CardTitle>Tasks</CardTitle>
           <CardDescription>
-            Track all your assigned tasks and their status
+            View and manage your assigned tasks
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-5 mb-4">
+          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid grid-cols-2 sm:grid-cols-5 mb-4">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="pending">Pending</TabsTrigger>
               <TabsTrigger value="submitted">Submitted</TabsTrigger>
               <TabsTrigger value="completed">Completed</TabsTrigger>
-              <TabsTrigger value="overdue">Overdue</TabsTrigger>
+              <TabsTrigger value="resubmit">Resubmit</TabsTrigger>
             </TabsList>
             
-            <TabsContent value={activeTab} className="mt-0">
-              <div className="space-y-4">
-                {filteredTasks().length > 0 ? (
-                  filteredTasks().map(task => (
-                    <TaskCard key={task.id} task={task} />
-                  ))
-                ) : (
-                  <div className="text-center py-10 text-muted-foreground">
-                    <p>No tasks found in this category</p>
-                  </div>
-                )}
-              </div>
+            <TabsContent value={activeTab} className="space-y-4">
+              {filteredTasks().map(task => (
+                <TaskCard key={task.id} task={task} />
+              ))}
+              
+              {filteredTasks().length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No tasks found in this category.</p>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>
