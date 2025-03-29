@@ -232,7 +232,8 @@ const AdminTeachers = () => {
                     </TableCell>
                     <TableCell>
                       <Badge 
-                        variant={teacher.status === 'active' ? 'success' : 'secondary'}
+                        variant={teacher.status === 'active' ? 'default' : 'secondary'}
+                        className={teacher.status === 'active' ? 'bg-green-500 hover:bg-green-600' : ''}
                       >
                         {teacher.status}
                       </Badge>
@@ -254,7 +255,7 @@ const AdminTeachers = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        <DollarSign className="h-4 w-4 mr-1 text-success" />
+                        <DollarSign className="h-4 w-4 mr-1 text-green-500" />
                         ${teacher.totalEarnings}
                       </div>
                     </TableCell>

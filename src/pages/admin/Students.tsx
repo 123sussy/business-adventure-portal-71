@@ -277,11 +277,12 @@ const AdminStudents = () => {
                       <Badge 
                         variant={
                           student.status === 'active' 
-                            ? 'success' 
+                            ? 'default' 
                             : student.status === 'pending' 
                               ? 'outline' 
                               : 'secondary'
                         }
+                        className={student.status === 'active' ? 'bg-green-500 hover:bg-green-600' : ''}
                       >
                         {student.status}
                       </Badge>
@@ -292,7 +293,7 @@ const AdminStudents = () => {
                           <div className="h-2 w-full bg-muted rounded-full">
                             <div 
                               className={`h-full rounded-full ${
-                                student.attendance >= 90 ? 'bg-success' : 
+                                student.attendance >= 90 ? 'bg-green-500' : 
                                 student.attendance >= 75 ? 'bg-amber-500' : 
                                 'bg-destructive'
                               }`}
@@ -309,7 +310,7 @@ const AdminStudents = () => {
                           <div className="h-2 w-full bg-muted rounded-full">
                             <div 
                               className={`h-full rounded-full ${
-                                student.taskCompletion >= 90 ? 'bg-success' : 
+                                student.taskCompletion >= 90 ? 'bg-green-500' : 
                                 student.taskCompletion >= 75 ? 'bg-amber-500' : 
                                 'bg-destructive'
                               }`}
@@ -322,7 +323,7 @@ const AdminStudents = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        <DollarSign className="h-4 w-4 mr-1 text-success" />
+                        <DollarSign className="h-4 w-4 mr-1 text-green-500" />
                         ${student.earnings}
                       </div>
                     </TableCell>
@@ -347,7 +348,7 @@ const AdminStudents = () => {
                               Edit Student
                             </DropdownMenuItem>
                             {student.status === 'pending' && (
-                              <DropdownMenuItem className="flex items-center text-success">
+                              <DropdownMenuItem className="flex items-center text-green-500">
                                 <UserCheck className="h-4 w-4 mr-2" />
                                 Approve Student
                               </DropdownMenuItem>
