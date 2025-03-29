@@ -27,6 +27,16 @@ import MentorEarnings from "./pages/mentor/Earnings";
 import MentorLeaderboard from "./pages/mentor/Leaderboard";
 import MentorStudentDetails from "./pages/mentor/StudentDetails";
 
+// Admin Pages
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminBatches from "./pages/admin/Batches";
+import AdminBatchDetails from "./pages/admin/BatchDetails";
+import AdminEarnings from "./pages/admin/Earnings";
+import AdminStudents from "./pages/admin/Students";
+import AdminStudentDetails from "./pages/admin/StudentDetails";
+import AdminTeachers from "./pages/admin/Teachers";
+import AdminTeacherDetails from "./pages/admin/TeacherDetails";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -59,6 +69,16 @@ const App = () => (
             <Route path="/mentor/students/:studentId" element={<MentorStudentDetails />} />
             <Route path="/mentor/earnings" element={<MentorEarnings />} />
             <Route path="/mentor/leaderboard" element={<MentorLeaderboard />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/batches" element={<AdminBatches />} />
+            <Route path="/admin/batches/:batchId" element={<AdminBatchDetails />} />
+            <Route path="/admin/students" element={<AdminStudents />} />
+            <Route path="/admin/students/:studentId" element={<AdminStudentDetails />} />
+            <Route path="/admin/teachers" element={<AdminTeachers />} />
+            <Route path="/admin/teachers/:teacherId" element={<AdminTeacherDetails />} />
+            <Route path="/admin/earnings" element={<AdminEarnings />} />
           </Route>
           
           {/* Catch-all route */}

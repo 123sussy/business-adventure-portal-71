@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -19,7 +18,10 @@ import {
   Video,
   PieChart,
   School,
-  Briefcase
+  Briefcase,
+  Layers,
+  UserCog,
+  GraduationCap
 } from 'lucide-react';
 
 const roleBasedNavItems = {
@@ -39,11 +41,12 @@ const roleBasedNavItems = {
     { to: '/profile', icon: <User size={18} />, label: 'My Profile' },
   ],
   admin: [
-    { to: '/dashboard', icon: <Home size={18} />, label: 'Dashboard' },
-    { to: '/users', icon: <Users size={18} />, label: 'Users' },
-    { to: '/leaderboard', icon: <Trophy size={18} />, label: 'Leaderboard' },
-    { to: '/analytics', icon: <BarChart3 size={18} />, label: 'Analytics' },
-    { to: '/settings', icon: <Settings size={18} />, label: 'Settings' },
+    { to: '/admin/dashboard', icon: <Home size={18} />, label: 'Dashboard' },
+    { to: '/admin/batches', icon: <Briefcase size={18} />, label: 'Batches' },
+    { to: '/admin/students', icon: <GraduationCap size={18} />, label: 'Students' },
+    { to: '/admin/teachers', icon: <School size={18} />, label: 'Teachers' },
+    { to: '/admin/earnings', icon: <DollarSign size={18} />, label: 'Earnings' },
+    { to: '/admin/settings', icon: <Settings size={18} />, label: 'Settings' },
   ],
 };
 
