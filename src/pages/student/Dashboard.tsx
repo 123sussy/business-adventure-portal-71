@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Calendar, CheckCircle, Clock, DollarSign, Link, Plus, Star } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,17 +28,17 @@ interface Task {
 // Mock data for dashboard
 const mockEarnings = 425.50;
 const mockTasks: Task[] = [
-  { id: 1, title: "Business Idea Submission", description: "Submit your initial business concept", status: "pending", deadline: "2023-07-10" },
-  { id: 2, title: "Sales Projection", description: "Create your sales forecast for the month", status: "submitted", deadline: "2023-07-05", submittedAt: "2023-07-04" },
-  { id: 3, title: "Marketing Strategy", description: "Document your marketing approach", status: "completed", deadline: "2023-06-25", feedback: "Great job thinking through customer acquisition!", rating: 4.5 },
-  { id: 4, title: "Expense Report", description: "Submit your business expenses", status: "overdue", deadline: "2023-06-15" },
-  { id: 5, title: "Prototype Design", description: "Submit images of your product prototype", status: "resubmit", deadline: "2023-06-20", feedback: "Please provide clearer images and include dimensions" }
+  { id: 1, title: "Business Idea Submission", description: "Submit your initial business concept", status: "pending", deadline: "2025-07-10" },
+  { id: 2, title: "Sales Projection", description: "Create your sales forecast for the month", status: "submitted", deadline: "2025-07-05", submittedAt: "2025-07-04" },
+  { id: 3, title: "Marketing Strategy", description: "Document your marketing approach", status: "completed", deadline: "2025-06-25", feedback: "Great job thinking through customer acquisition!", rating: 4.5 },
+  { id: 4, title: "Expense Report", description: "Submit your business expenses", status: "overdue", deadline: "2025-06-15" },
+  { id: 5, title: "Prototype Design", description: "Submit images of your product prototype", status: "resubmit", deadline: "2025-06-20", feedback: "Please provide clearer images and include dimensions" }
 ];
 
 const mockNextSession = {
   id: 1,
   title: "Product Innovation Workshop",
-  date: new Date(2023, 6, 15, 15, 0), // July 15, 2023, 3:00 PM
+  date: new Date(2025, 6, 15, 15, 0), // July 15, 2025, 3:00 PM
   link: "https://zoom.us/j/1234567890"
 };
 
@@ -74,7 +73,7 @@ const StudentDashboard = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Student Dashboard</h1>
-        <Badge variant="outline" className="font-normal">Summer 2023</Badge>
+        <Badge variant="outline" className="font-normal">Summer 2025</Badge>
       </div>
 
       {/* Main Stats Card */}

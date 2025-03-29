@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Leaderboard from "./pages/Leaderboard";
@@ -11,6 +11,8 @@ import Profile from "./pages/Profile";
 import Rewards from "./pages/Rewards";
 import NotFound from "./pages/NotFound";
 import MainLayout from "./components/Layout/MainLayout";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 // Student Pages
 import StudentDashboard from "./pages/student/Dashboard";
@@ -47,10 +49,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Login />} /> {/* Redirects to the register tab on the login page */}
           
           {/* Protected routes with MainLayout */}
           <Route element={<MainLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Navigate to="/student/dashboard" replace />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/rewards" element={<Rewards />} />

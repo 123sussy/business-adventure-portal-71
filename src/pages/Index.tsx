@@ -40,7 +40,7 @@ const Index = () => {
       <section className="bg-gradient-to-b from-blue-50 to-white py-16 px-4 sm:py-24">
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-block animate-fade-in">
-            <span className="badge-primary mb-4">Summer 2023</span>
+            <span className="badge-primary mb-4">Summer 2025</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in" style={{animationDelay: '0.1s'}}>
             OLL Summer Business <span className="text-primary">Bootcamp</span>
@@ -50,7 +50,7 @@ const Index = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{animationDelay: '0.3s'}}>
             <Button size="lg" asChild>
-              <Link to="/dashboard">
+              <Link to="/login">
                 Get Started <ArrowRight className="ml-2" size={16} />
               </Link>
             </Button>

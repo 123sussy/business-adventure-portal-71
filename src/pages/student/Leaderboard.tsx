@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,7 +27,7 @@ const mockStudents: Student[] = [
     customers: 7,
     taskCompletion: 95,
     attendance: 100,
-    batchName: "Summer 2023"
+    batchName: "Summer 2025"
   },
   {
     id: 2,
@@ -37,7 +36,7 @@ const mockStudents: Student[] = [
     customers: 15,
     taskCompletion: 90,
     attendance: 95,
-    batchName: "Summer 2023"
+    batchName: "Summer 2025"
   },
   {
     id: 3,
@@ -46,7 +45,7 @@ const mockStudents: Student[] = [
     customers: 5,
     taskCompletion: 85,
     attendance: 90,
-    batchName: "Summer 2023"
+    batchName: "Summer 2025"
   },
   {
     id: 4,
@@ -64,7 +63,7 @@ const mockStudents: Student[] = [
     customers: 12,
     taskCompletion: 92,
     attendance: 85,
-    batchName: "Summer 2023"
+    batchName: "Summer 2025"
   },
   {
     id: 6,
@@ -73,7 +72,7 @@ const mockStudents: Student[] = [
     customers: 6,
     taskCompletion: 80,
     attendance: 100,
-    batchName: "Summer 2023"
+    batchName: "Summer 2025"
   },
   {
     id: 7,
@@ -100,7 +99,7 @@ const mockStudents: Student[] = [
     customers: 3,
     taskCompletion: 75,
     attendance: 80,
-    batchName: "Summer 2023"
+    batchName: "Summer 2025"
   },
   {
     id: 10,
@@ -130,7 +129,7 @@ const StudentLeaderboard = () => {
   const currentStudentId = 1; // Alex Johnson for this example
   
   // Calculate ranks
-  const batchStudents = calculateRank(mockStudents.filter(s => s.batchName === "Summer 2023"));
+  const batchStudents = calculateRank(mockStudents.filter(s => s.batchName === "Summer 2025"));
   const allStudents = calculateRank(mockStudents);
   
   // Find current student ranks
