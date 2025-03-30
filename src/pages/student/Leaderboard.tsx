@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -218,7 +219,13 @@ const StudentLeaderboard = () => {
                 </TableHeader>
                 <TableBody>
                   {displayedStudents.map((student, index) => (
-                    <TableRow key={student.id} className={student.id === currentStudentId ? "bg-muted/50" : ""}>
+                    <TableRow 
+                      key={student.id} 
+                      className={student.id === currentStudentId 
+                        ? "bg-primary/10 border-l-4 border-primary" 
+                        : ""
+                      }
+                    >
                       <TableCell>
                         <div className="flex items-center justify-center font-medium">
                           {index === 0 ? (
@@ -245,7 +252,12 @@ const StudentLeaderboard = () => {
                             <AvatarFallback>{student.name.charAt(0)}{student.name.split(' ')[1]?.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{student.name}</p>
+                            <p className={`font-medium ${student.id === currentStudentId ? "text-primary" : ""}`}>
+                              {student.name}
+                              {student.id === currentStudentId && 
+                                <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">You</span>
+                              }
+                            </p>
                             <p className="text-xs text-muted-foreground">{student.batchName}</p>
                           </div>
                         </div>
