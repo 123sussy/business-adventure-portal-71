@@ -11,16 +11,16 @@ import UserAvatar from '@/components/ui-custom/UserAvatar';
 
 // Mock data
 const studentLeaderboard = [
-  { id: 1, name: 'Alex Johnson', points: 1250, earnings: 345, business: 'Eco Crafts', rank: 1, batch: 'Batch 1' },
-  { id: 2, name: 'Samantha Lee', points: 1100, earnings: 290, business: 'Digital Art Prints', rank: 2, batch: 'Batch 2' },
-  { id: 3, name: 'Miguel Santos', points: 950, earnings: 210, business: 'Handmade Jewelry', rank: 3, batch: 'Batch 1' },
-  { id: 4, name: 'Emma Wilson', points: 900, earnings: 185, business: 'Custom Stickers', rank: 4, batch: 'Batch 2' },
-  { id: 5, name: 'Jayden Brown', points: 850, earnings: 170, business: 'Healthy Snacks', rank: 5, batch: 'Batch 1' },
-  { id: 6, name: 'Sophia Chen', points: 820, earnings: 165, business: 'Mobile Phone Cases', rank: 6, batch: 'Batch 2' },
-  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, business: 'Sustainable Bags', rank: 7, batch: 'Batch 1' },
-  { id: 8, name: 'Olivia Davis', points: 750, earnings: 120, business: 'Personalized Notebooks', rank: 8, batch: 'Batch 2' },
-  { id: 9, name: 'Noah Garcia', points: 700, earnings: 110, business: 'Pet Accessories', rank: 9, batch: 'Batch 1' },
-  { id: 10, name: 'Ava Martinez', points: 650, earnings: 95, business: 'Custom T-shirts', rank: 10, batch: 'Batch 2' },
+  { id: 1, name: 'Alex Johnson', points: 1250, earnings: 345, business: 'Eco Crafts', rank: 1, nationalRank: 3, batch: 'Batch 1' },
+  { id: 2, name: 'Samantha Lee', points: 1100, earnings: 290, business: 'Digital Art Prints', rank: 2, nationalRank: 4, batch: 'Batch 2' },
+  { id: 3, name: 'Miguel Santos', points: 950, earnings: 210, business: 'Handmade Jewelry', rank: 3, nationalRank: 7, batch: 'Batch 1' },
+  { id: 4, name: 'Emma Wilson', points: 900, earnings: 185, business: 'Custom Stickers', rank: 4, nationalRank: 9, batch: 'Batch 2' },
+  { id: 5, name: 'Jayden Brown', points: 850, earnings: 170, business: 'Healthy Snacks', rank: 5, nationalRank: 12, batch: 'Batch 1' },
+  { id: 6, name: 'Sophia Chen', points: 820, earnings: 165, business: 'Mobile Phone Cases', rank: 6, nationalRank: 15, batch: 'Batch 2' },
+  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, business: 'Sustainable Bags', rank: 7, nationalRank: 17, batch: 'Batch 1' },
+  { id: 8, name: 'Olivia Davis', points: 750, earnings: 120, business: 'Personalized Notebooks', rank: 8, nationalRank: 19, batch: 'Batch 2' },
+  { id: 9, name: 'Noah Garcia', points: 700, earnings: 110, business: 'Pet Accessories', rank: 9, nationalRank: 22, batch: 'Batch 1' },
+  { id: 10, name: 'Ava Martinez', points: 650, earnings: 95, business: 'Custom T-shirts', rank: 10, nationalRank: 25, batch: 'Batch 2' },
 ];
 
 const mentorLeaderboard = [
@@ -39,6 +39,9 @@ const MentorLeaderboard = () => {
   const [filterVisible, setFilterVisible] = useState(false);
   const [batchFilter, setBatchFilter] = useState('all');
   const [leaderboardType, setLeaderboardType] = useState('my-students');
+
+  // Current logged in mentor ID
+  const currentMentorId = 3; // Sarah Johnson for this example
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -167,6 +170,7 @@ const MentorLeaderboard = () => {
                   <div className="col-span-4 sm:col-span-3">Student</div>
                   <div className="col-span-4 hidden sm:block">Business</div>
                   <div className="col-span-3 sm:col-span-2 text-right">Points</div>
+                  <div className="col-span-2 hidden sm:block text-right">National Rank</div>
                   <div className="col-span-4 sm:col-span-2 text-right">Earnings</div>
                 </div>
                 
@@ -194,6 +198,9 @@ const MentorLeaderboard = () => {
                     </div>
                     <div className="col-span-4 hidden sm:block truncate">{student.business}</div>
                     <div className="col-span-3 sm:col-span-2 text-right font-semibold">{student.points}</div>
+                    <div className="col-span-2 hidden sm:block text-right">
+                      <Badge variant="outline" className="bg-muted/30">#{student.nationalRank}</Badge>
+                    </div>
                     <div className="col-span-4 sm:col-span-2 text-right text-success font-semibold">${student.earnings}</div>
                   </div>
                 ))}
@@ -230,7 +237,9 @@ const MentorLeaderboard = () => {
                 {filteredMentors.map((mentor) => (
                   <div 
                     key={mentor.id}
-                    className="grid grid-cols-12 py-3 px-4 items-center border-b last:border-0 hover:bg-muted/20 transition-colors"
+                    className={`grid grid-cols-12 py-3 px-4 items-center border-b last:border-0 hover:bg-muted/20 transition-colors
+                      ${mentor.id === currentMentorId ? "bg-primary/10 border-l-4 border-primary" : ""}
+                    `}
                   >
                     <div className="col-span-1 text-center font-semibold">
                       {mentor.rank <= 3 ? (
@@ -247,7 +256,12 @@ const MentorLeaderboard = () => {
                     </div>
                     <div className="col-span-5 sm:col-span-3 flex items-center gap-3">
                       <UserAvatar name={mentor.name} size="sm" />
-                      <span className="font-medium truncate">{mentor.name}</span>
+                      <span className={`font-medium truncate ${mentor.id === currentMentorId ? "text-primary" : ""}`}>
+                        {mentor.name}
+                        {mentor.id === currentMentorId && 
+                          <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">You</span>
+                        }
+                      </span>
                     </div>
                     <div className="col-span-3 hidden sm:block">{mentor.students} students</div>
                     <div className="col-span-3 hidden sm:block">

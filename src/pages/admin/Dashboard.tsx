@@ -1,83 +1,61 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import UserAvatar from '@/components/ui-custom/UserAvatar';
-import { 
-  Calendar, 
-  Clock, 
-  Users, 
-  DollarSign, 
-  Briefcase, 
-  Check, 
-  AlertCircle,
-  School,
-  Video
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { CalendarClock, DollarSign, Users, School, CheckCircle, Calendar } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 
-// Mock data for today's sessions
+// Mock data for the dashboard
+const salesData = [
+  { name: 'Jan', total: 2500 },
+  { name: 'Feb', total: 3500 },
+  { name: 'Mar', total: 4000 },
+  { name: 'Apr', total: 6500 },
+  { name: 'May', total: 5000 },
+  { name: 'Jun', total: 7500 },
+  { name: 'Jul', total: 9000 },
+];
+
+const attendanceData = [
+  { batch: 'Batch 1', attendance: 92 },
+  { batch: 'Batch 2', attendance: 85 },
+  { batch: 'Batch 3', attendance: 78 },
+  { batch: 'Batch 4', attendance: 95 },
+  { batch: 'Batch 5', attendance: 88 },
+];
+
+// Upcoming sessions for today
 const todaySessions = [
   {
     id: 1,
-    batchName: 'Business Bootcamp - Batch 1',
-    time: '10:00 AM - 12:00 PM',
-    teacher: 'Jamie Smith',
+    time: '09:00 AM - 11:00 AM',
+    batch: 'Business Bootcamp - Batch 1',
     topic: 'Financial Planning',
-    status: 'scheduled',
-    totalStudents: 15,
-    attendingStudents: 13
+    teacher: 'Jamie Smith',
+    attendees: 15,
+    status: 'scheduled'
   },
   {
     id: 2,
-    batchName: 'Business Bootcamp - Batch 2',
-    time: '2:00 PM - 4:00 PM',
+    time: '01:00 PM - 03:00 PM',
+    batch: 'Business Bootcamp - Batch 2',
+    topic: 'Market Research Strategies',
     teacher: 'Alex Rodriguez',
-    topic: 'Marketing Strategies',
-    status: 'ongoing',
-    totalStudents: 18,
-    attendingStudents: 16
+    attendees: 18,
+    status: 'scheduled'
   },
   {
     id: 3,
-    batchName: 'Entrepreneurship 101',
-    time: '5:00 PM - 7:00 PM',
+    time: '04:00 PM - 06:00 PM',
+    batch: 'Entrepreneurship 101',
+    topic: 'Introduction to Entrepreneurship',
     teacher: 'Sarah Johnson',
-    topic: 'Business Models',
-    status: 'scheduled',
-    totalStudents: 12,
-    attendingStudents: 0
+    attendees: 12,
+    status: 'rescheduled'
   }
-];
-
-// Mock data for stats
-const statsData = {
-  totalStudents: 156,
-  totalTeachers: 12,
-  totalBatches: 9,
-  activeStudents: 134,
-  totalRevenue: 28450,
-  pendingApprovals: 5
-};
-
-// Weekly schedule data
-const weeklySchedule = [
-  { day: 'Monday', sessions: 3 },
-  { day: 'Tuesday', sessions: 4 },
-  { day: 'Wednesday', sessions: 5 },
-  { day: 'Thursday', sessions: 3 },
-  { day: 'Friday', sessions: 4 },
-  { day: 'Saturday', sessions: 2 },
-  { day: 'Sunday', sessions: 0 }
 ];
 
 const AdminDashboard = () => {
@@ -85,269 +63,198 @@ const AdminDashboard = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <div className="flex gap-2">
-          <Button variant="outline">
-            <Calendar className="h-4 w-4 mr-2" />
-            Schedule View
+        <div className="flex gap-4">
+          <Button variant="outline" className="gap-2">
+            <Calendar className="h-4 w-4" />
+            Today: {new Date().toLocaleDateString()}
           </Button>
-          <Button>
-            <Video className="h-4 w-4 mr-2" />
-            Create Session
-          </Button>
+          <Button>View Reports</Button>
         </div>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Overview Section */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Total Students</CardDescription>
-            <CardTitle className="text-2xl flex items-center">
-              <Users className="mr-2 h-5 w-5 text-primary" />
-              {statsData.totalStudents}
-            </CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
+            <div className="text-2xl font-bold">$45,231.89</div>
             <p className="text-xs text-muted-foreground">
-              {statsData.activeStudents} active students
+              +20.1% from last month
             </p>
           </CardContent>
         </Card>
-        
         <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Total Teachers</CardDescription>
-            <CardTitle className="text-2xl flex items-center">
-              <School className="mr-2 h-5 w-5 text-secondary" />
-              {statsData.totalTeachers}
-            </CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Students</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
+            <div className="text-2xl font-bold">+120</div>
             <p className="text-xs text-muted-foreground">
-              Across {statsData.totalBatches} batches
+              +10 since last week
             </p>
           </CardContent>
         </Card>
-        
         <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Total Revenue</CardDescription>
-            <CardTitle className="text-2xl flex items-center">
-              <DollarSign className="mr-2 h-5 w-5 text-success" />
-              ${statsData.totalRevenue}
-            </CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Batches</CardTitle>
+            <School className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
+            <div className="text-2xl font-bold">6</div>
             <p className="text-xs text-muted-foreground">
-              From student sales
+              1 starting next week
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Task Completion</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">87.5%</div>
+            <p className="text-xs text-muted-foreground">
+              +2.3% from last month
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Today's Schedule */}
+      {/* Today's Sessions Section */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Calendar className="mr-2 h-5 w-5" />
-            Today's Schedule
+          <CardTitle className="flex items-center gap-2">
+            <CalendarClock className="h-5 w-5 text-primary" />
+            Today's Sessions
           </CardTitle>
           <CardDescription>
-            All sessions planned for today
+            All scheduled sessions for today, {new Date().toLocaleDateString()}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {todaySessions.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Batch</TableHead>
-                  <TableHead>Time</TableHead>
-                  <TableHead>Teacher</TableHead>
-                  <TableHead>Topic</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Attendance</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Time</TableHead>
+                <TableHead>Batch</TableHead>
+                <TableHead>Topic</TableHead>
+                <TableHead>Teacher</TableHead>
+                <TableHead>Attendees</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {todaySessions.map((session) => (
+                <TableRow key={session.id}>
+                  <TableCell className="font-medium">{session.time}</TableCell>
+                  <TableCell>{session.batch}</TableCell>
+                  <TableCell>{session.topic}</TableCell>
+                  <TableCell>{session.teacher}</TableCell>
+                  <TableCell>{session.attendees}</TableCell>
+                  <TableCell>
+                    <Badge variant={session.status === 'scheduled' ? 'default' : 'secondary'}>
+                      {session.status}
+                    </Badge>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {todaySessions.map(session => (
-                  <TableRow key={session.id}>
-                    <TableCell className="font-medium">{session.batchName}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                        <span>{session.time}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <UserAvatar name={session.teacher} size="sm" />
-                        <span>{session.teacher}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{session.topic}</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={
-                          session.status === 'ongoing' 
-                            ? 'default' 
-                            : session.status === 'scheduled' 
-                              ? 'outline' 
-                              : 'secondary'
-                        }
-                      >
-                        {session.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {session.status === 'ongoing' || session.status === 'completed' ? (
-                        <span>{session.attendingStudents}/{session.totalStudents}</span>
-                      ) : (
-                        <span>-</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {session.status === 'ongoing' ? (
-                        <Button size="sm">Join</Button>
-                      ) : session.status === 'scheduled' ? (
-                        <Button variant="outline" size="sm">View Details</Button>
-                      ) : (
-                        <Button variant="ghost" size="sm">View Recording</Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No sessions scheduled for today.
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Weekly Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Weekly Schedule */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Weekly Schedule</CardTitle>
-            <CardDescription>
-              Session distribution throughout the week
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {weeklySchedule.map(day => (
-                <div key={day.day} className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">{day.day}</span>
-                    <span className="text-sm text-muted-foreground">{day.sessions} sessions</span>
-                  </div>
-                  <div className="h-2 w-full bg-muted rounded-full">
-                    <div 
-                      className="h-full bg-primary rounded-full" 
-                      style={{ width: `${(day.sessions / 5) * 100}%` }}
-                    />
-                  </div>
-                </div>
               ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              Latest actions across the platform
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                  <Users size={16} />
-                </div>
-                <div>
-                  <p className="font-medium">New Student Registration</p>
-                  <p className="text-xs text-muted-foreground">Emily Parker joined the platform</p>
-                </div>
-                <div className="ml-auto text-xs text-muted-foreground">2h ago</div>
-              </div>
-              
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-success/10 text-success flex items-center justify-center">
-                  <DollarSign size={16} />
-                </div>
-                <div>
-                  <p className="font-medium">New Sale Recorded</p>
-                  <p className="text-xs text-muted-foreground">Alex Johnson made a sale of $45</p>
-                </div>
-                <div className="ml-auto text-xs text-muted-foreground">5h ago</div>
-              </div>
-              
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-secondary/10 text-secondary flex items-center justify-center">
-                  <School size={16} />
-                </div>
-                <div>
-                  <p className="font-medium">New Teacher Added</p>
-                  <p className="text-xs text-muted-foreground">Sarah Thompson joined as a mentor</p>
-                </div>
-                <div className="ml-auto text-xs text-muted-foreground">1d ago</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Pending Actions</CardTitle>
-          <CardDescription>Items that require your attention</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="p-4 border rounded-lg flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 text-amber-500" />
-                <div>
-                  <p className="font-medium">Student Approvals Pending</p>
-                  <p className="text-sm text-muted-foreground">{statsData.pendingApprovals} students waiting for approval</p>
-                </div>
-              </div>
-              <Button>Review</Button>
-            </div>
-            
-            <div className="p-4 border rounded-lg flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 text-amber-500" />
-                <div>
-                  <p className="font-medium">Upcoming Batch Starting</p>
-                  <p className="text-sm text-muted-foreground">Marketing Bootcamp starts in 3 days</p>
-                </div>
-              </div>
-              <Button variant="outline">View Details</Button>
-            </div>
-            
-            <div className="p-4 border rounded-lg flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 text-amber-500" />
-                <div>
-                  <p className="font-medium">Teacher Payment Processing</p>
-                  <p className="text-sm text-muted-foreground">8 teachers due for payment this month</p>
-                </div>
-              </div>
-              <Button variant="outline">Process Payments</Button>
-            </div>
-          </div>
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
+
+      {/* Charts Section */}
+      <Tabs defaultValue="sales">
+        <TabsList>
+          <TabsTrigger value="sales">Revenue</TabsTrigger>
+          <TabsTrigger value="attendance">Attendance</TabsTrigger>
+        </TabsList>
+        <TabsContent value="sales" className="pt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Revenue Overview</CardTitle>
+              <CardDescription>
+                Monthly revenue trend for the current year
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={salesData}
+                  margin={{
+                    top: 10,
+                    right: 20,
+                    left: 20,
+                    bottom: 10,
+                  }}
+                >
+                  <defs>
+                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} />
+                  <YAxis 
+                    tickFormatter={(value) => `$${value}`}
+                    tickLine={false}
+                    axisLine={false}
+                    width={60}
+                  />
+                  <Tooltip formatter={(value) => [`$${value}`, 'Revenue']} />
+                  <Area 
+                    type="monotone" 
+                    dataKey="total" 
+                    stroke="hsl(var(--primary))" 
+                    fillOpacity={1} 
+                    fill="url(#colorTotal)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="attendance" className="pt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Attendance By Batch</CardTitle>
+              <CardDescription>
+                Average attendance percentage across active batches
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={attendanceData}
+                  margin={{
+                    top: 10,
+                    right: 20,
+                    left: 20,
+                    bottom: 10,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                  <XAxis dataKey="batch" tickLine={false} axisLine={false} />
+                  <YAxis 
+                    tickFormatter={(value) => `${value}%`} 
+                    domain={[0, 100]}
+                    tickLine={false}
+                    axisLine={false}
+                    width={60}
+                  />
+                  <Tooltip formatter={(value) => [`${value}%`, 'Attendance']} />
+                  <Bar dataKey="attendance" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

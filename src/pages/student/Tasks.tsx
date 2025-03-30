@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import TaskCard from '@/components/student/TaskCard';
+import TaskCardUpdated from '@/components/student/TaskCardUpdated';
 
-// Define the task type to match TaskCard props
+// Define the task type
 type TaskStatus = 'pending' | 'submitted' | 'completed' | 'overdue' | 'resubmit';
 
 interface Task {
@@ -32,29 +32,30 @@ const mockTasks: Task[] = [
 
 const StudentTasks = () => {
   const [activeTab, setActiveTab] = useState<string>("all");
+  const [tasks, setTasks] = useState<Task[]>(mockTasks);
   
   const filteredTasks = () => {
     switch (activeTab) {
       case "pending":
-        return mockTasks.filter(task => ["pending", "overdue"].includes(task.status));
+        return tasks.filter(task => ["pending", "overdue"].includes(task.status));
       case "submitted":
-        return mockTasks.filter(task => task.status === "submitted");
+        return tasks.filter(task => task.status === "submitted");
       case "completed":
-        return mockTasks.filter(task => task.status === "completed");
+        return tasks.filter(task => task.status === "completed");
       case "resubmit":
-        return mockTasks.filter(task => task.status === "resubmit");
+        return tasks.filter(task => task.status === "resubmit");
       default:
-        return mockTasks;
+        return tasks;
     }
   };
   
   // Calculate statistics
-  const completedCount = mockTasks.filter(task => task.status === "completed").length;
-  const pendingCount = mockTasks.filter(task => task.status === "pending").length;
-  const overdueCount = mockTasks.filter(task => task.status === "overdue").length;
-  const submittedCount = mockTasks.filter(task => task.status === "submitted").length;
-  const resubmitCount = mockTasks.filter(task => task.status === "resubmit").length;
-  const totalCount = mockTasks.length;
+  const completedCount = tasks.filter(task => task.status === "completed").length;
+  const pendingCount = tasks.filter(task => task.status === "pending").length;
+  const overdueCount = tasks.filter(task => task.status === "overdue").length;
+  const submittedCount = tasks.filter(task => task.status === "submitted").length;
+  const resubmitCount = tasks.filter(task => task.status === "resubmit").length;
+  const totalCount = tasks.length;
   const completionRate = Math.round((completedCount / totalCount) * 100);
 
   return (
@@ -124,7 +125,7 @@ const StudentTasks = () => {
             
             <TabsContent value={activeTab} className="space-y-4">
               {filteredTasks().map(task => (
-                <TaskCard key={task.id} task={task} />
+                <TaskCardUpdated key={task.id} task={task} />
               ))}
               
               {filteredTasks().length === 0 && (
