@@ -2,496 +2,422 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  MessageSquare,
-  Search,
-  Filter,
-  Eye,
-  MessageCircle,
-  Star,
-  CheckCircle,
-  X
-} from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { CheckCircle, XCircle, MessageSquare, Search, Filter, Star, Image as ImageIcon } from 'lucide-react';
 
-// Mock data
+// Mock feedback data
 const feedbackData = [
   {
     id: 1,
-    student: "Alex Johnson",
-    title: "Platform Navigation Issues",
-    category: "platform",
+    studentName: "Alex Johnson",
+    studentId: "ST12345",
+    category: "Teacher",
+    subject: "Teaching Pace Too Fast",
+    message: "I'm finding it difficult to keep up with the pace of the lessons. Could we slow down a bit or have additional resources provided?",
+    date: "2025-04-10T09:30:00",
     status: "pending",
-    date: "2023-06-15",
-    message: "I'm having trouble navigating between the dashboard and the sales page. Sometimes the links don't work and I have to refresh the page.",
-    image: null
+    imageUrl: null,
+    response: null
   },
   {
     id: 2,
-    student: "Taylor Swift",
-    title: "Teacher Communication",
-    category: "teacher",
+    studentName: "Emma Martinez",
+    studentId: "ST12346",
+    category: "Content",
+    subject: "Missing Module Materials",
+    message: "The slides for Module 3 seem to be incomplete. The last few pages mentioned during the lecture are missing.",
+    date: "2025-04-08T14:15:00",
     status: "resolved",
-    date: "2023-06-10",
-    message: "I'd like to suggest having a direct messaging feature to communicate with teachers instead of using the feedback system.",
-    response: "Thank you for your suggestion! We're currently working on implementing a direct messaging feature that will be available in the next update.",
-    image: null
+    imageUrl: "https://example.com/screenshot1.jpg",
+    response: "Thank you for pointing this out. We've updated the materials with the missing slides. You can now access the complete module."
   },
   {
     id: 3,
-    student: "John Smith",
-    title: "Session Content Suggestion",
-    category: "content",
-    status: "pending",
-    date: "2023-06-12",
-    message: "I think it would be helpful to have more practical exercises during the business planning sessions. Currently, it's mostly theoretical.",
-    image: "/placeholder.svg"
+    studentName: "David Wong",
+    studentId: "ST12347",
+    category: "Platform",
+    subject: "Video Playback Issues",
+    message: "I'm experiencing buffering issues when trying to watch the recorded sessions. The video keeps pausing every few seconds.",
+    date: "2025-04-05T11:20:00",
+    status: "in-progress",
+    imageUrl: "https://example.com/screenshot2.jpg",
+    response: null
   },
   {
     id: 4,
-    student: "Sophia Chen",
-    title: "Platform Loading Time",
-    category: "platform",
-    status: "pending",
-    date: "2023-06-18",
-    message: "The platform takes a long time to load, especially the sales report section. This makes it difficult to update my sales information quickly.",
-    image: null
+    studentName: "Sophia Chen",
+    studentId: "ST12348",
+    category: "Teacher",
+    subject: "Need More Practical Examples",
+    message: "The theoretical content is good, but I would benefit from more real-world examples and case studies to understand the application better.",
+    date: "2025-04-03T16:45:00",
+    status: "resolved",
+    imageUrl: null,
+    response: "We appreciate your feedback. We've added more practical examples to the upcoming classes and shared additional case studies in the resources section."
   },
   {
     id: 5,
-    student: "Michael Brown",
-    title: "Teacher Feedback Timing",
-    category: "teacher",
-    status: "resolved",
-    date: "2023-06-05",
-    message: "It would be nice if we could get feedback on our tasks more quickly. Sometimes it takes more than a week to receive feedback.",
-    response: "We've addressed this with our teaching team and have implemented a new policy that ensures feedback will be provided within 48 hours of submission.",
-    image: null
-  }
-];
-
-const reviewData = [
-  {
-    id: 1,
-    student: "Emma Wilson",
-    batchName: "Business Bootcamp - Batch 0",
-    rating: 5,
-    date: "2023-05-01",
-    review: "The bootcamp was excellent! I learned so much about business fundamentals and how to apply them in real-world scenarios. The mentor was very knowledgeable and supportive."
-  },
-  {
-    id: 2,
-    student: "Noah Garcia",
-    batchName: "Business Bootcamp - Batch 0",
-    rating: 4,
-    date: "2023-05-02",
-    review: "Great experience overall. The content was well-structured and the sessions were engaging. I would have appreciated more one-on-one mentoring time."
-  },
-  {
-    id: 3,
-    student: "Olivia Davis",
-    batchName: "Business Bootcamp - Batch 0",
-    rating: 3,
-    date: "2023-05-03",
-    review: "The bootcamp was good but there were some technical issues with the platform that made accessing materials difficult at times. Content was valuable though."
+    studentName: "Taylor Swift",
+    studentId: "ST12349",
+    category: "Content",
+    subject: "Suggestion for Additional Resources",
+    message: "Would it be possible to get a list of recommended books or articles for further reading on the topics covered in class?",
+    date: "2025-04-01T10:05:00",
+    status: "pending",
+    imageUrl: null,
+    response: null
   }
 ];
 
 const AdminFeedback = () => {
+  const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFeedback, setSelectedFeedback] = useState<any | null>(null);
-  const [viewDialogOpen, setViewDialogOpen] = useState(false);
-  const [responseDialogOpen, setResponseDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("feedback");
-  const [response, setResponse] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  
-  const handleViewFeedback = (feedback: any) => {
-    setSelectedFeedback(feedback);
-    setViewDialogOpen(true);
-  };
-  
-  const handleOpenResponseDialog = (feedback: any) => {
-    setSelectedFeedback(feedback);
-    setResponse(feedback.response || '');
-    setResponseDialogOpen(true);
-  };
-  
-  const handleSubmitResponse = () => {
-    // Update local state
-    const updatedFeedbackData = feedbackData.map(item => 
-      item.id === selectedFeedback.id 
-        ? { ...item, status: 'resolved', response: response } 
-        : item
+  const [filterVisible, setFilterVisible] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState({
+    category: 'all',
+    status: 'all',
+    date: 'all'
+  });
+  const [selectedFeedback, setSelectedFeedback] = useState<typeof feedbackData[0] | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [feedbacks, setFeedbacks] = useState(feedbackData);
+
+  // Filter feedbacks based on search term and filters
+  const filteredFeedbacks = feedbacks.filter(feedback => {
+    // Search term filter
+    const matchesSearch = 
+      feedback.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      feedback.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      feedback.message.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Tab filter
+    const matchesTab = 
+      activeTab === 'all' || 
+      (activeTab === 'pending' && feedback.status === 'pending') ||
+      (activeTab === 'in-progress' && feedback.status === 'in-progress') ||
+      (activeTab === 'resolved' && feedback.status === 'resolved');
+    
+    // Additional filters
+    const matchesCategory = selectedFilter.category === 'all' || feedback.category === selectedFilter.category;
+    const matchesStatus = selectedFilter.status === 'all' || feedback.status === selectedFilter.status;
+    
+    // Date filter would be implemented here with actual date logic
+    const matchesDate = true; // Placeholder
+    
+    return matchesSearch && matchesTab && matchesCategory && matchesStatus && matchesDate;
+  });
+
+  const handleSendReply = () => {
+    if (!selectedFeedback || !replyText.trim()) return;
+    
+    // Update the feedback with the response
+    const updatedFeedbacks = feedbacks.map(feedback => 
+      feedback.id === selectedFeedback.id 
+        ? { 
+            ...feedback, 
+            status: 'resolved', 
+            response: replyText 
+          } 
+        : feedback
     );
     
-    // In a real app, you would make an API call here
-    console.log("Submitting response:", {
-      feedbackId: selectedFeedback.id,
-      response,
-    });
-    
-    toast({
-      title: "Response submitted",
-      description: "Your response has been sent to the student.",
-    });
-    
-    setResponseDialogOpen(false);
+    setFeedbacks(updatedFeedbacks);
+    setSelectedFeedback(prev => prev ? {...prev, status: 'resolved', response: replyText} : null);
+    setReplyText('');
   };
-  
-  const filteredFeedback = feedbackData.filter(item => 
-    (item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     item.student.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     item.message.toLowerCase().includes(searchTerm.toLowerCase())) &&
-    (statusFilter === 'all' || item.status === statusFilter) &&
-    (categoryFilter === 'all' || item.category === categoryFilter)
-  );
-  
-  const filteredReviews = reviewData.filter(item =>
-    item.student.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.review.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+
+  const renderStatusBadge = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending</Badge>;
+      case 'in-progress':
+        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">In Progress</Badge>;
+      case 'resolved':
+        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Resolved</Badge>;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Feedback & Reviews</h1>
-      </div>
-      
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search feedback..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-2xl font-bold">Student Feedback</h1>
         
-        {activeTab === 'feedback' && (
-          <>
-            <select 
-              className="px-3 py-2 rounded-md border" 
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-            >
-              <option value="all">All Categories</option>
-              <option value="platform">Platform</option>
-              <option value="teacher">Teacher</option>
-              <option value="content">Content</option>
-            </select>
-            
-            <select 
-              className="px-3 py-2 rounded-md border" 
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="all">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="resolved">Resolved</option>
-            </select>
-          </>
-        )}
-      </div>
-      
-      <Tabs defaultValue="feedback" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full max-w-md grid-cols-2 mx-auto">
-          <TabsTrigger value="feedback">Feedback</TabsTrigger>
-          <TabsTrigger value="reviews">Batch Reviews</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="feedback" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Student Feedback</CardTitle>
-              <CardDescription>
-                Manage and respond to student feedback
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[200px]">Student</TableHead>
-                    <TableHead>Feedback</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredFeedback.length > 0 ? (
-                    filteredFeedback.map((feedback) => (
-                      <TableRow key={feedback.id}>
-                        <TableCell className="font-medium">
-                          {feedback.student}
-                        </TableCell>
-                        <TableCell>
-                          <div className="max-w-xs truncate">
-                            <span className="font-medium">{feedback.title}</span>
-                            <div className="text-xs text-muted-foreground truncate">
-                              {feedback.message.substring(0, 50)}...
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant="outline" 
-                            className={
-                              feedback.category === 'platform' 
-                                ? 'bg-blue-100 text-blue-800' 
-                                : feedback.category === 'teacher'
-                                  ? 'bg-purple-100 text-purple-800'
-                                  : 'bg-green-100 text-green-800'
-                            }
-                          >
-                            {feedback.category}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={feedback.status === 'resolved' ? 'outline' : 'default'}
-                          >
-                            {feedback.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {new Date(feedback.date).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleViewFeedback(feedback)}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant={feedback.status === 'resolved' ? 'outline' : 'default'}
-                              size="sm"
-                              onClick={() => handleOpenResponseDialog(feedback)}
-                            >
-                              <MessageCircle className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                        No feedback found matching your criteria.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="reviews" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Batch Reviews</CardTitle>
-              <CardDescription>
-                Reviews submitted by students after batch completion
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[200px]">Student</TableHead>
-                    <TableHead>Batch</TableHead>
-                    <TableHead>Rating</TableHead>
-                    <TableHead>Review</TableHead>
-                    <TableHead>Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredReviews.length > 0 ? (
-                    filteredReviews.map((review) => (
-                      <TableRow key={review.id}>
-                        <TableCell className="font-medium">
-                          {review.student}
-                        </TableCell>
-                        <TableCell>
-                          {review.batchName}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center">
-                            <div className="flex">
-                              {Array(5).fill(0).map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-4 w-4 ${i < review.rating ? 'text-yellow-500 fill-current' : 'text-gray-300'}`}
-                                />
-                              ))}
-                            </div>
-                            <span className="ml-2 text-sm font-medium">{review.rating}/5</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="max-w-md truncate">
-                            {review.review.substring(0, 100)}...
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {new Date(review.date).toLocaleDateString()}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                        No reviews found matching your search.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-      
-      {/* View Feedback Dialog */}
-      <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{selectedFeedback?.title}</DialogTitle>
-            <DialogDescription>
-              From {selectedFeedback?.student} on {selectedFeedback?.date && new Date(selectedFeedback.date).toLocaleDateString()}
-            </DialogDescription>
-          </DialogHeader>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search feedback..."
+              className="pl-8"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
           
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-2">
-                  <Badge 
-                    variant="outline" 
-                    className={
-                      selectedFeedback?.category === 'platform' 
-                        ? 'bg-blue-100 text-blue-800' 
-                        : selectedFeedback?.category === 'teacher'
-                          ? 'bg-purple-100 text-purple-800'
-                          : 'bg-green-100 text-green-800'
-                    }
-                  >
-                    {selectedFeedback?.category}
-                  </Badge>
-                  
-                  <Badge 
-                    variant={selectedFeedback?.status === 'resolved' ? 'outline' : 'default'}
-                  >
-                    {selectedFeedback?.status}
-                  </Badge>
-                </div>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => setFilterVisible(!filterVisible)}
+            className={filterVisible ? "bg-muted" : ""}
+          >
+            <Filter size={18} />
+          </Button>
+        </div>
+      </div>
+
+      {filterVisible && (
+        <Card className="animate-fade-in">
+          <CardContent className="p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="category-filter">Category</Label>
+                <Select 
+                  value={selectedFilter.category} 
+                  onValueChange={(value) => setSelectedFilter({...selectedFilter, category: value})}
+                >
+                  <SelectTrigger id="category-filter">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="Teacher">Teacher</SelectItem>
+                    <SelectItem value="Content">Content</SelectItem>
+                    <SelectItem value="Platform">Platform</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               
-              <p className="text-sm">{selectedFeedback?.message}</p>
+              <div>
+                <Label htmlFor="status-filter">Status</Label>
+                <Select 
+                  value={selectedFilter.status} 
+                  onValueChange={(value) => setSelectedFilter({...selectedFilter, status: value})}
+                >
+                  <SelectTrigger id="status-filter">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="in-progress">In Progress</SelectItem>
+                    <SelectItem value="resolved">Resolved</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="date-filter">Date Range</Label>
+                <Select 
+                  value={selectedFilter.date} 
+                  onValueChange={(value) => setSelectedFilter({...selectedFilter, date: value})}
+                >
+                  <SelectTrigger id="date-filter">
+                    <SelectValue placeholder="Select date range" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Time</SelectItem>
+                    <SelectItem value="today">Today</SelectItem>
+                    <SelectItem value="this-week">This Week</SelectItem>
+                    <SelectItem value="this-month">This Month</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
-            {selectedFeedback?.image && (
-              <div className="border rounded-md p-2">
-                <img 
-                  src={selectedFeedback.image} 
-                  alt="Feedback attachment" 
-                  className="max-h-[200px] mx-auto object-contain rounded"
-                />
-              </div>
-            )}
-            
-            {selectedFeedback?.response && (
-              <div className="border rounded-md p-4 bg-muted/20">
-                <h3 className="text-sm font-medium mb-2">Response:</h3>
-                <p className="text-sm">{selectedFeedback.response}</p>
-              </div>
-            )}
-          </div>
-          
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              onClick={() => setViewDialogOpen(false)}
-            >
-              Close
-            </Button>
-            
-            {selectedFeedback?.status !== 'resolved' && (
-              <Button onClick={() => {
-                setViewDialogOpen(false);
-                handleOpenResponseDialog(selectedFeedback);
-              }}>
-                <MessageCircle className="h-4 w-4 mr-2" />
-                Respond
+            <div className="flex justify-end mt-4 gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setSelectedFilter({
+                  category: 'all',
+                  status: 'all',
+                  date: 'all'
+                })}
+              >
+                Reset
               </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Response Dialog */}
-      <Dialog open={responseDialogOpen} onOpenChange={setResponseDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Respond to Feedback</DialogTitle>
-            <DialogDescription>
-              Write a response to {selectedFeedback?.student}'s feedback
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div className="border rounded-md p-4 bg-muted/20">
-              <h3 className="text-sm font-medium mb-2">Original Feedback:</h3>
-              <p className="text-sm">{selectedFeedback?.message}</p>
+              <Button 
+                size="sm"
+                onClick={() => setFilterVisible(false)}
+              >
+                Apply Filters
+              </Button>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-1">
+          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="in-progress">In Progress</TabsTrigger>
+              <TabsTrigger value="resolved">Resolved</TabsTrigger>
+            </TabsList>
             
-            <div className="space-y-2">
-              <Label htmlFor="response">Your Response</Label>
-              <Textarea 
-                id="response" 
-                className="min-h-[150px]" 
-                placeholder="Write your response here..." 
-                value={response}
-                onChange={(e) => setResponse(e.target.value)}
-              />
+            <div className="mt-4 space-y-2">
+              {filteredFeedbacks.length > 0 ? (
+                filteredFeedbacks.map((feedback) => (
+                  <div 
+                    key={feedback.id} 
+                    className={`
+                      p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors
+                      ${selectedFeedback?.id === feedback.id ? 'border-primary bg-primary/5' : ''}
+                    `}
+                    onClick={() => setSelectedFeedback(feedback)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex gap-3 items-center">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={`https://avatar.vercel.sh/${feedback.studentId}`} alt={feedback.studentName} />
+                          <AvatarFallback>{feedback.studentName.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium text-sm">{feedback.studentName}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(feedback.date).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      {renderStatusBadge(feedback.status)}
+                    </div>
+                    
+                    <div className="mt-2">
+                      <p className="text-sm font-medium truncate">{feedback.subject}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{feedback.message}</p>
+                    </div>
+                    
+                    <div className="flex items-center mt-2 text-xs text-muted-foreground">
+                      <Badge variant="outline" className="bg-muted/50 hover:bg-muted/50">
+                        {feedback.category}
+                      </Badge>
+                      {feedback.imageUrl && (
+                        <div className="ml-2 flex items-center">
+                          <ImageIcon size={12} className="mr-1" />
+                          <span>Has attachment</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="py-8 text-center">
+                  <p className="text-muted-foreground">No feedback found matching your criteria.</p>
+                </div>
+              )}
             </div>
-          </div>
-          
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setResponseDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={!response.trim()}
-              onClick={handleSubmitResponse}
-              className="gap-2"
-            >
-              <CheckCircle className="h-4 w-4" />
-              Submit Response
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </Tabs>
+        </div>
+        
+        <div className="md:col-span-2">
+          {selectedFeedback ? (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>{selectedFeedback.subject}</CardTitle>
+                    <CardDescription>
+                      From {selectedFeedback.studentName} ({selectedFeedback.studentId}) • {new Date(selectedFeedback.date).toLocaleString()}
+                    </CardDescription>
+                  </div>
+                  {renderStatusBadge(selectedFeedback.status)}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 border rounded-lg bg-muted/30">
+                  <div className="flex gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={`https://avatar.vercel.sh/${selectedFeedback.studentId}`} alt={selectedFeedback.studentName} />
+                      <AvatarFallback>{selectedFeedback.studentName.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{selectedFeedback.studentName}</p>
+                      <p className="text-sm text-muted-foreground">Category: {selectedFeedback.category}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <p className="whitespace-pre-line">{selectedFeedback.message}</p>
+                  </div>
+                  
+                  {selectedFeedback.imageUrl && (
+                    <div className="mt-4">
+                      <p className="text-sm font-medium mb-2">Attached Image:</p>
+                      <img 
+                        src={selectedFeedback.imageUrl} 
+                        alt="Feedback attachment" 
+                        className="max-w-full max-h-64 rounded-md border"
+                      />
+                    </div>
+                  )}
+                </div>
+                
+                {selectedFeedback.response ? (
+                  <Alert className="bg-green-50 border-green-200">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <AlertDescription className="ml-2">
+                      <p className="font-medium text-green-800">Admin Response:</p>
+                      <p className="text-green-800 mt-1">{selectedFeedback.response}</p>
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <MessageSquare size={16} className="text-muted-foreground" />
+                      <p className="text-sm font-medium">Your Reply</p>
+                    </div>
+                    
+                    <Textarea 
+                      placeholder="Type your response here..."
+                      className="min-h-32"
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                    />
+                    
+                    <div className="flex justify-end mt-4 gap-2">
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          // Mark as in-progress without sending a reply
+                          const updatedFeedbacks = feedbacks.map(feedback => 
+                            feedback.id === selectedFeedback.id 
+                              ? { ...feedback, status: 'in-progress' } 
+                              : feedback
+                          );
+                          setFeedbacks(updatedFeedbacks);
+                          setSelectedFeedback(prev => prev ? {...prev, status: 'in-progress'} : null);
+                        }}
+                      >
+                        Mark as In Progress
+                      </Button>
+                      <Button onClick={handleSendReply}>
+                        Send Reply
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full p-8 border rounded-lg bg-muted/10">
+              <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">No Feedback Selected</h3>
+              <p className="text-center text-muted-foreground">
+                Select a feedback from the list to view details and respond.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

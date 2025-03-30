@@ -9,12 +9,29 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Search, Calendar, Clock, Users, Link as LinkIcon, Video, Edit, Trash2, PlusCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useForm } from 'react-hook-form';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
+
+// Define session type to avoid type errors
+interface Session {
+  id: number;
+  batchName: string;
+  title: string;
+  status: 'upcoming' | 'completed' | 'rescheduled';
+  date: string;
+  time: string;
+  students: number;
+  attendance: number;
+  recordingUrl?: string;
+  sessionUrl?: string;
+  originalDate?: string;
+  reason?: string;
+}
 
 // Mock data for sessions
 const batchStudents = [
@@ -25,7 +42,7 @@ const batchStudents = [
   { id: 5, name: "David Wong", present: false },
 ];
 
-const sessionData = [
+const sessionData: Session[] = [
   { 
     id: 1, 
     batchName: "Business Bootcamp - Batch 1", 
@@ -108,7 +125,7 @@ const MentorSessions = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('upcoming');
-  const [sessions, setSessions] = useState(sessionData);
+  const [sessions, setSessions] = useState<Session[]>(sessionData);
   const [showSessionDialog, setShowSessionDialog] = useState(false);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit' | 'attendance'>('add');
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
@@ -160,12 +177,12 @@ const MentorSessions = () => {
   const handleAddSession = (data: SessionFormData) => {
     if (dialogMode === 'add') {
       // Add new session
-      const newSession = {
+      const newSession: Session = {
         id: Math.max(...sessions.map(s => s.id)) + 1,
         batchName: data.batchId === "1" ? "Business Bootcamp - Batch 1" : 
                   data.batchId === "2" ? "Business Bootcamp - Batch 2" : "Entrepreneurship 101",
         title: data.title,
-        status: "upcoming" as const,
+        status: "upcoming",
         date: data.date,
         time: data.time,
         students: data.batchId === "1" ? 15 : data.batchId === "2" ? 18 : 12,
@@ -178,7 +195,7 @@ const MentorSessions = () => {
         title: "Session added",
         description: `New session "${data.title}" has been added.`,
       });
-    } else {
+    } else if (dialogMode === 'edit') {
       // Edit existing session
       setSessions(prev => 
         prev.map(session => 
@@ -529,7 +546,7 @@ const MentorSessions = () => {
                   />
                 </div>
                 
-                {dialogMode === 'upcoming' || dialogMode === 'add' ? (
+                {dialogMode === 'add' ? (
                   <FormField
                     control={form.control}
                     name="sessionUrl"
