@@ -29,6 +29,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { 
   Select,
@@ -57,6 +58,7 @@ import {
 } from 'lucide-react';
 import UserAvatar from '@/components/ui-custom/UserAvatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { toast } from "@/hooks/use-toast";
 
 // Mock students data
 const studentsData = [
@@ -140,8 +142,23 @@ const AdminStudents = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [batchFilter, setBatchFilter] = useState('all');
   const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
+  const [showEditStudentDialog, setShowEditStudentDialog] = useState(false);
+  const [showBulkUploadDialog, setShowBulkUploadDialog] = useState(false);
+  const [currentStudent, setCurrentStudent] = useState<any>(null);
   
   const form = useForm({
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      batch: '',
+      age: '',
+      school: '',
+      password: ''
+    }
+  });
+
+  const editForm = useForm({
     defaultValues: {
       name: '',
       email: '',
@@ -154,8 +171,46 @@ const AdminStudents = () => {
   
   const handleAddStudent = (data: any) => {
     console.log("New student data:", data);
+    toast({
+      title: "Student added",
+      description: "New student has been successfully added"
+    });
     setShowAddStudentDialog(false);
     form.reset();
+  };
+
+  const handleEditStudent = (studentId: number) => {
+    const student = studentsData.find(s => s.id === studentId);
+    if (student) {
+      setCurrentStudent(student);
+      editForm.reset({
+        name: student.name,
+        email: student.email,
+        phone: student.phone,
+        batch: student.batch,
+        age: student.age.toString(),
+        school: student.school
+      });
+      setShowEditStudentDialog(true);
+    }
+  };
+
+  const handleUpdateStudent = (data: any) => {
+    console.log("Updated student data:", data);
+    toast({
+      title: "Student updated",
+      description: "Student has been successfully updated"
+    });
+    setShowEditStudentDialog(false);
+    editForm.reset();
+  };
+
+  const handleBulkUpload = () => {
+    toast({
+      title: "Students uploaded",
+      description: "Students have been successfully uploaded"
+    });
+    setShowBulkUploadDialog(false);
   };
 
   const filteredStudents = studentsData
@@ -228,10 +283,22 @@ const AdminStudents = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           
-          <Button onClick={() => setShowAddStudentDialog(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Student
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Students
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setShowAddStudentDialog(true)}>
+                Add Single Student
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setShowBulkUploadDialog(true)}>
+                Bulk Upload Students
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -343,7 +410,10 @@ const AdminStudents = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem className="flex items-center">
+                            <DropdownMenuItem 
+                              className="flex items-center"
+                              onClick={() => handleEditStudent(student.id)}
+                            >
                               <Edit className="h-4 w-4 mr-2" />
                               Edit Student
                             </DropdownMenuItem>
@@ -430,8 +500,22 @@ const AdminStudents = () => {
                   )}
                 />
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Enter password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
                 <FormField
                   control={form.control}
                   name="age"
@@ -445,21 +529,21 @@ const AdminStudents = () => {
                     </FormItem>
                   )}
                 />
-                
-                <FormField
-                  control={form.control}
-                  name="school"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>School Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter school name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
+              
+              <FormField
+                control={form.control}
+                name="school"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>School Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter school name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
               <FormField
                 control={form.control}
@@ -494,6 +578,197 @@ const AdminStudents = () => {
               </DialogFooter>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Student Dialog */}
+      <Dialog open={showEditStudentDialog} onOpenChange={setShowEditStudentDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Student</DialogTitle>
+            <DialogDescription>
+              Update student information below.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...editForm}>
+            <form onSubmit={editForm.handleSubmit(handleUpdateStudent)} className="space-y-4">
+              <FormField
+                control={editForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter student's full name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={editForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="Enter email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={editForm.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter phone number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={editForm.control}
+                  name="age"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Age</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="Enter age" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={editForm.control}
+                  name="school"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>School Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter school name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <FormField
+                control={editForm.control}
+                name="batch"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Assigned Batch</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a batch" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {batchesData.map(batch => (
+                          <SelectItem key={batch.id} value={batch.name}>
+                            {batch.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <Button variant="outline" type="button" onClick={() => setShowEditStudentDialog(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">Update Student</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Upload Dialog */}
+      <Dialog open={showBulkUploadDialog} onOpenChange={setShowBulkUploadDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Bulk Upload Students</DialogTitle>
+            <DialogDescription>
+              Upload multiple students at once using a CSV or Excel file.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="border-2 border-dashed rounded-lg p-6 text-center">
+              <label className="cursor-pointer">
+                <Input type="file" className="hidden" accept=".csv,.xlsx" />
+                <div className="space-y-2">
+                  <Plus className="h-10 w-10 mx-auto text-muted-foreground" />
+                  <p className="text-sm font-medium">Upload CSV or Excel file</p>
+                  <p className="text-xs text-muted-foreground">
+                    Drag and drop or click to browse
+                  </p>
+                </div>
+              </label>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-medium mb-2">Required Format</h3>
+              <div className="bg-muted p-3 rounded text-xs">
+                <p className="mb-1">Your file should include the following columns:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Name (required)</li>
+                  <li>Email (required)</li>
+                  <li>Phone (required)</li>
+                  <li>Age</li>
+                  <li>School</li>
+                  <li>Password (required)</li>
+                  <li>Batch ID or Name</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div>
+              <Button 
+                className="w-full"
+                onClick={handleBulkUpload}
+              >
+                Upload Students
+              </Button>
+            </div>
+            
+            <div>
+              <a 
+                href="#" 
+                className="text-sm text-primary hover:underline block text-center"
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Would download a template in a real app
+                  toast({
+                    title: "Template downloaded",
+                    description: "Student upload template has been downloaded"
+                  });
+                }}
+              >
+                Download template file
+              </a>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

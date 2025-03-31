@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -19,7 +20,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -114,16 +114,6 @@ const teachersData = [
   }
 ];
 
-const specializationOptions = [
-  'Business Strategy',
-  'Marketing',
-  'Finance',
-  'Entrepreneurship',
-  'Sales',
-  'Product Development',
-  'Digital Marketing'
-];
-
 const AdminTeachers = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
@@ -140,13 +130,12 @@ const AdminTeachers = () => {
   
   const handleAddTeacher = (data: any) => {
     console.log("New teacher data:", data);
-    setShowAddTeacherDialog(false);
-    form.reset();
-    
     toast({
       title: "Teacher added",
-      description: "New teacher has been successfully added",
+      description: "New teacher has been successfully added"
     });
+    setShowAddTeacherDialog(false);
+    form.reset();
   };
 
   const filteredTeachers = teachersData

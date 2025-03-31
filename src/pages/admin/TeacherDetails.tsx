@@ -69,12 +69,16 @@ const AdminTeacherDetails = () => {
   };
 
   const handleSaveChanges = () => {
-    // Here you would save the changes to the backend
-    // For now, we'll just show a toast notification
+    // In a real app, this would update the backend
+    console.log("Updated teacher data:", editedTeacher);
     toast({
       title: "Changes saved",
       description: "Teacher profile has been updated successfully"
     });
+    
+    // Update the local data to simulate a backend update
+    Object.assign(teacherData, editedTeacher);
+    
     setIsEditModalOpen(false);
   };
 
