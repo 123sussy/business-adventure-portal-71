@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -92,6 +91,10 @@ const TaskCardUpdated: React.FC<TaskProps> = ({ task }) => {
     return diffDays;
   };
   
+  const isViewableStatus = (status: TaskStatus): status is 'submitted' | 'completed' | 'resubmit' => {
+    return ['submitted', 'completed', 'resubmit'].includes(status);
+  };
+  
   return (
     <Card className={`
       border-l-4 
@@ -138,15 +141,13 @@ const TaskCardUpdated: React.FC<TaskProps> = ({ task }) => {
       </CardContent>
       
       <CardFooter className="px-5 py-3 bg-muted/20 flex justify-end">
-        {taskStatus === 'pending' && (
+        {taskStatus === 'pending' || taskStatus === 'overdue' ? (
           <TaskSubmission 
             taskId={task.id}
             taskTitle={task.title}
             onSubmissionComplete={handleSubmissionComplete}
           />
-        )}
-        
-        {['submitted', 'completed', 'resubmit'].includes(taskStatus) && (
+        ) : isViewableStatus(taskStatus) ? (
           <TaskView
             taskId={task.id}
             taskTitle={task.title}
@@ -156,7 +157,7 @@ const TaskCardUpdated: React.FC<TaskProps> = ({ task }) => {
             rating={rating}
             onResubmit={handleResubmit}
           />
-        )}
+        ) : null}
       </CardFooter>
     </Card>
   );
