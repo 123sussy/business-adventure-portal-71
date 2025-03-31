@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,13 +29,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { 
   Search, 
@@ -54,8 +46,8 @@ import {
 } from 'lucide-react';
 import UserAvatar from '@/components/ui-custom/UserAvatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { toast } from '@/hooks/use-toast';
 
-// Mock teachers data
 const teachersData = [
   {
     id: 1,
@@ -95,7 +87,7 @@ const teachersData = [
     totalBatches: 1,
     currentBatches: 1,
     totalStudents: 12,
-    totalEarnings: 0, // Upcoming batch
+    totalEarnings: 0,
     rating: 4.7,
     joiningDate: '2023-03-10'
   },
@@ -115,7 +107,6 @@ const teachersData = [
   }
 ];
 
-// Specialization options for the form
 const specializationOptions = [
   'Business Strategy',
   'Marketing',
@@ -136,8 +127,7 @@ const AdminTeachers = () => {
     defaultValues: {
       name: '',
       email: '',
-      phone: '',
-      specialization: ''
+      phone: ''
     }
   });
   
@@ -145,6 +135,11 @@ const AdminTeachers = () => {
     console.log("New teacher data:", data);
     setShowAddTeacherDialog(false);
     form.reset();
+    
+    toast({
+      title: "Teacher added",
+      description: "New teacher has been successfully added",
+    });
   };
 
   const filteredTeachers = teachersData
@@ -311,7 +306,6 @@ const AdminTeachers = () => {
         </CardContent>
       </Card>
 
-      {/* Add Teacher Dialog */}
       <Dialog open={showAddTeacherDialog} onOpenChange={setShowAddTeacherDialog}>
         <DialogContent>
           <DialogHeader>
@@ -366,31 +360,6 @@ const AdminTeachers = () => {
                   )}
                 />
               </div>
-              
-              <FormField
-                control={form.control}
-                name="specialization"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Specialization</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select specialization" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {specializationOptions.map(specialization => (
-                          <SelectItem key={specialization} value={specialization}>
-                            {specialization}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               
               <DialogFooter>
                 <Button variant="outline" type="button" onClick={() => setShowAddTeacherDialog(false)}>
