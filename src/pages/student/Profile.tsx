@@ -24,7 +24,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from '@/hooks/use-toast';
 
 // Mock data
-const profileData = {
+const initialProfileData = {
   name: 'Alex Johnson',
   role: 'Student',
   email: 'alex.johnson@example.com',
@@ -54,6 +54,7 @@ const profileData = {
 };
 
 const Profile = () => {
+  const [profileData, setProfileData] = useState(initialProfileData);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editedProfile, setEditedProfile] = useState({
     name: profileData.name,
@@ -73,8 +74,19 @@ const Profile = () => {
   };
 
   const handleSaveProfile = () => {
-    // In a real app, this would save to backend
+    // Update the profile data
+    setProfileData(prev => ({
+      ...prev,
+      name: editedProfile.name,
+      email: editedProfile.email,
+      phone: editedProfile.phone,
+      location: editedProfile.location,
+      school: editedProfile.school,
+      grade: editedProfile.grade
+    }));
+    
     setIsEditModalOpen(false);
+    
     toast({
       title: "Profile updated",
       description: "Your profile has been successfully updated.",
@@ -280,7 +292,7 @@ const Profile = () => {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="school" className="text-right">
-                School
+                School Name
               </Label>
               <Input
                 id="school"

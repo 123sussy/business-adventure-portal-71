@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar as CalendarIcon, Clock, Video, Users, Pencil, Trash2, Check, Plus } from 'lucide-react';
+import { 
+  Calendar as CalendarIcon, 
+  Clock, 
+  Video, 
+  Users, 
+  Pencil, 
+  Trash2, 
+  Check, 
+  Plus 
+} from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
@@ -98,6 +106,8 @@ const Sessions = () => {
   const [showSessionDialog, setShowSessionDialog] = useState(false);
   const [showAttendanceDialog, setShowAttendanceDialog] = useState(false);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState<number | null>(null);
   const [newSession, setNewSession] = useState({
     title: '',
     batch: '',
@@ -216,10 +226,17 @@ const Sessions = () => {
 
   const handleDeleteSession = (sessionId: number) => {
     setSessions(sessions.filter(session => session.id !== sessionId));
+    setShowDeleteDialog(false);
+    setSessionToDelete(null);
     toast({
       title: "Session deleted",
       description: "The session has been removed"
     });
+  };
+
+  const confirmDeleteSession = (sessionId: number) => {
+    setSessionToDelete(sessionId);
+    setShowDeleteDialog(true);
   };
 
   const handleOpenAttendance = (session: Session) => {
@@ -329,7 +346,7 @@ const Sessions = () => {
                           <Button 
                             variant="outline" 
                             size="icon"
-                            onClick={() => handleDeleteSession(session.id)}
+                            onClick={() => confirmDeleteSession(session.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -389,13 +406,15 @@ const Sessions = () => {
                           <CardTitle>{session.title}</CardTitle>
                           <CardDescription>{session.batch}</CardDescription>
                         </div>
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          onClick={() => handleDeleteSession(session.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="icon"
+                            onClick={() => confirmDeleteSession(session.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -655,6 +674,30 @@ const Sessions = () => {
                 Save Attendance
               </Button>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this session? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => sessionToDelete && handleDeleteSession(sessionToDelete)}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Session
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
