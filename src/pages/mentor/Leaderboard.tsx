@@ -171,7 +171,7 @@ const MentorLeaderboard = () => {
                   <div className="col-span-4 sm:col-span-3">Student</div>
                   <div className="col-span-4 hidden sm:block">Business</div>
                   <div className="col-span-3 sm:col-span-2 text-right">Points</div>
-                  <div className="col-span-2 hidden sm:block text-right">National Rank</div>
+                  <div className="col-span-2 sm:block text-right">National Rank</div>
                   <div className="col-span-4 sm:col-span-2 text-right">Earnings</div>
                 </div>
                 
@@ -199,7 +199,7 @@ const MentorLeaderboard = () => {
                     </div>
                     <div className="col-span-4 hidden sm:block truncate">{student.business}</div>
                     <div className="col-span-3 sm:col-span-2 text-right font-semibold">{student.points}</div>
-                    <div className="col-span-2 hidden sm:block text-right">
+                    <div className="col-span-2 text-right">
                       <Badge variant="outline" className="bg-muted/30">#{student.nationalRank}</Badge>
                     </div>
                     <div className="col-span-4 sm:col-span-2 text-right text-success font-semibold">${student.earnings}</div>

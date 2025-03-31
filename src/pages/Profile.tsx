@@ -1,21 +1,26 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   User, 
   Mail, 
   Phone, 
   MapPin, 
-  Briefcase, 
+  School,
   Trophy, 
   Edit, 
   ShoppingBag,
   Rocket,
   Clock,
-  ChevronRight
+  X,
+  Save
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { toast } from '@/hooks/use-toast';
 
 // Mock data
 const profileData = {
@@ -26,7 +31,6 @@ const profileData = {
   location: 'San Francisco, CA',
   school: 'Lincoln High School',
   grade: '10th Grade',
-  business: 'Eco Crafts',
   joined: 'June 2023',
   badges: [
     { id: 1, name: 'First Sale', description: 'Made first product sale', icon: <ShoppingBag size={16} /> },
@@ -48,11 +52,38 @@ const profileData = {
 };
 
 const Profile = () => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState({
+    name: profileData.name,
+    email: profileData.email,
+    phone: profileData.phone,
+    location: profileData.location,
+    school: profileData.school,
+    grade: profileData.grade
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditedProfile(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSaveProfile = () => {
+    // In a real app, this would save to backend
+    setIsEditing(false);
+    toast({
+      title: "Profile updated",
+      description: "Your profile has been successfully updated.",
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">My Profile</h1>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
           <Edit size={16} className="mr-2" />
           Edit Profile
         </Button>
@@ -104,11 +135,12 @@ const Profile = () => {
                 
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                    <Briefcase size={14} />
+                    <School size={14} />
                   </div>
                   <div className="text-left">
-                    <p className="text-xs text-muted-foreground">Business</p>
-                    <p className="text-sm font-medium">{profileData.business}</p>
+                    <p className="text-xs text-muted-foreground">School</p>
+                    <p className="text-sm font-medium">{profileData.school}</p>
+                    <p className="text-xs text-muted-foreground">{profileData.grade}</p>
                   </div>
                 </div>
               </div>
@@ -222,6 +254,98 @@ const Profile = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+            <DialogDescription>
+              Update your personal information
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input 
+                  id="name" 
+                  name="name" 
+                  value={editedProfile.name} 
+                  onChange={handleInputChange} 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input 
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  value={editedProfile.email} 
+                  onChange={handleInputChange} 
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone</Label>
+                <Input 
+                  id="phone" 
+                  name="phone" 
+                  value={editedProfile.phone} 
+                  onChange={handleInputChange} 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="location">Location</Label>
+                <Input 
+                  id="location" 
+                  name="location" 
+                  value={editedProfile.location} 
+                  onChange={handleInputChange} 
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="school">School</Label>
+                <Input 
+                  id="school" 
+                  name="school" 
+                  value={editedProfile.school} 
+                  onChange={handleInputChange} 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="grade">Grade</Label>
+                <Input 
+                  id="grade" 
+                  name="grade" 
+                  value={editedProfile.grade} 
+                  onChange={handleInputChange} 
+                />
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditing(false)} className="gap-2">
+              <X size={16} />
+              Cancel
+            </Button>
+            <Button onClick={handleSaveProfile} className="gap-2">
+              <Save size={16} />
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Eye, Star, MessageSquare } from 'lucide-react';
+import { FileText, Eye, Star, MessageSquare, Download, CheckCircle } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface TaskViewProps {
   taskId: number;
@@ -12,6 +13,7 @@ interface TaskViewProps {
   submittedAt?: string;
   feedback?: string;
   rating?: number;
+  onResubmit?: () => void;
 }
 
 const TaskView: React.FC<TaskViewProps> = ({ 
@@ -20,7 +22,8 @@ const TaskView: React.FC<TaskViewProps> = ({
   taskStatus, 
   submittedAt, 
   feedback, 
-  rating 
+  rating,
+  onResubmit
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -30,6 +33,21 @@ const TaskView: React.FC<TaskViewProps> = ({
     type: "application/pdf",
     size: 2.45,
     url: "https://example.com/file.pdf" // This would be a real URL in production
+  };
+
+  const handleDownload = () => {
+    // Mock download functionality
+    toast({
+      title: "Download started",
+      description: `${mockFile.name} is being downloaded.`,
+    });
+  };
+
+  const handleResubmit = () => {
+    setOpen(false);
+    if (onResubmit) {
+      onResubmit();
+    }
   };
 
   const renderStatusBadge = () => {
@@ -89,7 +107,8 @@ const TaskView: React.FC<TaskViewProps> = ({
                     {mockFile.size} MB - {mockFile.type.split('/')[1].toUpperCase()}
                   </p>
                 </div>
-                <Button variant="outline" size="sm" className="ml-auto">
+                <Button variant="outline" size="sm" className="ml-auto" onClick={handleDownload}>
+                  <Download size={14} className="mr-2" />
                   Download
                 </Button>
               </div>
@@ -123,7 +142,8 @@ const TaskView: React.FC<TaskViewProps> = ({
                 Close
               </Button>
               {taskStatus === 'resubmit' && (
-                <Button>
+                <Button onClick={handleResubmit} className="gap-2">
+                  <CheckCircle size={16} />
                   Resubmit Task
                 </Button>
               )}

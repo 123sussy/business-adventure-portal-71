@@ -23,9 +23,15 @@ interface TaskProps {
 
 const TaskCardUpdated: React.FC<TaskProps> = ({ task }) => {
   const [taskStatus, setTaskStatus] = useState<TaskStatus>(task.status);
+  const [submittedAt, setSubmittedAt] = useState<string | undefined>(task.submittedAt);
   
   const handleSubmissionComplete = () => {
     setTaskStatus('submitted');
+    setSubmittedAt(new Date().toISOString());
+  };
+  
+  const handleResubmit = () => {
+    setTaskStatus('pending');
   };
   
   const getStatusIcon = () => {
@@ -131,9 +137,10 @@ const TaskCardUpdated: React.FC<TaskProps> = ({ task }) => {
             taskId={task.id}
             taskTitle={task.title}
             taskStatus={taskStatus}
-            submittedAt={task.submittedAt}
+            submittedAt={submittedAt || task.submittedAt}
             feedback={task.feedback}
             rating={task.rating}
+            onResubmit={handleResubmit}
           />
         )}
       </CardFooter>
