@@ -1,12 +1,11 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Upload, FileText, CheckCircle } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { UploadCloud, PaperclipIcon, X, SendIcon } from 'lucide-react';
 
 interface TaskSubmissionProps {
   taskId: number;
@@ -16,116 +15,139 @@ interface TaskSubmissionProps {
 
 const TaskSubmission: React.FC<TaskSubmissionProps> = ({ taskId, taskTitle, onSubmissionComplete }) => {
   const [open, setOpen] = useState(false);
+  const [description, setDescription] = useState('');
+  const [files, setFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [comments, setComments] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files);
+      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    }
+  };
+  
+  const removeFile = (indexToRemove: number) => {
+    setFiles(files.filter((_, index) => index !== indexToRemove));
+  };
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulating API call
+    // Simulate API call
     setTimeout(() => {
-      console.log("Submitting task:", {
-        taskId,
-        comments,
-        file: selectedFile?.name
-      });
-      
       setIsSubmitting(false);
       setOpen(false);
-      setComments('');
-      setSelectedFile(null);
       onSubmissionComplete();
-      
-      toast({
-        title: "Task Submitted",
-        description: `Your task "${taskTitle}" has been submitted successfully.`,
-      });
-    }, 1500);
+      setDescription('');
+      setFiles([]);
+    }, 1000);
   };
-
+  
   return (
-    <>
-      <Button onClick={() => setOpen(true)} className="gap-2">
-        <Upload size={16} />
-        Submit Task
-      </Button>
-      
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Submit Task: {taskTitle}</DialogTitle>
-            <DialogDescription>
-              Upload your completed task. Accepted formats: PDF, PNG, JPG, MP4.
-            </DialogDescription>
-          </DialogHeader>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="default">Submit Task</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[525px]">
+        <DialogHeader>
+          <DialogTitle>Submit Task</DialogTitle>
+          <DialogDescription>
+            Task: {taskTitle}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea 
+              id="description" 
+              placeholder="Describe your submission..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="min-h-24"
+              required
+            />
+          </div>
           
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="file">Task File</Label>
-              <div className="border-2 border-dashed rounded-md p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors">
-                <input
-                  id="file"
-                  type="file"
-                  className="hidden"
-                  accept=".pdf,.png,.jpg,.jpeg,.mp4"
-                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                />
-                <Label htmlFor="file" className="cursor-pointer w-full h-full block">
-                  {selectedFile ? (
-                    <div className="flex flex-col items-center gap-2">
-                      <FileText size={24} className="text-primary" />
-                      <p className="text-sm font-medium text-primary">{selectedFile.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                      </p>
-                      <Button type="button" size="sm" variant="outline">Replace File</Button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-2">
-                      <Upload size={24} className="text-muted-foreground" />
-                      <p className="text-sm font-medium">Drop file here or click to upload</p>
-                      <p className="text-xs text-muted-foreground">Max file size: 50MB</p>
-                    </div>
-                  )}
-                </Label>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="comments">Comments (Optional)</Label>
-              <Textarea
-                id="comments"
-                placeholder="Add any additional information about your submission..."
-                value={comments}
-                onChange={(e) => setComments(e.target.value)}
-                className="min-h-[100px]"
+          <div className="space-y-2">
+            <Label htmlFor="file-upload">Attachments</Label>
+            <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center bg-muted/30">
+              <UploadCloud className="h-10 w-10 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground mb-1">
+                Drag and drop files here or click to browse
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Accepted file types: PDF, DOCX, JPG, PNG, MP4 (max 10MB)
+              </p>
+              <Input 
+                id="file-upload" 
+                type="file" 
+                className="hidden" 
+                multiple
+                onChange={handleFileChange} 
               />
-            </div>
-            
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
               <Button 
-                type="submit" 
-                disabled={!selectedFile || isSubmitting}
-                className="gap-2"
+                type="button" 
+                variant="outline" 
+                className="mt-4" 
+                size="sm"
+                asChild
               >
-                {isSubmitting ? 'Submitting...' : 'Submit Task'}
-                {isSubmitting ? null : <CheckCircle size={16} />}
+                <label htmlFor="file-upload" className="cursor-pointer">
+                  <PaperclipIcon className="h-4 w-4 mr-2" />
+                  Choose files
+                </label>
               </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </>
+            </div>
+          </div>
+          
+          {files.length > 0 && (
+            <div className="space-y-2">
+              <Label>Selected Files</Label>
+              <ul className="space-y-2">
+                {files.map((file, index) => (
+                  <li key={index} className="flex items-center justify-between bg-muted/30 rounded-md p-2 text-sm">
+                    <span className="truncate max-w-[300px]">{file.name}</span>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6"
+                      onClick={() => removeFile(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setOpen(false)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={isSubmitting || description.trim() === ''}
+            >
+              {isSubmitting ? 'Submitting...' : (
+                <>
+                  <SendIcon className="h-4 w-4 mr-2" />
+                  Submit
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -38,14 +38,17 @@ const StudentProfile = () => {
     address: '456 Oak Street, Springfield, IL 62701',
     parentName: 'Michael Johnson',
     parentPhone: '+1 (555) 987-6543',
-    bio: "I'm a student entrepreneur interested in developing eco-friendly products. My business 'Eco Crafts' sells handmade sustainable items.",
-    businessName: 'Eco Crafts',
-    businessDescription: 'Handmade sustainable crafts and products for everyday use.',
+    bio: "I'm a student entrepreneur interested in developing eco-friendly products.",
+    schoolProject: 'Eco Crafts',
+    projectDescription: 'Handmade sustainable crafts and products for everyday use.',
     interests: 'Sustainability, Crafting, Marketing, Design'
   });
   
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
   
   const handleSaveProfile = () => {
@@ -131,8 +134,8 @@ const StudentProfile = () => {
             
             <div className="sm:ml-auto flex flex-col gap-2">
               <div className="text-sm">
-                <span className="text-muted-foreground">Business: </span>
-                <span className="font-medium">{formData.businessName}</span>
+                <span className="text-muted-foreground">Project: </span>
+                <span className="font-medium">{formData.schoolProject}</span>
               </div>
               <div className="text-sm">
                 <span className="text-muted-foreground">Joined: </span>
@@ -146,7 +149,7 @@ const StudentProfile = () => {
       <Tabs defaultValue="personal">
         <TabsList className="w-full grid grid-cols-3 md:w-auto">
           <TabsTrigger value="personal">Personal</TabsTrigger>
-          <TabsTrigger value="business">Business</TabsTrigger>
+          <TabsTrigger value="school">School Project</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
         </TabsList>
         
@@ -313,43 +316,43 @@ const StudentProfile = () => {
           </Card>
         </TabsContent>
         
-        <TabsContent value="business" className="pt-4 space-y-4">
+        <TabsContent value="school" className="pt-4 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Business Information</CardTitle>
+              <CardTitle>School Project Information</CardTitle>
               <CardDescription>
-                Details about your entrepreneurship venture
+                Details about your school entrepreneurship project
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-2">
-                <Label htmlFor="businessName">Business Name</Label>
+                <Label htmlFor="schoolProject">Project Name</Label>
                 {isEditing ? (
                   <Input 
-                    id="businessName" 
-                    value={formData.businessName} 
-                    onChange={(e) => handleInputChange('businessName', e.target.value)} 
+                    id="schoolProject" 
+                    value={formData.schoolProject} 
+                    onChange={(e) => handleInputChange('schoolProject', e.target.value)} 
                   />
                 ) : (
                   <div className="flex items-center gap-2 text-sm">
                     <School className="h-4 w-4 text-muted-foreground" />
-                    {formData.businessName}
+                    {formData.schoolProject}
                   </div>
                 )}
               </div>
               
               <div className="grid gap-2">
-                <Label htmlFor="businessDescription">Business Description</Label>
+                <Label htmlFor="projectDescription">Project Description</Label>
                 {isEditing ? (
                   <Textarea 
-                    id="businessDescription" 
-                    value={formData.businessDescription} 
-                    onChange={(e) => handleInputChange('businessDescription', e.target.value)} 
+                    id="projectDescription" 
+                    value={formData.projectDescription} 
+                    onChange={(e) => handleInputChange('projectDescription', e.target.value)} 
                     className="min-h-[100px]"
                   />
                 ) : (
                   <div className="text-sm">
-                    {formData.businessDescription}
+                    {formData.projectDescription}
                   </div>
                 )}
               </div>
@@ -376,7 +379,7 @@ const StudentProfile = () => {
               
               <div className="pt-4 border-t">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-sm font-medium">Business Logo</h3>
+                  <h3 className="text-sm font-medium">Project Logo</h3>
                   {isEditing && (
                     <Button variant="outline" size="sm">
                       <Upload className="h-4 w-4 mr-2" />
@@ -390,7 +393,7 @@ const StudentProfile = () => {
                     <div className="w-24 h-24 bg-muted rounded-full mx-auto flex items-center justify-center">
                       <span className="text-2xl font-bold text-muted-foreground">EC</span>
                     </div>
-                    <p className="mt-2 text-sm text-muted-foreground">Business logo not uploaded</p>
+                    <p className="mt-2 text-sm text-muted-foreground">Project logo not uploaded</p>
                   </div>
                 </div>
               </div>
@@ -399,9 +402,9 @@ const StudentProfile = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle>Business Performance</CardTitle>
+              <CardTitle>Project Performance</CardTitle>
               <CardDescription>
-                A summary of your business metrics
+                A summary of your project metrics
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -450,7 +453,7 @@ const StudentProfile = () => {
                     <FileText className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium">Business Plan.pdf</p>
+                    <p className="font-medium">Project Plan.pdf</p>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5" />
@@ -480,17 +483,13 @@ const StudentProfile = () => {
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="h-3.5 w-3.5" />
-                        1.2 MB
+                        2.1 MB
                       </span>
                     </div>
                   </div>
                   <Button variant="ghost" size="icon">
                     <Edit className="h-4 w-4" />
                   </Button>
-                </div>
-                
-                <div className="text-center py-4 text-muted-foreground">
-                  <p>Upload important documents related to your business venture</p>
                 </div>
               </div>
             </CardContent>

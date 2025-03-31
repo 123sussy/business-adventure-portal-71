@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Clock, CheckCircle, AlertTriangle, FileText, RotateCcw } from 'lucide-react';
 import TaskSubmission from './TaskSubmission';
 import TaskView from './TaskView';
+import { toast } from '@/hooks/use-toast';
 
 type TaskStatus = 'pending' | 'submitted' | 'completed' | 'overdue' | 'resubmit';
 
@@ -24,14 +25,27 @@ interface TaskProps {
 const TaskCardUpdated: React.FC<TaskProps> = ({ task }) => {
   const [taskStatus, setTaskStatus] = useState<TaskStatus>(task.status);
   const [submittedAt, setSubmittedAt] = useState<string | undefined>(task.submittedAt);
+  const [feedback, setFeedback] = useState<string | undefined>(task.feedback);
+  const [rating, setRating] = useState<number | undefined>(task.rating);
   
   const handleSubmissionComplete = () => {
     setTaskStatus('submitted');
-    setSubmittedAt(new Date().toISOString());
+    const submissionDate = new Date().toISOString();
+    setSubmittedAt(submissionDate);
+    
+    toast({
+      title: "Task Submitted",
+      description: "Your task has been submitted successfully!",
+    });
   };
   
   const handleResubmit = () => {
     setTaskStatus('pending');
+    
+    toast({
+      title: "Task Ready for Resubmission",
+      description: "You can now resubmit your task.",
+    });
   };
   
   const getStatusIcon = () => {
@@ -112,10 +126,10 @@ const TaskCardUpdated: React.FC<TaskProps> = ({ task }) => {
               </div>
             )}
             
-            {taskStatus === 'completed' && task.rating && (
+            {taskStatus === 'completed' && rating && (
               <div className="flex items-center gap-1 mt-1">
                 <span className="text-xs">Rating:</span>
-                <span className="text-xs font-medium">{task.rating}/5</span>
+                <span className="text-xs font-medium">{rating}/5</span>
                 <span className="text-yellow-500">★</span>
               </div>
             )}
@@ -137,9 +151,9 @@ const TaskCardUpdated: React.FC<TaskProps> = ({ task }) => {
             taskId={task.id}
             taskTitle={task.title}
             taskStatus={taskStatus}
-            submittedAt={submittedAt || task.submittedAt}
-            feedback={task.feedback}
-            rating={task.rating}
+            submittedAt={submittedAt}
+            feedback={feedback}
+            rating={rating}
             onResubmit={handleResubmit}
           />
         )}
