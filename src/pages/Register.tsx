@@ -319,6 +319,23 @@ const Register = () => {
                 <li>User Type (student, mentor, admin)</li>
               </ul>
             </div>
+            
+            <div className="mt-4">
+              <a 
+                href="#" 
+                className="text-sm text-blue-600 hover:underline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  // In a real app, this would download a template
+                  toast({
+                    title: "Template downloaded",
+                    description: "CSV template has been downloaded"
+                  });
+                }}
+              >
+                Download CSV template with required columns
+              </a>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowBulkUploadDialog(false)}>

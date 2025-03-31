@@ -1,518 +1,410 @@
 
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  ArrowLeft, 
-  Users, 
-  Calendar, 
-  Clock, 
-  School,
-  Edit,
-  Plus,
-  DollarSign,
-  Trash2,
-  BarChart4,
-  BookOpen,
-  CheckCircle2,
-  XCircle
-} from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { 
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useForm } from "react-hook-form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { 
+  Users, 
+  Book, 
+  Calendar, 
+  Clock, 
+  DollarSign, 
+  School, 
+  Edit
+} from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import UserAvatar from '@/components/ui-custom/UserAvatar';
 
-// Mock batch data
-const batchData = {
-  id: 1,
-  name: "Business Bootcamp - Batch 1",
-  status: "ongoing",
-  startDate: "2023-05-01",
-  endDate: "2023-07-30",
-  teacher: "Jamie Smith",
-  students: 15,
-  daysPerWeek: ["Monday", "Wednesday", "Friday"],
-  time: "3:00 PM - 5:00 PM",
-  earnings: 1200,
-  teacherEarnings: 240, // 20% of earnings
-  ollShare: 360, // 30% of earnings
-  completionRate: 68,
-  nextSession: "2023-06-16T15:00:00",
-  sessionsCompleted: 12,
-  totalSessions: 24,
-  tasks: [
-    {
-      id: 1,
-      title: "Market Research Assignment",
-      dueDate: "2023-06-20",
-      status: "active",
-      completions: 10
-    },
-    {
-      id: 2,
-      title: "Business Model Canvas",
-      dueDate: "2023-06-15",
-      status: "completed",
-      completions: 15
-    },
-    {
-      id: 3,
-      title: "Pitch Deck Creation",
-      dueDate: "2023-06-30",
-      status: "upcoming",
-      completions: 0
-    }
-  ],
-  studentsList: [
-    {
-      id: 1,
-      name: "Alex Johnson",
-      email: "alex@example.com",
-      attendance: 90,
-      taskCompletion: 85,
-      earnings: 150
-    },
-    {
-      id: 2,
-      name: "Morgan Smith",
-      email: "morgan@example.com",
-      attendance: 85,
-      taskCompletion: 90,
-      earnings: 200
-    },
-    {
-      id: 3,
-      name: "Jamie Lee",
-      email: "jamie@example.com",
-      attendance: 95,
-      taskCompletion: 95,
-      earnings: 250
-    }
-  ],
-  sessions: [
-    {
-      id: 1,
-      title: "Introduction to Business Fundamentals",
-      date: "2023-05-01",
-      time: "3:00 PM - 5:00 PM",
-      status: "completed"
-    },
-    {
-      id: 2,
-      title: "Market Research Strategies",
-      date: "2023-05-03",
-      time: "3:00 PM - 5:00 PM",
-      status: "completed"
-    },
-    {
-      id: 3,
-      title: "Business Model Canvas",
-      date: "2023-05-05",
-      time: "3:00 PM - 5:00 PM",
-      status: "upcoming"
-    }
-  ]
-};
+// Mock data for batches (would normally fetch this from API)
+const batchesData = [
+  { 
+    id: 1, 
+    name: "Business Bootcamp - Batch 1", 
+    status: "ongoing", 
+    startDate: "2023-05-01",
+    endDate: "2023-07-30", 
+    students: 15,
+    teacher: "Jamie Smith",
+    teacherEmail: "jamie.smith@example.com",
+    teacherPhone: "+1 (555) 123-4567",
+    earnings: 1200,
+    teacherEarnings: 240, // 20% of earnings
+    ollShare: 360, // 30% of earnings
+    studentShare: 600, // 50% of earnings
+    nextSession: "2023-06-16T15:00:00",
+    daysPerWeek: ["Monday", "Wednesday", "Friday"],
+    time: "3:00 PM - 5:00 PM",
+    topics: [
+      "Introduction to Business",
+      "Marketing Fundamentals",
+      "Financial Planning",
+      "Business Strategy",
+      "Pitch Development",
+      "Customer Acquisition",
+      "Sales Techniques",
+      "Team Building"
+    ],
+    sessions: [
+      {
+        id: 1,
+        date: "2023-05-01",
+        time: "3:00 PM - 5:00 PM",
+        topic: "Introduction to Business",
+        attendance: 15,
+        completed: true
+      },
+      {
+        id: 2,
+        date: "2023-05-03",
+        time: "3:00 PM - 5:00 PM",
+        topic: "Marketing Fundamentals",
+        attendance: 14,
+        completed: true
+      },
+      {
+        id: 3,
+        date: "2023-05-05",
+        time: "3:00 PM - 5:00 PM",
+        topic: "Financial Planning",
+        attendance: 15,
+        completed: true
+      },
+      {
+        id: 4,
+        date: "2023-05-08",
+        time: "3:00 PM - 5:00 PM",
+        topic: "Business Strategy",
+        attendance: 13,
+        completed: true
+      },
+      {
+        id: 5,
+        date: "2023-05-10",
+        time: "3:00 PM - 5:00 PM",
+        topic: "Pitch Development",
+        attendance: 15,
+        completed: false
+      },
+      {
+        id: 6,
+        date: "2023-05-12",
+        time: "3:00 PM - 5:00 PM",
+        topic: "Customer Acquisition",
+        attendance: 0,
+        completed: false
+      },
+      {
+        id: 7,
+        date: "2023-05-15",
+        time: "3:00 PM - 5:00 PM",
+        topic: "Sales Techniques",
+        attendance: 0,
+        completed: false
+      },
+      {
+        id: 8,
+        date: "2023-05-17",
+        time: "3:00 PM - 5:00 PM",
+        topic: "Team Building",
+        attendance: 0,
+        completed: false
+      }
+    ],
+    students: [
+      { 
+        id: 1, 
+        name: "John Doe", 
+        email: "john.doe@example.com",
+        phone: "+1 (555) 987-6543",
+        attendance: 90,
+        progress: 85,
+        school: "City High School"
+      },
+      { 
+        id: 2, 
+        name: "Jane Smith", 
+        email: "jane.smith@example.com",
+        phone: "+1 (555) 876-5432",
+        attendance: 95,
+        progress: 92,
+        school: "Metro University"
+      },
+      { 
+        id: 3, 
+        name: "Ahmed Hassan", 
+        email: "ahmed.hassan@example.com",
+        phone: "+1 (555) 765-4321",
+        attendance: 85,
+        progress: 78,
+        school: "Valley High School"
+      },
+      { 
+        id: 4, 
+        name: "Sarah Johnson", 
+        email: "sarah.johnson@example.com",
+        phone: "+1 (555) 654-3210",
+        attendance: 100,
+        progress: 95,
+        school: "City High School"
+      },
+      { 
+        id: 5, 
+        name: "Michael Brown", 
+        email: "michael.brown@example.com",
+        phone: "+1 (555) 543-2109",
+        attendance: 80,
+        progress: 72,
+        school: "Metro University"
+      }
+    ]
+  }
+];
+
+// Mock data for teachers
+const teachersData = [
+  { id: 1, name: "Jamie Smith" },
+  { id: 2, name: "Alex Rodriguez" },
+  { id: 3, name: "Sarah Johnson" },
+  { id: 4, name: "Michael Brown" }
+];
 
 const AdminBatchDetails = () => {
   const { batchId } = useParams();
   const navigate = useNavigate();
-  const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
-  const [showAddSessionDialog, setShowAddSessionDialog] = useState(false);
-  const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
-  const [newTask, setNewTask] = useState({
-    title: '',
-    dueDate: '',
-    description: ''
+  const [activeTab, setActiveTab] = useState('overview');
+  const [showEditBatchDialog, setShowEditBatchDialog] = useState(false);
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  
+  // Find batch by ID from mock data
+  const batch = batchesData.find(b => b.id === Number(batchId));
+
+  const form = useForm({
+    defaultValues: {
+      batchName: batch?.name || '',
+      startDate: batch?.startDate || '',
+      endDate: batch?.endDate || '',
+      teacher: batch?.teacher || '',
+      time: batch?.time || '',
+      topics: batch?.topics?.join('\n') || ''
+    }
   });
-  const [newSession, setNewSession] = useState({
-    title: '',
-    date: '',
-    time: '',
-    description: ''
-  });
-  const [newStudent, setNewStudent] = useState({
-    email: ''
-  });
 
-  const handleNewTaskChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNewTask(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+  const handleDayToggle = (day: string) => {
+    if (selectedDays.includes(day)) {
+      setSelectedDays(selectedDays.filter(d => d !== day));
+    } else {
+      setSelectedDays([...selectedDays, day]);
+    }
   };
 
-  const handleNewSessionChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNewSession(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleEditBatch = () => {
+    if (batch) {
+      setSelectedDays(batch.daysPerWeek);
+      setShowEditBatchDialog(true);
+    }
   };
 
-  const handleNewStudentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewStudent({ email: e.target.value });
-  };
-
-  const handleAddTask = () => {
-    console.log("Adding new task:", newTask);
-    // In a real app, you'd make an API call here
+  const handleUpdateBatch = (data: any) => {
+    console.log("Updated batch data:", { ...data, daysPerWeek: selectedDays });
     toast({
-      title: "Task added",
-      description: "New task has been added to the batch"
+      title: "Batch updated",
+      description: "Batch has been successfully updated"
     });
-    setShowAddTaskDialog(false);
-    setNewTask({ title: '', dueDate: '', description: '' });
+    setShowEditBatchDialog(false);
   };
 
-  const handleAddSession = () => {
-    console.log("Adding new session:", newSession);
-    toast({
-      title: "Session added",
-      description: "New session has been added to the batch"
-    });
-    setShowAddSessionDialog(false);
-    setNewSession({ title: '', date: '', time: '', description: '' });
-  };
-
-  const handleAddStudent = () => {
-    console.log("Adding new student:", newStudent);
-    toast({
-      title: "Student invited",
-      description: "Invitation has been sent to the student"
-    });
-    setShowAddStudentDialog(false);
-    setNewStudent({ email: '' });
-  };
-
-  const handleDeleteTask = (taskId: number) => {
-    console.log("Deleting task:", taskId);
-    toast({
-      title: "Task deleted",
-      description: "The task has been deleted from the batch"
-    });
-  };
-
-  const handleDeleteSession = (sessionId: number) => {
-    console.log("Deleting session:", sessionId);
-    toast({
-      title: "Session deleted",
-      description: "The session has been deleted from the batch"
-    });
-  };
-
-  const handleRemoveStudent = (studentId: number) => {
-    console.log("Removing student:", studentId);
-    toast({
-      title: "Student removed",
-      description: "The student has been removed from the batch"
-    });
-  };
+  if (!batch) {
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-xl font-semibold mb-4">Batch not found</h2>
+        <Button variant="outline" onClick={() => navigate('/admin/batches')}>
+          Back to Batches
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => navigate('/admin/batches')}
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" /> Back
-          </Button>
-          <h1 className="text-2xl font-bold">{batchData.name}</h1>
-          <Badge
-            variant={
-              batchData.status === 'ongoing' 
-                ? 'default' 
-                : batchData.status === 'upcoming' 
-                  ? 'outline' 
-                  : 'secondary'
-            }
-          >
-            {batchData.status}
-          </Badge>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">{batch.name}</h1>
+          <p className="text-muted-foreground">
+            {batch.startDate} to {batch.endDate}
+          </p>
         </div>
-        <Button onClick={() => navigate(`/admin/batches/${batchId}/edit`)}>
-          <Edit className="h-4 w-4 mr-2" /> Edit Batch
-        </Button>
+        
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => navigate('/admin/batches')}>
+            Back to Batches
+          </Button>
+          <Button onClick={handleEditBatch}>
+            <Edit className="h-4 w-4 mr-2" />
+            Edit Batch
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Teacher</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-3">
-              <School className="h-5 w-5 text-muted-foreground" />
-              <span className="font-medium">{batchData.teacher}</span>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Schedule</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span>{batchData.daysPerWeek.join(', ')}</span>
-              </div>
-              <div className="flex items-center">
-                <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span>{batchData.time}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Students</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-3">
-              <Users className="h-5 w-5 text-muted-foreground" />
-              <span className="font-medium">{batchData.students}</span>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Progress</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-1">
-              <div className="text-xl font-bold">{batchData.sessionsCompleted}/{batchData.totalSessions}</div>
-              <div className="w-full bg-muted rounded-full h-2">
-                <div 
-                  className="bg-primary rounded-full h-2" 
-                  style={{ width: `${(batchData.sessionsCompleted / batchData.totalSessions) * 100}%` }}
-                ></div>
-              </div>
-              <div className="text-xs text-muted-foreground">Sessions completed</div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="md:col-span-1">
-          <CardHeader>
-            <CardTitle>Revenue Breakdown</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-primary" />
-                <span>Total Revenue</span>
-              </div>
-              <span className="font-bold">${batchData.earnings}</span>
-            </div>
-            
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-blue-500" />
-                <span>Teacher (20%)</span>
-              </div>
-              <span className="font-bold">${batchData.teacherEarnings}</span>
-            </div>
-            
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-green-500" />
-                <span>OLL Share (30%)</span>
-              </div>
-              <span className="font-bold">${batchData.ollShare}</span>
-            </div>
-            
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-amber-500" />
-                <span>Student (50%)</span>
-              </div>
-              <span className="font-bold">${batchData.earnings - batchData.teacherEarnings - batchData.ollShare}</span>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Batch Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Start Date</p>
-                <p className="font-medium">{batchData.startDate}</p>
-              </div>
-              
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">End Date</p>
-                <p className="font-medium">{batchData.endDate}</p>
-              </div>
-              
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Task Completion</p>
-                <p className="font-medium">{batchData.completionRate}%</p>
-              </div>
-              
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Next Session</p>
-                <p className="font-medium">
-                  {batchData.nextSession 
-                    ? new Date(batchData.nextSession).toLocaleDateString() 
-                    : 'N/A'}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="tasks" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="tasks" className="flex items-center gap-1">
-            <BookOpen className="h-4 w-4" /> Tasks
-          </TabsTrigger>
-          <TabsTrigger value="sessions" className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" /> Sessions
-          </TabsTrigger>
-          <TabsTrigger value="students" className="flex items-center gap-1">
-            <Users className="h-4 w-4" /> Students
-          </TabsTrigger>
+      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-4 mb-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="sessions">Sessions</TabsTrigger>
+          <TabsTrigger value="students">Students</TabsTrigger>
+          <TabsTrigger value="financials">Financials</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="tasks">
+
+        <TabsContent value="overview" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle>Tasks & Assignments</CardTitle>
-              <Button size="sm" onClick={() => setShowAddTaskDialog(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Task
-              </Button>
+            <CardHeader>
+              <CardTitle>Batch Details</CardTitle>
+              <CardDescription>Key information about this batch</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Status</p>
+                  <p className="text-lg">{batch.status}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Number of Students</p>
+                  <p className="text-lg flex items-center">
+                    <Users className="h-5 w-5 mr-2 text-muted-foreground" />
+                    {batch.students.length}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Teacher</p>
+                  <p className="text-lg flex items-center">
+                    <School className="h-5 w-5 mr-2 text-muted-foreground" />
+                    {batch.teacher}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Teacher Contact</p>
+                  <div>
+                    <p className="text-sm">{batch.teacherEmail}</p>
+                    <p className="text-sm">{batch.teacherPhone}</p>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Schedule</p>
+                  <div>
+                    <p className="text-base flex items-center">
+                      <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                      {batch.daysPerWeek.join(', ')}
+                    </p>
+                    <p className="text-base flex items-center mt-1">
+                      <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+                      {batch.time}
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Next Session</p>
+                  <p className="text-lg">
+                    {batch.nextSession ? new Date(batch.nextSession).toLocaleString() : 'No upcoming session'}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Course Content</CardTitle>
+              <CardDescription>Topics covered in this batch</CardDescription>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Task Name</TableHead>
-                    <TableHead>Due Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Completions</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {batchData.tasks.map(task => (
-                    <TableRow key={task.id}>
-                      <TableCell className="font-medium">{task.title}</TableCell>
-                      <TableCell>{task.dueDate}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            task.status === 'active' 
-                              ? 'default' 
-                              : task.status === 'upcoming' 
-                                ? 'outline' 
-                                : 'secondary'
-                          }
-                          className={task.status === 'completed' ? 'bg-green-500 hover:bg-green-600' : ''}
-                        >
-                          {task.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {task.completions}/{batchData.students}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm">
-                            View
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="text-destructive"
-                            onClick={() => handleDeleteTask(task.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <ul className="space-y-2">
+                {batch.topics.map((topic, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <Book className="h-5 w-5 text-muted-foreground mt-0.5" />
+                    <span>{topic}</span>
+                  </li>
+                ))}
+              </ul>
             </CardContent>
           </Card>
         </TabsContent>
-        
-        <TabsContent value="sessions">
+
+        <TabsContent value="sessions" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle>Sessions Schedule</CardTitle>
-              <Button size="sm" onClick={() => setShowAddSessionDialog(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Session
-              </Button>
+            <CardHeader>
+              <CardTitle>Session Schedule</CardTitle>
+              <CardDescription>All sessions for this batch</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Session Name</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Time</TableHead>
+                    <TableHead>Topic</TableHead>
+                    <TableHead>Attendance</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {batchData.sessions.map(session => (
+                  {batch.sessions.map((session) => (
                     <TableRow key={session.id}>
-                      <TableCell className="font-medium">{session.title}</TableCell>
                       <TableCell>{session.date}</TableCell>
                       <TableCell>{session.time}</TableCell>
+                      <TableCell>{session.topic}</TableCell>
                       <TableCell>
-                        <Badge
-                          variant={session.status === 'completed' ? 'secondary' : 'outline'}
-                          className={session.status === 'completed' ? 'bg-green-500 hover:bg-green-600' : ''}
-                        >
-                          {session.status}
-                        </Badge>
+                        {session.completed 
+                          ? `${session.attendance}/${batch.students.length}` 
+                          : '-'}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm">
-                            View
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="text-destructive"
-                            onClick={() => handleDeleteSession(session.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
+                        {session.completed ? (
+                          <span className="text-green-600">Completed</span>
+                        ) : (
+                          <span className="text-blue-600">Scheduled</span>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -521,271 +413,272 @@ const AdminBatchDetails = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
-        <TabsContent value="students">
+
+        <TabsContent value="students" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle>Enrolled Students</CardTitle>
-              <Button size="sm" onClick={() => setShowAddStudentDialog(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Student
-              </Button>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Enrolled Students</CardTitle>
+                  <CardDescription>List of students in this batch</CardDescription>
+                </div>
+                <Button variant="outline" onClick={() => navigate('/admin/students')}>
+                  Manage Students
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Student</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>School</TableHead>
                     <TableHead>Attendance</TableHead>
-                    <TableHead>Task Completion</TableHead>
-                    <TableHead>Earnings</TableHead>
+                    <TableHead>Progress</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {batchData.studentsList.map(student => (
+                  {batch.students.map((student) => (
                     <TableRow key={student.id}>
+                      <TableCell className="font-medium">{student.name}</TableCell>
+                      <TableCell>{student.email}</TableCell>
+                      <TableCell>{student.phone}</TableCell>
+                      <TableCell>{student.school}</TableCell>
+                      <TableCell>{student.attendance}%</TableCell>
+                      <TableCell>{student.progress}%</TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-3">
-                          <UserAvatar name={student.name} size="sm" />
-                          <div>
-                            <div className="font-medium">{student.name}</div>
-                            <div className="text-xs text-muted-foreground">{student.email}</div>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="w-full max-w-24">
-                            <div className="h-2 w-full bg-muted rounded-full">
-                              <div 
-                                className={`h-full rounded-full ${
-                                  student.attendance >= 90 ? 'bg-green-500' : 
-                                  student.attendance >= 75 ? 'bg-amber-500' : 
-                                  'bg-destructive'
-                                }`}
-                                style={{ width: `${student.attendance}%` }}
-                              />
-                            </div>
-                          </div>
-                          <span className="text-xs">{student.attendance}%</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="w-full max-w-24">
-                            <div className="h-2 w-full bg-muted rounded-full">
-                              <div 
-                                className={`h-full rounded-full ${
-                                  student.taskCompletion >= 90 ? 'bg-green-500' : 
-                                  student.taskCompletion >= 75 ? 'bg-amber-500' : 
-                                  'bg-destructive'
-                                }`}
-                                style={{ width: `${student.taskCompletion}%` }}
-                              />
-                            </div>
-                          </div>
-                          <span className="text-xs">{student.taskCompletion}%</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <DollarSign className="h-4 w-4 mr-1 text-green-500" />
-                          ${student.earnings}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => navigate(`/admin/students/${student.id}`)}
-                          >
-                            View
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="text-destructive"
-                            onClick={() => handleRemoveStudent(student.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => navigate(`/admin/students/${student.id}`)}
+                        >
+                          View
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="financials" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Financial Overview</CardTitle>
+              <CardDescription>Revenue and earnings distribution</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="border rounded-lg p-4 bg-gray-50">
+                  <div className="flex items-center mb-2">
+                    <DollarSign className="h-5 w-5 mr-2 text-green-600" />
+                    <p className="font-medium">Total Revenue</p>
+                  </div>
+                  <p className="text-2xl font-bold">${batch.earnings}</p>
+                  <p className="text-sm text-muted-foreground">From {batch.students.length} students</p>
+                </div>
+                
+                <div className="border rounded-lg p-4 bg-blue-50">
+                  <div className="flex items-center mb-2">
+                    <DollarSign className="h-5 w-5 mr-2 text-blue-600" />
+                    <p className="font-medium">Teacher's Share (20%)</p>
+                  </div>
+                  <p className="text-2xl font-bold">${batch.teacherEarnings}</p>
+                  <p className="text-sm text-muted-foreground">Paid to {batch.teacher}</p>
+                </div>
+                
+                <div className="border rounded-lg p-4 bg-purple-50">
+                  <div className="flex items-center mb-2">
+                    <DollarSign className="h-5 w-5 mr-2 text-purple-600" />
+                    <p className="font-medium">OLL Share (30%)</p>
+                  </div>
+                  <p className="text-2xl font-bold">${batch.ollShare}</p>
+                  <p className="text-sm text-muted-foreground">Platform fee</p>
+                </div>
+              </div>
+              
+              <div className="border rounded-lg p-4 bg-orange-50">
+                <div className="flex items-center mb-2">
+                  <DollarSign className="h-5 w-5 mr-2 text-orange-600" />
+                  <p className="font-medium">Students' Share (50%)</p>
+                </div>
+                <p className="text-2xl font-bold">${batch.studentShare}</p>
+                <p className="text-sm text-muted-foreground">Distributed among students based on performance</p>
+              </div>
+              
+              <Card className="border-dashed">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">Payment Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>Teacher payout</span>
+                      <span className="text-green-600">Paid on May 31, 2023</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Student earnings distribution</span>
+                      <span className="text-blue-600">Pending batch completion</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
 
-      {/* Add Task Dialog */}
-      <Dialog open={showAddTaskDialog} onOpenChange={setShowAddTaskDialog}>
-        <DialogContent>
+      {/* Edit Batch Dialog */}
+      <Dialog open={showEditBatchDialog} onOpenChange={setShowEditBatchDialog}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Add New Task</DialogTitle>
+            <DialogTitle>Edit Batch</DialogTitle>
             <DialogDescription>
-              Create a new task or assignment for this batch.
+              Update batch information below.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-medium">
-                Task Title
-              </label>
-              <Input
-                id="title"
-                name="title"
-                value={newTask.title}
-                onChange={handleNewTaskChange}
-                placeholder="Enter task title"
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="dueDate" className="text-sm font-medium">
-                Due Date
-              </label>
-              <Input
-                id="dueDate"
-                name="dueDate"
-                type="date"
-                value={newTask.dueDate}
-                onChange={handleNewTaskChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="description" className="text-sm font-medium">
-                Description
-              </label>
-              <Textarea
-                id="description"
-                name="description"
-                value={newTask.description}
-                onChange={handleNewTaskChange}
-                placeholder="Enter task description"
-                rows={4}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddTaskDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleAddTask}>
-              Add Task
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Add Session Dialog */}
-      <Dialog open={showAddSessionDialog} onOpenChange={setShowAddSessionDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Session</DialogTitle>
-            <DialogDescription>
-              Schedule a new session for this batch.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="sessionTitle" className="text-sm font-medium">
-                Session Title
-              </label>
-              <Input
-                id="sessionTitle"
-                name="title"
-                value={newSession.title}
-                onChange={handleNewSessionChange}
-                placeholder="Enter session title"
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="sessionDate" className="text-sm font-medium">
-                  Date
-                </label>
-                <Input
-                  id="sessionDate"
-                  name="date"
-                  type="date"
-                  value={newSession.date}
-                  onChange={handleNewSessionChange}
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleUpdateBatch)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="batchName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Batch Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter batch name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="teacher"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Teacher</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a teacher" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {teachersData.map(teacher => (
+                            <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                              {teacher.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-              <div className="space-y-2">
-                <label htmlFor="sessionTime" className="text-sm font-medium">
-                  Time
-                </label>
-                <Input
-                  id="sessionTime"
-                  name="time"
-                  type="time"
-                  value={newSession.time}
-                  onChange={handleNewSessionChange}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Start Date</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="endDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>End Date</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="sessionDescription" className="text-sm font-medium">
-                Description
-              </label>
-              <Textarea
-                id="sessionDescription"
-                name="description"
-                value={newSession.description}
-                onChange={handleNewSessionChange}
-                placeholder="Enter session description"
-                rows={4}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddSessionDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleAddSession}>
-              Add Session
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
-      {/* Add Student Dialog */}
-      <Dialog open={showAddStudentDialog} onOpenChange={setShowAddStudentDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Student to Batch</DialogTitle>
-            <DialogDescription>
-              Add an existing student to this batch or invite a new one.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="studentEmail" className="text-sm font-medium">
-                Student Email
-              </label>
-              <Input
-                id="studentEmail"
-                name="email"
-                type="email"
-                value={newStudent.email}
-                onChange={handleNewStudentChange}
-                placeholder="Enter student email"
+              <div>
+                <FormLabel>Schedule Days</FormLabel>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {daysOfWeek.map(day => (
+                    <Button
+                      key={day}
+                      type="button"
+                      variant={selectedDays.includes(day) ? "default" : "outline"}
+                      onClick={() => handleDayToggle(day)}
+                      className="flex-1"
+                    >
+                      {day.substring(0, 3)}
+                    </Button>
+                  ))}
+                </div>
+                {selectedDays.length === 0 && (
+                  <p className="text-sm text-destructive mt-1">Please select at least one day</p>
+                )}
+              </div>
+
+              <FormField
+                control={form.control}
+                name="time"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Session Time</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., 3:00 PM - 5:00 PM" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddStudentDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleAddStudent}>
-              Add Student
-            </Button>
-          </DialogFooter>
+
+              <FormField
+                control={form.control}
+                name="topics"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Session Topics</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Enter topics to be covered in this batch, one per line"
+                        className="min-h-[100px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Enter one topic per line. These will be used to create session schedules.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <Button variant="outline" type="button" onClick={() => setShowEditBatchDialog(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">Update Batch</Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>
