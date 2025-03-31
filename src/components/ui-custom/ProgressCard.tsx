@@ -1,72 +1,70 @@
 
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
-type ProgressCardProps = {
+interface ProgressCardProps {
   title: string;
   value: number;
   maxValue: number;
   icon?: React.ReactNode;
-  color?: 'primary' | 'secondary' | 'accent' | 'success' | 'warning';
-  className?: string;
-  size?: 'sm' | 'md' | 'lg';
-};
+  color?: 'primary' | 'secondary' | 'success' | 'accent' | 'warning' | 'destructive';
+  subtitle?: string;
+}
 
-const ProgressCard = ({
+const ProgressCard: React.FC<ProgressCardProps> = ({
   title,
   value,
   maxValue,
   icon,
   color = 'primary',
-  className,
-  size = 'md',
-}: ProgressCardProps) => {
+  subtitle
+}) => {
   const percentage = Math.min(Math.round((value / maxValue) * 100), 100);
   
   const colorClasses = {
-    primary: 'bg-primary',
-    secondary: 'bg-secondary',
-    accent: 'bg-accent',
-    success: 'bg-success',
-    warning: 'bg-warning',
+    primary: "bg-primary text-primary-foreground",
+    secondary: "bg-secondary text-secondary-foreground",
+    success: "bg-success text-success-foreground",
+    accent: "bg-accent text-accent-foreground",
+    warning: "bg-warning text-warning-foreground",
+    destructive: "bg-destructive text-destructive-foreground",
   };
-
-  const sizeClasses = {
-    sm: 'p-3',
-    md: 'p-4',
-    lg: 'p-6',
+  
+  const bgColorClasses = {
+    primary: "bg-primary/20",
+    secondary: "bg-secondary/20",
+    success: "bg-success/20",
+    accent: "bg-accent/20",
+    warning: "bg-warning/20",
+    destructive: "bg-destructive/20",
   };
-
+  
   return (
-    <div className={cn(
-      "glass-card rounded-xl hover-card",
-      sizeClasses[size],
-      className
-    )}>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="font-medium">{title}</h3>
-        {icon && (
-          <div className={cn(
-            "w-8 h-8 rounded-full flex items-center justify-center",
-            `bg-${color}/10 text-${color}`
-          )}>
-            {icon}
-          </div>
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+          {icon && <span>{icon}</span>}
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold mb-2">
+          {value} {maxValue && <span className="text-muted-foreground text-sm font-normal">/ {maxValue}</span>}
+        </div>
+        
+        {subtitle && (
+          <p className="text-sm text-muted-foreground mb-2">{subtitle}</p>
         )}
-      </div>
-      
-      <div className="progress-bar">
-        <div 
-          className={cn("progress-bar-fill", colorClasses[color])} 
-          style={{ width: `${percentage}%` }}
-        />
-      </div>
-      
-      <div className="flex justify-between mt-2 text-sm">
-        <span className="font-medium">{value} / {maxValue}</span>
-        <span className="text-muted-foreground">{percentage}%</span>
-      </div>
-    </div>
+        
+        <div className="progress-bar">
+          <div 
+            className={cn("progress-bar-fill", colorClasses[color])}
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

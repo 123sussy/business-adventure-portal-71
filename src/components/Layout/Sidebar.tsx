@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -21,7 +22,8 @@ import {
   Briefcase,
   Layers,
   UserCog,
-  GraduationCap
+  GraduationCap,
+  MessageSquare
 } from 'lucide-react';
 
 const roleBasedNavItems = {
@@ -31,14 +33,17 @@ const roleBasedNavItems = {
     { to: '/student/sessions', icon: <Video size={18} />, label: 'Sessions' },
     { to: '/student/sales', icon: <DollarSign size={18} />, label: 'Sales' },
     { to: '/student/leaderboard', icon: <Trophy size={18} />, label: 'Leaderboard' },
-    { to: '/profile', icon: <User size={18} />, label: 'My Profile' },
+    { to: '/student/feedback', icon: <MessageSquare size={18} />, label: 'Feedback' },
+    { to: '/student/help', icon: <UserCog size={18} />, label: 'Help & Support' },
+    { to: '/student/profile', icon: <User size={18} />, label: 'My Profile' },
   ],
   mentor: [
     { to: '/mentor/dashboard', icon: <Home size={18} />, label: 'Dashboard' },
     { to: '/mentor/batches', icon: <Briefcase size={18} />, label: 'Batches' },
+    { to: '/mentor/sessions', icon: <Video size={18} />, label: 'Sessions' },
     { to: '/mentor/earnings', icon: <DollarSign size={18} />, label: 'Earnings' },
     { to: '/mentor/leaderboard', icon: <Trophy size={18} />, label: 'Leaderboard' },
-    { to: '/profile', icon: <User size={18} />, label: 'My Profile' },
+    { to: '/mentor/profile', icon: <User size={18} />, label: 'My Profile' },
   ],
   admin: [
     { to: '/admin/dashboard', icon: <Home size={18} />, label: 'Dashboard' },
@@ -46,7 +51,8 @@ const roleBasedNavItems = {
     { to: '/admin/students', icon: <GraduationCap size={18} />, label: 'Students' },
     { to: '/admin/teachers', icon: <School size={18} />, label: 'Teachers' },
     { to: '/admin/earnings', icon: <DollarSign size={18} />, label: 'Earnings' },
-    { to: '/admin/settings', icon: <Settings size={18} />, label: 'Settings' },
+    { to: '/admin/feedback', icon: <MessageSquare size={18} />, label: 'Feedback' },
+    { to: '/admin/profile', icon: <User size={18} />, label: 'My Profile' },
   ],
 };
 

@@ -1,636 +1,665 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Calendar } from '@/components/ui/calendar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Calendar, Clock, Users, Link as LinkIcon, Video, Edit, Trash2, PlusCircle } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useForm } from 'react-hook-form';
-import { Badge } from '@/components/ui/badge';
+import { Calendar as CalendarIcon, Clock, Video, Users, Pencil, Trash2, Check, Plus } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
+import { Checkbox } from '@/components/ui/checkbox';
 
-// Define session type to avoid type errors
-interface Session {
-  id: number;
-  batchName: string;
-  title: string;
-  status: 'upcoming' | 'completed' | 'rescheduled';
-  date: string;
-  time: string;
-  students: number;
-  attendance: number;
-  recordingUrl?: string;
-  sessionUrl?: string;
-  originalDate?: string;
-  reason?: string;
-}
-
-// Mock data for sessions
-const batchStudents = [
-  { id: 1, name: "Alex Johnson", present: true },
-  { id: 2, name: "Taylor Swift", present: true },
-  { id: 3, name: "John Smith", present: false },
-  { id: 4, name: "Emma Martinez", present: true },
-  { id: 5, name: "David Wong", present: false },
-];
-
-const sessionData: Session[] = [
-  { 
-    id: 1, 
-    batchName: "Business Bootcamp - Batch 1", 
-    title: "Introduction to Business Models",
-    status: "completed", 
-    date: "2023-06-10",
-    time: "15:00 - 17:00",
-    students: 15,
-    attendance: 12,
-    recordingUrl: "https://example.com/recording1",
+// Mock data
+const sessionsMockData = [
+  {
+    id: 1,
+    title: 'Business Plan Fundamentals',
+    batch: 'Business Bootcamp - Batch 1',
+    date: '2023-10-25',
+    time: '10:00 AM - 11:30 AM',
+    students: 8,
+    status: 'upcoming' as const,
+    attendance: null,
+    notes: 'Introduction to creating effective business plans and value propositions.'
   },
-  { 
-    id: 2, 
-    batchName: "Business Bootcamp - Batch 1", 
-    title: "Market Research Strategies",
-    status: "completed", 
-    date: "2023-06-13",
-    time: "15:00 - 17:00",
-    students: 15,
-    attendance: 14,
-    recordingUrl: "https://example.com/recording2",
+  {
+    id: 2,
+    title: 'Marketing Strategy Workshop',
+    batch: 'Business Bootcamp - Batch 2',
+    date: '2023-10-26',
+    time: '2:00 PM - 3:30 PM',
+    students: 10,
+    status: 'upcoming' as const,
+    attendance: null,
+    notes: 'Hands-on workshop for developing targeted marketing strategies.'
   },
-  { 
-    id: 3, 
-    batchName: "Business Bootcamp - Batch 2", 
-    title: "Introduction to Business Models",
-    status: "completed", 
-    date: "2023-06-12",
-    time: "14:00 - 16:00",
-    students: 18,
-    attendance: 15,
-    recordingUrl: "https://example.com/recording3",
+  {
+    id: 3,
+    title: 'Financial Planning',
+    batch: 'Business Bootcamp - Batch 1',
+    date: '2023-10-20',
+    time: '10:00 AM - 11:30 AM',
+    students: 8,
+    status: 'completed' as const,
+    attendance: [
+      { id: 1, name: 'Alex Johnson', present: true },
+      { id: 2, name: 'Samantha Lee', present: true },
+      { id: 3, name: 'Miguel Santos', present: false },
+      { id: 4, name: 'Emma Wilson', present: true },
+      { id: 5, name: 'Jayden Brown', present: true },
+      { id: 6, name: 'Sophia Chen', present: true },
+      { id: 7, name: 'Ethan Miller', present: false },
+      { id: 8, name: 'Olivia Davis', present: true },
+    ],
+    notes: 'Covered revenue projections, cost management, and pricing strategies.'
   },
-  { 
-    id: 4, 
-    batchName: "Business Bootcamp - Batch 1", 
-    title: "Financial Planning",
-    status: "upcoming", 
-    date: "2023-06-17",
-    time: "15:00 - 17:00",
-    students: 15,
-    attendance: 0,
-    sessionUrl: "https://meet.google.com/abc-defg-hij",
-  },
-  { 
-    id: 5, 
-    batchName: "Business Bootcamp - Batch 2", 
-    title: "Market Research Strategies",
-    status: "upcoming", 
-    date: "2023-06-16",
-    time: "14:00 - 16:00",
-    students: 18,
-    attendance: 0,
-    sessionUrl: "https://meet.google.com/klm-nopq-rst",
-  },
-  { 
-    id: 6, 
-    batchName: "Entrepreneurship 101", 
-    title: "Introduction to Entrepreneurship",
-    status: "rescheduled", 
-    date: "2023-07-01",
-    time: "13:00 - 15:00",
-    originalDate: "2023-06-15",
-    students: 12,
-    attendance: 0,
-    reason: "Teacher unavailable due to emergency",
+  {
+    id: 4,
+    title: 'Sales Techniques',
+    batch: 'Business Bootcamp - Batch 2',
+    date: '2023-10-18',
+    time: '2:00 PM - 3:30 PM',
+    students: 10,
+    status: 'completed' as const,
+    attendance: [
+      { id: 9, name: 'Noah Garcia', present: true },
+      { id: 10, name: 'Ava Martinez', present: true },
+      { id: 11, name: 'William Taylor', present: true },
+      { id: 12, name: 'Isabella Anderson', present: false },
+      { id: 13, name: 'James Thomas', present: true },
+      { id: 14, name: 'Charlotte White', present: true },
+      { id: 15, name: 'Benjamin Harris', present: true },
+      { id: 16, name: 'Mia Martin', present: true },
+      { id: 17, name: 'Lucas Thompson', present: true },
+      { id: 18, name: 'Amelia Garcia', present: false },
+    ],
+    notes: 'Discussed persuasive selling, objection handling, and closing techniques.'
   },
 ];
 
-interface SessionFormData {
-  batchId: string;
-  title: string;
-  date: string;
-  time: string;
-  sessionUrl?: string;
-  recordingUrl?: string;
-}
+const batchesMockData = [
+  { id: 1, name: 'Business Bootcamp - Batch 1', students: 8 },
+  { id: 2, name: 'Business Bootcamp - Batch 2', students: 10 },
+  { id: 3, name: 'Advanced Entrepreneurship', students: 6 },
+];
 
-const MentorSessions = () => {
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('upcoming');
-  const [sessions, setSessions] = useState<Session[]>(sessionData);
+type Session = typeof sessionsMockData[0];
+type Student = { id: number; name: string; present: boolean };
+
+const Sessions = () => {
+  const [sessions, setSessions] = useState(sessionsMockData);
+  const [date, setDate] = useState<Date | undefined>(new Date());
   const [showSessionDialog, setShowSessionDialog] = useState(false);
-  const [dialogMode, setDialogMode] = useState<'add' | 'edit' | 'attendance'>('add');
-  const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
-  const [attendance, setAttendance] = useState<{ id: number; name: string; present: boolean }[]>(batchStudents);
-
-  // Handle attendance change
-  const handleAttendanceChange = (studentId: number, isPresent: boolean) => {
-    setAttendance(prev => 
-      prev.map(student => 
-        student.id === studentId 
-          ? { ...student, present: isPresent } 
-          : student
-      )
-    );
-  };
-
-  // Handle attendance save
-  const handleAttendanceSave = () => {
-    const presentCount = attendance.filter(s => s.present).length;
-    
-    setSessions(prev => 
-      prev.map(session => 
-        session.id === selectedSessionId
-          ? { ...session, attendance: presentCount }
-          : session
-      )
-    );
-    
-    toast({
-      title: "Attendance recorded",
-      description: `Recorded attendance for ${presentCount} students.`,
-    });
-    
-    setShowSessionDialog(false);
-  };
-
-  // Form for adding/editing sessions
-  const form = useForm<SessionFormData>({
-    defaultValues: {
-      batchId: "",
-      title: "",
-      date: "",
-      time: "",
-      sessionUrl: "",
-      recordingUrl: "",
-    }
+  const [showAttendanceDialog, setShowAttendanceDialog] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [newSession, setNewSession] = useState({
+    title: '',
+    batch: '',
+    date: format(new Date(), 'yyyy-MM-dd'),
+    time: '',
+    notes: ''
   });
+  const [editMode, setEditMode] = useState(false);
 
-  const handleAddSession = (data: SessionFormData) => {
-    if (dialogMode === 'add') {
-      // Add new session
-      const newSession: Session = {
-        id: Math.max(...sessions.map(s => s.id)) + 1,
-        batchName: data.batchId === "1" ? "Business Bootcamp - Batch 1" : 
-                  data.batchId === "2" ? "Business Bootcamp - Batch 2" : "Entrepreneurship 101",
-        title: data.title,
-        status: "upcoming",
-        date: data.date,
-        time: data.time,
-        students: data.batchId === "1" ? 15 : data.batchId === "2" ? 18 : 12,
-        attendance: 0,
-        sessionUrl: data.sessionUrl
-      };
-      
-      setSessions([...sessions, newSession]);
-      toast({
-        title: "Session added",
-        description: `New session "${data.title}" has been added.`,
+  // Filter sessions by tab
+  const upcomingSessions = sessions.filter(session => session.status === 'upcoming');
+  const completedSessions = sessions.filter(session => session.status === 'completed');
+  
+  // Filter sessions by selected date
+  const selectedDateStr = date ? format(date, 'yyyy-MM-dd') : '';
+  const sessionsOnSelectedDate = sessions.filter(session => session.date === selectedDateStr);
+
+  const handleNewSessionChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setNewSession({
+      ...newSession,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleBatchChange = (value: string) => {
+    setNewSession({
+      ...newSession,
+      batch: value
+    });
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setDate(date);
+    if (date) {
+      setNewSession({
+        ...newSession,
+        date: format(date, 'yyyy-MM-dd')
       });
-    } else if (dialogMode === 'edit') {
-      // Edit existing session
-      setSessions(prev => 
-        prev.map(session => 
-          session.id === selectedSessionId
-            ? { 
-                ...session, 
-                title: data.title,
-                date: data.date,
-                time: data.time,
-                sessionUrl: data.sessionUrl,
-                recordingUrl: data.recordingUrl
-              }
-            : session
-        )
+    }
+  };
+
+  const handleCreateSession = () => {
+    // Validate form
+    if (!newSession.title || !newSession.batch || !newSession.date || !newSession.time) {
+      toast({
+        title: "Missing fields",
+        description: "Please fill all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (editMode && selectedSession) {
+      // Update existing session
+      const updatedSessions = sessions.map(session => 
+        session.id === selectedSession.id 
+          ? { 
+              ...session, 
+              title: newSession.title,
+              batch: newSession.batch,
+              date: newSession.date,
+              time: newSession.time,
+              notes: newSession.notes
+            } 
+          : session
       );
-      
+      setSessions(updatedSessions);
       toast({
         title: "Session updated",
-        description: `Session "${data.title}" has been updated.`,
+        description: "The session has been updated successfully"
+      });
+    } else {
+      // Create new session
+      const newSessionObj = {
+        id: sessions.length + 1,
+        title: newSession.title,
+        batch: newSession.batch,
+        date: newSession.date,
+        time: newSession.time,
+        students: 8, // Default value
+        status: 'upcoming' as const,
+        attendance: null,
+        notes: newSession.notes
+      };
+      setSessions([...sessions, newSessionObj]);
+      toast({
+        title: "Session created",
+        description: "New session has been created successfully"
       });
     }
-    
+
+    // Reset form and close dialog
+    setNewSession({
+      title: '',
+      batch: '',
+      date: format(new Date(), 'yyyy-MM-dd'),
+      time: '',
+      notes: ''
+    });
     setShowSessionDialog(false);
-    form.reset();
+    setEditMode(false);
   };
 
-  const handleEditSession = (sessionId: number) => {
-    const session = sessions.find(s => s.id === sessionId);
-    if (!session) return;
-    
-    form.reset({
-      batchId: session.batchName === "Business Bootcamp - Batch 1" ? "1" : 
-               session.batchName === "Business Bootcamp - Batch 2" ? "2" : "3",
+  const handleEditSession = (session: Session) => {
+    setSelectedSession(session);
+    setNewSession({
       title: session.title,
+      batch: session.batch,
       date: session.date,
       time: session.time,
-      sessionUrl: session.sessionUrl,
-      recordingUrl: session.recordingUrl
+      notes: session.notes || ''
     });
-    
-    setSelectedSessionId(sessionId);
-    setDialogMode('edit');
+    setEditMode(true);
     setShowSessionDialog(true);
   };
 
   const handleDeleteSession = (sessionId: number) => {
-    setSessions(prev => prev.filter(session => session.id !== sessionId));
-    
+    setSessions(sessions.filter(session => session.id !== sessionId));
     toast({
       title: "Session deleted",
-      description: "The session has been successfully deleted.",
-      variant: "destructive"
+      description: "The session has been removed"
     });
   };
 
-  const handleOpenAttendance = (sessionId: number) => {
-    setSelectedSessionId(sessionId);
-    setDialogMode('attendance');
-    setShowSessionDialog(true);
+  const handleOpenAttendance = (session: Session) => {
+    setSelectedSession(session);
+    setShowAttendanceDialog(true);
   };
 
-  const filteredSessions = sessions
-    .filter(session => 
-      session.batchName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      session.title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .filter(session => 
-      activeTab === 'all' || session.status === activeTab
-    )
-    .sort((a, b) => {
-      // Sort by date (newest first for completed, oldest first for upcoming)
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
-      
-      if (a.status === 'completed' && b.status === 'completed') {
-        return dateB.getTime() - dateA.getTime();
-      } else {
-        return dateA.getTime() - dateB.getTime();
-      }
+  const handleAttendanceChange = (studentId: number, checked: boolean) => {
+    if (!selectedSession) return;
+    
+    // If session doesn't have attendance yet, create mock attendance
+    if (!selectedSession.attendance) {
+      // Generate mock students
+      const mockAttendance: Student[] = Array.from({ length: selectedSession.students }).map((_, index) => ({
+        id: index + 1,
+        name: `Student ${index + 1}`,
+        present: false
+      }));
+      selectedSession.attendance = mockAttendance;
+    }
+    
+    // Update attendance
+    const updatedAttendance = selectedSession.attendance.map(student => 
+      student.id === studentId ? { ...student, present: checked } : student
+    );
+    
+    // Update session
+    const updatedSession = { ...selectedSession, attendance: updatedAttendance };
+    const updatedSessions = sessions.map(session => 
+      session.id === selectedSession.id ? updatedSession : session
+    );
+    
+    setSessions(updatedSessions);
+    setSelectedSession(updatedSession);
+  };
+
+  const handleSaveAttendance = () => {
+    if (!selectedSession) return;
+    
+    // Update session status to completed
+    const updatedSessions = sessions.map(session => 
+      session.id === selectedSession.id 
+        ? { ...session, status: 'completed' as const, attendance: selectedSession.attendance } 
+        : session
+    );
+    
+    setSessions(updatedSessions);
+    setShowAttendanceDialog(false);
+    
+    toast({
+      title: "Attendance saved",
+      description: "The attendance has been recorded"
     });
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl font-bold">Manage Sessions</h1>
-        
-        <div className="flex flex-col sm:flex-row gap-2">
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search sessions..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          <Button onClick={() => {
-            form.reset();
-            setDialogMode('add');
-            setShowSessionDialog(true);
-          }}>
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Add Session
-          </Button>
-        </div>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Sessions</h1>
+        <Button onClick={() => {
+          setEditMode(false);
+          setSelectedSession(null);
+          setNewSession({
+            title: '',
+            batch: '',
+            date: format(new Date(), 'yyyy-MM-dd'),
+            time: '',
+            notes: ''
+          });
+          setShowSessionDialog(true);
+        }}>
+          <Plus className="mr-2 h-4 w-4" />
+          Create Session
+        </Button>
       </div>
 
-      <Tabs defaultValue="upcoming" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 mb-4">
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-          <TabsTrigger value="rescheduled">Rescheduled</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={activeTab}>
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Session Details</TableHead>
-                    <TableHead>Schedule</TableHead>
-                    <TableHead>Batch</TableHead>
-                    <TableHead>Attendance</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredSessions.length > 0 ? (
-                    filteredSessions.map((session) => (
-                      <TableRow key={session.id}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{session.title}</div>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge 
-                                variant={
-                                  session.status === 'upcoming' 
-                                    ? 'default' 
-                                    : session.status === 'completed' 
-                                      ? 'outline' 
-                                      : 'secondary'
-                                }
-                              >
-                                {session.status}
-                              </Badge>
-                              
-                              {session.status === 'rescheduled' && (
-                                <span className="text-xs text-muted-foreground">
-                                  from {session.originalDate}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-col">
-                            <div className="text-sm flex items-center">
-                              <Calendar className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                              {new Date(session.date).toLocaleDateString()}
-                            </div>
-                            <div className="text-sm flex items-center mt-1">
-                              <Clock className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                              {session.time}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {session.batchName}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center">
-                            <Users className="h-4 w-4 mr-2 text-muted-foreground" />
-                            {session.attendance}/{session.students}
-                            {session.status === 'completed' && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                className="ml-2 h-6"
-                                onClick={() => handleOpenAttendance(session.id)}
-                              >
-                                Edit
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end items-center space-x-2">
-                            {session.status === 'upcoming' && (
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => {
-                                  if (session.sessionUrl) {
-                                    window.open(session.sessionUrl, '_blank');
-                                  }
-                                }}
-                                disabled={!session.sessionUrl}
-                              >
-                                <LinkIcon className="h-4 w-4 mr-1" />
-                                Join
-                              </Button>
-                            )}
-                            
-                            {session.status === 'completed' && session.recordingUrl && (
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => {
-                                  window.open(session.recordingUrl, '_blank');
-                                }}
-                              >
-                                <Video className="h-4 w-4 mr-1" />
-                                Recording
-                              </Button>
-                            )}
-                            
-                            {session.status === 'upcoming' && (
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleOpenAttendance(session.id)}
-                              >
-                                Take Attendance
-                              </Button>
-                            )}
-                            
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleEditSession(session.id)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleDeleteSession(session.id)}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                        No sessions found matching your criteria.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2">
+          <Tabs defaultValue="upcoming">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="upcoming">
+                Upcoming ({upcomingSessions.length})
+              </TabsTrigger>
+              <TabsTrigger value="completed">
+                Completed ({completedSessions.length})
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="upcoming" className="space-y-4 mt-6">
+              {upcomingSessions.length > 0 ? (
+                upcomingSessions.map(session => (
+                  <Card key={session.id}>
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle>{session.title}</CardTitle>
+                          <CardDescription>{session.batch}</CardDescription>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="icon"
+                            onClick={() => handleEditSession(session)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="icon"
+                            onClick={() => handleDeleteSession(session.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex items-center gap-2">
+                          <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                          <span>{format(new Date(session.date), 'MMMM d, yyyy')}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                          <span>{session.time}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <span>{session.students} Students</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Video className="h-4 w-4 text-muted-foreground" />
+                          <span>Online Session</span>
+                        </div>
+                      </div>
+                      {session.notes && (
+                        <div className="mt-4 text-sm text-muted-foreground">
+                          <p>{session.notes}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                    <CardFooter>
+                      <Button 
+                        variant="default" 
+                        className="w-full"
+                        onClick={() => handleOpenAttendance(session)}
+                      >
+                        Take Attendance
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center py-10 text-muted-foreground">
+                  No upcoming sessions scheduled.
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="completed" className="space-y-4 mt-6">
+              {completedSessions.length > 0 ? (
+                completedSessions.map(session => (
+                  <Card key={session.id}>
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle>{session.title}</CardTitle>
+                          <CardDescription>{session.batch}</CardDescription>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="icon"
+                          onClick={() => handleDeleteSession(session.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex items-center gap-2">
+                          <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                          <span>{format(new Date(session.date), 'MMMM d, yyyy')}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                          <span>{session.time}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <span>
+                            {session.attendance ? 
+                              `${session.attendance.filter(s => s.present).length}/${session.attendance.length} Attended` : 
+                              `${session.students} Students`}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Video className="h-4 w-4 text-muted-foreground" />
+                          <span>Online Session</span>
+                        </div>
+                      </div>
+                      {session.notes && (
+                        <div className="mt-4 text-sm text-muted-foreground">
+                          <p>{session.notes}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                    <CardFooter>
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => handleOpenAttendance(session)}
+                      >
+                        View Attendance
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center py-10 text-muted-foreground">
+                  No completed sessions found.
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+        
+        <div>
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle>Session Calendar</CardTitle>
+              <CardDescription>View and manage sessions by date</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center pb-0">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={handleDateSelect}
+                className="rounded-md border"
+              />
+            </CardContent>
+            
+            <CardContent className="pt-6">
+              <h3 className="font-medium mb-3">Sessions on {date ? format(date, 'MMMM d, yyyy') : 'selected date'}</h3>
+              {sessionsOnSelectedDate.length > 0 ? (
+                <div className="space-y-3">
+                  {sessionsOnSelectedDate.map(session => (
+                    <div 
+                      key={session.id} 
+                      className="p-3 rounded-md border hover:border-primary transition-colors cursor-pointer"
+                      onClick={() => handleEditSession(session)}
+                    >
+                      <div className="font-medium">{session.title}</div>
+                      <div className="text-sm text-muted-foreground">{session.time}</div>
+                      <div className="text-xs mt-1 text-muted-foreground">{session.batch}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 text-muted-foreground">
+                  No sessions on this date.
+                </div>
+              )}
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Session Dialog - Add, Edit, or Attendance */}
+        </div>
+      </div>
+      
+      {/* Create/Edit Session Dialog */}
       <Dialog open={showSessionDialog} onOpenChange={setShowSessionDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
-            <DialogTitle>
-              {dialogMode === 'add' ? 'Add New Session' : 
-               dialogMode === 'edit' ? 'Edit Session' : 
-               'Record Attendance'}
-            </DialogTitle>
+            <DialogTitle>{editMode ? 'Edit Session' : 'Create New Session'}</DialogTitle>
             <DialogDescription>
-              {dialogMode === 'add' ? 'Create a new session by filling out the details below.' : 
-               dialogMode === 'edit' ? 'Update the session details.' : 
-               'Mark which students were present in this session.'}
+              {editMode ? 'Update the session details below' : 'Fill in the details for the new session'}
             </DialogDescription>
           </DialogHeader>
-          
-          {(dialogMode === 'add' || dialogMode === 'edit') && (
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleAddSession)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="batchId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Batch</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a batch" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="1">Business Bootcamp - Batch 1</SelectItem>
-                          <SelectItem value="2">Business Bootcamp - Batch 2</SelectItem>
-                          <SelectItem value="3">Entrepreneurship 101</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Session Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter session title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="date"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="time"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Time</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., 3:00 PM - 5:00 PM" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                {dialogMode === 'add' ? (
-                  <FormField
-                    control={form.control}
-                    name="sessionUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Session Link</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter meeting URL" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Add the URL that students will use to join the session.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                ) : (
-                  <FormField
-                    control={form.control}
-                    name="recordingUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Recording Link</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter recording URL" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Add the URL where students can view the session recording.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-                
-                <DialogFooter>
-                  <Button type="submit">
-                    {dialogMode === 'add' ? 'Create Session' : 'Update Session'}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          )}
-          
-          {dialogMode === 'attendance' && (
-            <div className="space-y-4">
-              <div className="border rounded-md divide-y">
-                {attendance.map((student) => (
-                  <div key={student.id} className="flex items-center py-2 px-3">
-                    <Checkbox 
-                      id={`student-${student.id}`}
-                      checked={student.present}
-                      onCheckedChange={(checked) => 
-                        handleAttendanceChange(student.id, checked as boolean)
-                      }
-                      className="mr-3"
-                    />
-                    <Label 
-                      htmlFor={`student-${student.id}`}
-                      className="flex-1 cursor-pointer"
-                    >
-                      {student.name}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="flex justify-end gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowSessionDialog(false)}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handleAttendanceSave}>
-                  Save Attendance
-                </Button>
-              </div>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="title" className="text-right">Title</Label>
+              <Input
+                id="title"
+                name="title"
+                value={newSession.title}
+                onChange={handleNewSessionChange}
+                className="col-span-3"
+                placeholder="Session title"
+              />
             </div>
-          )}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="batch" className="text-right">Batch</Label>
+              <Select 
+                value={newSession.batch} 
+                onValueChange={handleBatchChange}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select a batch" />
+                </SelectTrigger>
+                <SelectContent>
+                  {batchesMockData.map(batch => (
+                    <SelectItem key={batch.id} value={batch.name}>
+                      {batch.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="date" className="text-right">Date</Label>
+              <Input
+                id="date"
+                name="date"
+                type="date"
+                value={newSession.date}
+                onChange={handleNewSessionChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="time" className="text-right">Time</Label>
+              <Input
+                id="time"
+                name="time"
+                value={newSession.time}
+                onChange={handleNewSessionChange}
+                className="col-span-3"
+                placeholder="e.g., 10:00 AM - 11:30 AM"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="notes" className="text-right">Notes</Label>
+              <Textarea
+                id="notes"
+                name="notes"
+                value={newSession.notes}
+                onChange={handleNewSessionChange}
+                className="col-span-3"
+                placeholder="Session details and agenda"
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSessionDialog(false)}>Cancel</Button>
+            <Button onClick={handleCreateSession}>
+              {editMode ? 'Update Session' : 'Create Session'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Attendance Dialog */}
+      <Dialog open={showAttendanceDialog} onOpenChange={setShowAttendanceDialog}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedSession?.status === 'completed' ? 'Attendance Record' : 'Take Attendance'}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedSession?.title} - {selectedSession?.date}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {selectedSession && (
+              <>
+                {/* If attendance exists, show it */}
+                {selectedSession.attendance ? (
+                  <div className="space-y-2">
+                    {selectedSession.attendance.map(student => (
+                      <div 
+                        key={student.id} 
+                        className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Checkbox 
+                            id={`student-${student.id}`}
+                            checked={student.present}
+                            onCheckedChange={(checked) => 
+                              handleAttendanceChange(student.id, checked as boolean)
+                            }
+                            disabled={selectedSession.status === 'completed'}
+                          />
+                          <Label htmlFor={`student-${student.id}`}>{student.name}</Label>
+                        </div>
+                        {student.present ? (
+                          <span className="text-xs text-success flex items-center">
+                            <Check size={14} className="mr-1" /> Present
+                          </span>
+                        ) : (
+                          <span className="text-xs text-destructive">Absent</span>
+                        )}
+                      </div>
+                    ))}
+                    
+                    <div className="mt-4 p-3 bg-muted/50 rounded-md">
+                      <p className="text-sm font-medium">Attendance Summary</p>
+                      <p className="text-sm">
+                        {selectedSession.attendance.filter(s => s.present).length} out of {selectedSession.attendance.length} students present
+                        ({Math.round((selectedSession.attendance.filter(s => s.present).length / selectedSession.attendance.length) * 100)}%)
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  // If no attendance yet, create a form with mock data
+                  <div className="space-y-2">
+                    {Array.from({ length: selectedSession.students }).map((_, index) => (
+                      <div 
+                        key={index} 
+                        className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Checkbox 
+                            id={`student-${index}`}
+                            onCheckedChange={(checked) => 
+                              handleAttendanceChange(index + 1, checked as boolean)
+                            }
+                          />
+                          <Label htmlFor={`student-${index}`}>Student {index + 1}</Label>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAttendanceDialog(false)}>
+              Close
+            </Button>
+            {selectedSession?.status !== 'completed' && (
+              <Button onClick={handleSaveAttendance}>
+                Save Attendance
+              </Button>
+            )}
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
 };
 
-export default MentorSessions;
+export default Sessions;

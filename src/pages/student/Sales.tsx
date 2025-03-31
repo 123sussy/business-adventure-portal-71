@@ -1,402 +1,182 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, DollarSign, Trash2, Calendar, Upload } from 'lucide-react';
-import { format } from 'date-fns';
-import { useToast } from '@/hooks/use-toast';
+import { DollarSign, TrendingUp, BarChart3, Calendar } from 'lucide-react';
+import SalesChart from '@/components/student/SalesChart';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-// Interface for sale data
-interface Sale {
-  id: number;
-  amount: number;
-  customerSource: string;
-  customerType: string;
-  proofUrl: string;
-  date: Date;
-}
-
-// Mock data for sales
-const mockSales: Sale[] = [
-  { 
-    id: 1, 
-    amount: 75.00, 
-    customerSource: 'family', 
-    customerType: 'new', 
-    proofUrl: '/placeholder.svg', 
-    date: new Date(2023, 6, 5) 
-  },
-  { 
-    id: 2, 
-    amount: 150.00, 
-    customerSource: 'referral', 
-    customerType: 'recurring', 
-    proofUrl: '/placeholder.svg', 
-    date: new Date(2023, 6, 10) 
-  },
-  { 
-    id: 3, 
-    amount: 45.50, 
-    customerSource: 'society', 
-    customerType: 'new', 
-    proofUrl: '/placeholder.svg', 
-    date: new Date(2023, 6, 15) 
-  },
-];
-
-const CustomerSourceOptions = [
-  { value: 'friends', label: 'Friends' },
-  { value: 'family', label: 'Family' },
-  { value: 'society', label: 'Society' },
-  { value: 'referral', label: 'Referral' },
-  { value: 'other', label: 'Other' },
-];
-
-const CustomerTypeOptions = [
-  { value: 'new', label: 'New Customer' },
-  { value: 'recurring', label: 'Recurring Customer' },
-];
-
-const StudentSales = () => {
-  const { toast } = useToast();
-  const [sales, setSales] = useState<Sale[]>(mockSales);
-  const [newSale, setNewSale] = useState({
-    amount: '',
-    customerSource: '',
-    customerType: '',
-    otherSource: '',
-    proofFile: null as File | null
-  });
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedTab, setSelectedTab] = useState('all');
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewSale({ ...newSale, [name]: value });
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setNewSale({ ...newSale, [name]: value });
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setNewSale({ ...newSale, proofFile: e.target.files[0] });
-    }
-  };
-
-  const handleAddSale = () => {
-    // Validate the form
-    if (!newSale.amount || !newSale.customerSource || !newSale.customerType || !newSale.proofFile) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields and upload proof of sale",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Create new sale object
-    const sale: Sale = {
-      id: sales.length + 1,
-      amount: parseFloat(newSale.amount),
-      customerSource: newSale.customerSource === 'other' ? newSale.otherSource : newSale.customerSource,
-      customerType: newSale.customerType,
-      proofUrl: URL.createObjectURL(newSale.proofFile),
-      date: new Date()
-    };
-
-    // Add the new sale
-    setSales([...sales, sale]);
+// Mock sales data for 30 days
+const generateMockSalesData = () => {
+  const data = [];
+  const today = new Date();
+  
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
     
-    // Close dialog and reset form
-    setDialogOpen(false);
-    setNewSale({
-      amount: '',
-      customerSource: '',
-      customerType: '',
-      otherSource: '',
-      proofFile: null
-    });
-
-    toast({
-      title: "Sale Added",
-      description: `$${sale.amount.toFixed(2)} sale has been recorded.`
-    });
-  };
-
-  const handleDeleteSale = (id: number) => {
-    setSales(sales.filter(sale => sale.id !== id));
-    toast({
-      title: "Sale Deleted",
-      description: "The sale has been removed from your records."
-    });
-  };
-
-  const getTotalSales = () => {
-    return sales.reduce((total, sale) => total + sale.amount, 0);
-  };
-
-  const getFilteredSales = () => {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
+    // More sales on weekends and random spikes
+    let amount = 0;
     
-    switch (selectedTab) {
-      case 'this-month':
-        return sales.filter(sale => {
-          const saleMonth = sale.date.getMonth();
-          const saleYear = sale.date.getFullYear();
-          return saleMonth === currentMonth && saleYear === currentYear;
-        });
-      case 'all':
-      default:
-        return sales;
+    if (date.getDay() === 0 || date.getDay() === 6) {
+      // Weekends have higher sales
+      amount = Math.floor(Math.random() * 40) + 20;
+    } else {
+      // Weekdays
+      amount = Math.floor(Math.random() * 25) + 5;
     }
-  };
+    
+    // Add some spikes
+    if (Math.random() > 0.85) {
+      amount += Math.floor(Math.random() * 50) + 20;
+    }
+    
+    data.push({
+      date: date.toISOString().split('T')[0],
+      amount
+    });
+  }
+  
+  return data;
+};
 
+const generateMonthlySalesData = () => {
+  const months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+  
+  return months.map(month => ({
+    date: month,
+    amount: Math.floor(Math.random() * 300) + 100
+  }));
+};
+
+// Mock data
+const mockDailySales = generateMockSalesData();
+const mockMonthlySales = generateMonthlySalesData();
+
+const salesTransactions = [
+  { id: 1, customer: 'John Smith', product: 'Eco-friendly Notebook', amount: 25, date: '2023-10-15' },
+  { id: 2, customer: 'Emily Johnson', product: 'Bamboo Pen Set', amount: 18, date: '2023-10-14' },
+  { id: 3, customer: 'Michael Lee', product: 'Recycled Paper Journal', amount: 22, date: '2023-10-12' },
+  { id: 4, customer: 'Sophia Garcia', product: 'Eco-friendly Notebook', amount: 25, date: '2023-10-10' },
+  { id: 5, customer: 'David Wilson', product: 'Sustainable Pencil Case', amount: 15, date: '2023-10-08' },
+  { id: 6, customer: 'Emma Rodriguez', product: 'Bamboo Pen Set', amount: 18, date: '2023-10-05' },
+  { id: 7, customer: 'James Brown', product: 'Recycled Paper Journal', amount: 22, date: '2023-10-03' },
+  { id: 8, customer: 'Olivia Martinez', product: 'Sustainable Pencil Case', amount: 15, date: '2023-10-01' },
+];
+
+const Sales = () => {
+  const [period, setPeriod] = useState('daily');
+  const totalEarnings = salesTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">My Sales</h1>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus size={16} className="mr-2" />
-              Add New Sale
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Add New Sale</DialogTitle>
-              <DialogDescription>
-                Record a new sale you've made with your business.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="amount" className="text-right">
-                  Amount
-                </Label>
-                <div className="col-span-3 relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
-                    $
-                  </span>
-                  <Input
-                    id="amount"
-                    name="amount"
-                    className="pl-7"
-                    placeholder="0.00"
-                    type="number"
-                    value={newSale.amount}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="customerSource" className="text-right">
-                  Customer Source
-                </Label>
-                <div className="col-span-3">
-                  <Select 
-                    onValueChange={(value) => handleSelectChange('customerSource', value)}
-                    value={newSale.customerSource}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="How did you find the customer?" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {CustomerSourceOptions.map(option => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              {newSale.customerSource === 'other' && (
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="otherSource" className="text-right">
-                    Specify Source
-                  </Label>
-                  <Input
-                    id="otherSource"
-                    name="otherSource"
-                    className="col-span-3"
-                    placeholder="Please specify"
-                    value={newSale.otherSource}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              )}
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="customerType" className="text-right">
-                  Customer Type
-                </Label>
-                <div className="col-span-3">
-                  <Select 
-                    onValueChange={(value) => handleSelectChange('customerType', value)}
-                    value={newSale.customerType}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="New or recurring customer?" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {CustomerTypeOptions.map(option => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="proof" className="text-right">
-                  Proof of Sale
-                </Label>
-                <div className="col-span-3">
-                  <div className="relative">
-                    <Input
-                      id="proof"
-                      type="file"
-                      accept="image/png,image/jpeg,video/mp4"
-                      className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
-                      onChange={handleFileChange}
-                    />
-                    <Button 
-                      variant="outline" 
-                      className="w-full flex items-center justify-center gap-2"
-                      type="button"
-                    >
-                      <Upload size={16} />
-                      {newSale.proofFile ? newSale.proofFile.name : "Upload Proof (.png, .jpg, .mp4)"}
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Please upload an image or video as proof of your sale
-                  </p>
-                </div>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="button" onClick={handleAddSale}>
-                Add Sale
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <h1 className="text-2xl font-bold">Sales</h1>
+        <Select defaultValue="daily" onValueChange={setPeriod}>
+          <SelectTrigger className="w-32">
+            <SelectValue placeholder="Period" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="daily">Daily</SelectItem>
+            <SelectItem value="monthly">Monthly</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-
-      {/* Sales Summary Card */}
-      <Card className="bg-gradient-to-br from-blue-50 to-white">
-        <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h2 className="text-lg font-medium text-muted-foreground">Total Sales</h2>
-              <p className="text-3xl font-bold text-primary">${getTotalSales().toFixed(2)}</p>
-              <p className="text-sm text-muted-foreground">From {sales.length} sales</p>
+      
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Earnings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-success" />
+              <div className="text-2xl font-bold">${totalEarnings}</div>
             </div>
-            <Button size="sm" variant="outline" className="gap-1" onClick={() => setDialogOpen(true)}>
-              <DollarSign size={16} />
-              Record New Sale
-            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              <div className="text-2xl font-bold">{salesTransactions.length}</div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Average Order</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-accent" />
+              <div className="text-2xl font-bold">
+                ${(totalEarnings / salesTransactions.length).toFixed(2)}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Sales Chart */}
+      <SalesChart 
+        data={period === 'daily' ? mockDailySales : mockMonthlySales} 
+        title={`${period === 'daily' ? 'Daily' : 'Monthly'} Sales History`}
+        description={`Your ${period} sales performance over time`}
+      />
+      
+      {/* Transactions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Transactions</CardTitle>
+          <CardDescription>Your latest sales</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border overflow-hidden">
+            <table className="w-full caption-bottom text-sm">
+              <thead className="border-b bg-muted/50">
+                <tr>
+                  <th className="h-12 px-4 text-left align-middle font-medium">Customer</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium">Product</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium">Date</th>
+                  <th className="h-12 px-4 text-right align-middle font-medium">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {salesTransactions.map((transaction) => (
+                  <tr key={transaction.id} className="border-b transition-colors hover:bg-muted/20">
+                    <td className="p-4 align-middle">{transaction.customer}</td>
+                    <td className="p-4 align-middle">{transaction.product}</td>
+                    <td className="p-4 align-middle">
+                      {new Date(transaction.date).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </td>
+                    <td className="p-4 align-middle text-right font-medium">${transaction.amount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex justify-center mt-4">
+            <Button variant="outline">View All Transactions</Button>
           </div>
         </CardContent>
       </Card>
-
-      {/* Sales Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Sales History</CardTitle>
-          <CardDescription>View and manage your recorded sales</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="all" value={selectedTab} onValueChange={setSelectedTab}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="all">All Sales</TabsTrigger>
-              <TabsTrigger value="this-month">This Month</TabsTrigger>
-            </TabsList>
-            <TabsContent value={selectedTab}>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Customer Source</TableHead>
-                    <TableHead>Customer Type</TableHead>
-                    <TableHead>Proof</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {getFilteredSales().length > 0 ? (
-                    getFilteredSales().map((sale) => (
-                      <TableRow key={sale.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Calendar size={16} className="text-muted-foreground" />
-                            {format(sale.date, 'MMM d, yyyy')}
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium">${sale.amount.toFixed(2)}</TableCell>
-                        <TableCell className="capitalize">{sale.customerSource}</TableCell>
-                        <TableCell>
-                          {sale.customerType === 'new' ? 'New Customer' : 'Recurring Customer'}
-                        </TableCell>
-                        <TableCell>
-                          <Button size="sm" variant="outline" asChild>
-                            <a href={sale.proofUrl} target="_blank" rel="noopener noreferrer">
-                              View Proof
-                            </a>
-                          </Button>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button 
-                            size="sm" 
-                            variant="ghost" 
-                            className="text-destructive hover:text-destructive/90"
-                            onClick={() => handleDeleteSale(sale.id)}
-                          >
-                            <Trash2 size={16} />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                        No sales found for the selected period.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      {/* Add Sale Button - Fixed at bottom right */}
-      <Button 
-        onClick={() => setDialogOpen(true)}
-        size="icon" 
-        className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg"
-      >
-        <Plus size={24} />
-      </Button>
     </div>
   );
 };
 
-export default StudentSales;
+export default Sales;

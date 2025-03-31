@@ -1,71 +1,49 @@
 
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
-type UserAvatarProps = {
+interface UserAvatarProps {
   name: string;
-  image?: string;
-  size?: 'sm' | 'md' | 'lg';
-  status?: 'online' | 'offline' | 'away';
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   className?: string;
-};
+  highlight?: boolean;
+}
 
-const getInitials = (name: string) => {
-  return name
+const UserAvatar: React.FC<UserAvatarProps> = ({ 
+  name, 
+  size = "md",
+  className,
+  highlight = false
+}) => {
+  const initials = name
     .split(' ')
     .map(part => part[0])
     .join('')
     .toUpperCase()
     .substring(0, 2);
-};
-
-const UserAvatar = ({
-  name,
-  image,
-  size = 'md',
-  status,
-  className
-}: UserAvatarProps) => {
+  
   const sizeClasses = {
-    sm: 'w-8 h-8 text-xs',
-    md: 'w-10 h-10 text-sm',
-    lg: 'w-14 h-14 text-base',
+    "xs": "h-6 w-6 text-xs",
+    "sm": "h-8 w-8 text-sm",
+    "md": "h-10 w-10 text-base",
+    "lg": "h-16 w-16 text-xl",
+    "xl": "h-24 w-24 text-2xl"
   };
-
+  
   return (
-    <div className="relative">
-      <div 
-        className={cn(
-          "rounded-full flex items-center justify-center bg-primary/10 text-primary font-medium",
-          sizeClasses[size],
-          className
-        )}
-      >
-        {image ? (
-          <img 
-            src={image} 
-            alt={name} 
-            className="w-full h-full object-cover rounded-full"
-          />
-        ) : (
-          <span>{getInitials(name)}</span>
-        )}
-      </div>
-      
-      {status && (
-        <span 
-          className={cn(
-            "absolute bottom-0 right-0 rounded-full border-2 border-white",
-            size === 'sm' ? 'w-2.5 h-2.5' : 'w-3 h-3',
-            {
-              'bg-success': status === 'online',
-              'bg-gray-400': status === 'offline',
-              'bg-warning': status === 'away',
-            }
-          )}
-        />
-      )}
-    </div>
+    <Avatar className={cn(
+      sizeClasses[size], 
+      highlight && "ring-2 ring-primary ring-offset-2",
+      className
+    )}>
+      <AvatarFallback className={cn(
+        "bg-primary/10 text-primary font-medium",
+        highlight && "bg-primary/20"
+      )}>
+        {initials}
+      </AvatarFallback>
+    </Avatar>
   );
 };
 

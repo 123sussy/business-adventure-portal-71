@@ -1,136 +1,179 @@
 
 import React, { useState } from 'react';
+import TaskCardUpdated from '@/components/student/TaskCardUpdated';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import TaskCardUpdated from '@/components/student/TaskCardUpdated';
+import { Badge } from '@/components/ui/badge';
+import { ArrowRight, CheckSquare, Clock, AlertTriangle } from 'lucide-react';
 
-// Define the task type
-type TaskStatus = 'pending' | 'submitted' | 'completed' | 'overdue' | 'resubmit';
-
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: TaskStatus;
-  deadline: string;
-  submittedAt?: string;
-  feedback?: string;
-  rating?: number;
-}
-
-// Mock data
-const mockTasks: Task[] = [
-  { id: 1, title: "Business Idea Submission", description: "Submit your initial business concept", status: "pending", deadline: "2023-07-10" },
-  { id: 2, title: "Sales Projection", description: "Create your sales forecast for the month", status: "submitted", deadline: "2023-07-05", submittedAt: "2023-07-04" },
-  { id: 3, title: "Marketing Strategy", description: "Document your marketing approach", status: "completed", deadline: "2023-06-25", feedback: "Great job thinking through customer acquisition!", rating: 4.5 },
-  { id: 4, title: "Expense Report", description: "Submit your business expenses", status: "overdue", deadline: "2023-06-15" },
-  { id: 5, title: "Prototype Design", description: "Submit images of your product prototype", status: "resubmit", deadline: "2023-06-20", feedback: "Please provide clearer images and include dimensions" },
-  { id: 6, title: "Customer Testimonials", description: "Collect and submit at least 3 customer testimonials", status: "pending", deadline: "2023-07-15" },
-  { id: 7, title: "Social Media Plan", description: "Create a 30-day social media content plan", status: "pending", deadline: "2023-07-20" },
-  { id: 8, title: "Financial Analysis", description: "Complete the profit and loss analysis worksheet", status: "completed", deadline: "2023-06-10", feedback: "Excellent analysis of your cost structure!", rating: 5 }
+// Mock data for student tasks
+const studentTasks = [
+  {
+    id: 1, 
+    title: 'Create a Business Plan', 
+    description: 'Draft a comprehensive business plan for your product idea.', 
+    status: 'completed' as const, 
+    deadline: '2023-09-30',
+    submittedAt: '2023-09-28',
+    feedback: 'Excellent work! Your business plan is well-structured and shows great potential.', 
+    rating: 5
+  },
+  {
+    id: 2, 
+    title: 'Design Product Packaging', 
+    description: 'Create eco-friendly packaging designs for your product.', 
+    status: 'resubmit' as const, 
+    deadline: '2023-10-10',
+    submittedAt: '2023-10-08',
+    feedback: 'Good start, but please consider making the design more sustainable. Review materials section.' 
+  },
+  {
+    id: 3, 
+    title: 'Marketing Strategy', 
+    description: 'Develop a marketing strategy to promote your product.', 
+    status: 'submitted' as const, 
+    deadline: '2023-10-15',
+    submittedAt: '2023-10-14'
+  },
+  {
+    id: 4, 
+    title: 'Financial Projection', 
+    description: 'Create a financial projection for your business for the next 6 months.', 
+    status: 'pending' as const, 
+    deadline: '2023-10-25'
+  },
+  {
+    id: 5, 
+    title: 'Sales Pitch', 
+    description: 'Prepare a 5-minute sales pitch for your product.', 
+    status: 'pending' as const, 
+    deadline: '2023-11-05'
+  },
+  {
+    id: 6, 
+    title: 'Customer Feedback Analysis', 
+    description: 'Collect and analyze feedback from at least 10 potential customers.', 
+    status: 'overdue' as const, 
+    deadline: '2023-10-05'
+  },
 ];
 
-const StudentTasks = () => {
-  const [activeTab, setActiveTab] = useState<string>("all");
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
+const Tasks = () => {
+  const [tasks, setTasks] = useState(studentTasks);
   
-  const filteredTasks = () => {
-    switch (activeTab) {
-      case "pending":
-        return tasks.filter(task => ["pending", "overdue"].includes(task.status));
-      case "submitted":
-        return tasks.filter(task => task.status === "submitted");
-      case "completed":
-        return tasks.filter(task => task.status === "completed");
-      case "resubmit":
-        return tasks.filter(task => task.status === "resubmit");
-      default:
-        return tasks;
-    }
+  const pendingTasks = tasks.filter(task => task.status === 'pending' || task.status === 'overdue');
+  const submittedTasks = tasks.filter(task => task.status === 'submitted');
+  const completedTasks = tasks.filter(task => task.status === 'completed');
+  const resubmitTasks = tasks.filter(task => task.status === 'resubmit');
+  
+  const allTasks = [...pendingTasks, ...resubmitTasks, ...submittedTasks, ...completedTasks];
+  
+  const getStatusCounts = () => {
+    return {
+      pending: pendingTasks.length,
+      submitted: submittedTasks.length,
+      completed: completedTasks.length,
+      resubmit: resubmitTasks.length,
+      overdue: tasks.filter(task => task.status === 'overdue').length
+    };
   };
   
-  // Calculate statistics
-  const completedCount = tasks.filter(task => task.status === "completed").length;
-  const pendingCount = tasks.filter(task => task.status === "pending").length;
-  const overdueCount = tasks.filter(task => task.status === "overdue").length;
-  const submittedCount = tasks.filter(task => task.status === "submitted").length;
-  const resubmitCount = tasks.filter(task => task.status === "resubmit").length;
-  const totalCount = tasks.length;
-  const completionRate = Math.round((completedCount / totalCount) * 100);
-
+  const statusCounts = getStatusCounts();
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">My Tasks</h1>
-        <div className="text-sm text-muted-foreground">
-          Task Completion: <span className="font-medium text-primary">{completionRate}%</span>
+        <h1 className="text-2xl font-bold">Tasks</h1>
+        <div className="flex gap-2">
+          {statusCounts.pending > 0 && (
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Clock size={12} /> {statusCounts.pending} pending
+            </Badge>
+          )}
+          {statusCounts.overdue > 0 && (
+            <Badge variant="destructive" className="flex items-center gap-1">
+              <AlertTriangle size={12} /> {statusCounts.overdue} overdue
+            </Badge>
+          )}
+          {statusCounts.resubmit > 0 && (
+            <Badge variant="warning" className="flex items-center gap-1">
+              <ArrowRight size={12} /> {statusCounts.resubmit} to resubmit
+            </Badge>
+          )}
         </div>
       </div>
       
-      {/* Task Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-        <Card className="bg-muted/30">
-          <CardContent className="p-4 text-center">
-            <p className="text-sm text-muted-foreground">Total</p>
-            <p className="text-2xl font-bold">{totalCount}</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-muted/30">
-          <CardContent className="p-4 text-center">
-            <p className="text-sm text-muted-foreground">Pending</p>
-            <p className="text-2xl font-bold">{pendingCount}</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-muted/30">
-          <CardContent className="p-4 text-center">
-            <p className="text-sm text-muted-foreground">Submitted</p>
-            <p className="text-2xl font-bold">{submittedCount}</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-muted/30">
-          <CardContent className="p-4 text-center">
-            <p className="text-sm text-muted-foreground">Completed</p>
-            <p className="text-2xl font-bold">{completedCount}</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-muted/30">
-          <CardContent className="p-4 text-center">
-            <p className="text-sm text-muted-foreground">Overdue</p>
-            <p className="text-2xl font-bold text-destructive">{overdueCount}</p>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Tasks List */}
       <Card>
-        <CardHeader>
-          <CardTitle>Tasks</CardTitle>
-          <CardDescription>
-            View and manage your assigned tasks
-          </CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle>Task Management</CardTitle>
+          <CardDescription>View and manage your assigned tasks</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-2 sm:grid-cols-5 mb-4">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="submitted">Submitted</TabsTrigger>
-              <TabsTrigger value="completed">Completed</TabsTrigger>
-              <TabsTrigger value="resubmit">Resubmit</TabsTrigger>
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="grid grid-cols-5 mb-6">
+              <TabsTrigger value="all">All ({allTasks.length})</TabsTrigger>
+              <TabsTrigger value="pending">Pending ({statusCounts.pending})</TabsTrigger>
+              <TabsTrigger value="submitted">Submitted ({statusCounts.submitted})</TabsTrigger>
+              <TabsTrigger value="resubmit">To Resubmit ({statusCounts.resubmit})</TabsTrigger>
+              <TabsTrigger value="completed">Completed ({statusCounts.completed})</TabsTrigger>
             </TabsList>
             
-            <TabsContent value={activeTab} className="space-y-4">
-              {filteredTasks().map(task => (
-                <TaskCardUpdated key={task.id} task={task} />
-              ))}
-              
-              {filteredTasks().length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>No tasks found in this category.</p>
+            <TabsContent value="all" className="space-y-4">
+              {allTasks.length > 0 ? (
+                allTasks.map(task => (
+                  <TaskCardUpdated key={task.id} task={task} />
+                ))
+              ) : (
+                <div className="text-center py-10 text-muted-foreground">
+                  No tasks found.
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="pending" className="space-y-4">
+              {pendingTasks.length > 0 ? (
+                pendingTasks.map(task => (
+                  <TaskCardUpdated key={task.id} task={task} />
+                ))
+              ) : (
+                <div className="text-center py-10 text-muted-foreground">
+                  No pending tasks.
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="submitted" className="space-y-4">
+              {submittedTasks.length > 0 ? (
+                submittedTasks.map(task => (
+                  <TaskCardUpdated key={task.id} task={task} />
+                ))
+              ) : (
+                <div className="text-center py-10 text-muted-foreground">
+                  No submitted tasks.
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="resubmit" className="space-y-4">
+              {resubmitTasks.length > 0 ? (
+                resubmitTasks.map(task => (
+                  <TaskCardUpdated key={task.id} task={task} />
+                ))
+              ) : (
+                <div className="text-center py-10 text-muted-foreground">
+                  No tasks to resubmit.
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="completed" className="space-y-4">
+              {completedTasks.length > 0 ? (
+                completedTasks.map(task => (
+                  <TaskCardUpdated key={task.id} task={task} />
+                ))
+              ) : (
+                <div className="text-center py-10 text-muted-foreground">
+                  No completed tasks.
                 </div>
               )}
             </TabsContent>
@@ -141,4 +184,4 @@ const StudentTasks = () => {
   );
 };
 
-export default StudentTasks;
+export default Tasks;

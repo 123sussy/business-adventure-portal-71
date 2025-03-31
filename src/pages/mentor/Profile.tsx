@@ -1,49 +1,85 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Briefcase,
+  School,
+  Trophy, 
+  Edit, 
+  Star,
+  GraduationCap,
+  FileText,
+  Check,
+  Save
+} from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { PencilIcon, User, Mail, Phone, MapPin, Calendar, BadgeCheck, Shield, Lock, Bell, ExternalLink } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+// Mock data
+const profileData = {
+  name: 'Sarah Johnson',
+  role: 'Mentor',
+  email: 'sarah.johnson@example.com',
+  phone: '(555) 234-5678',
+  location: 'Chicago, IL',
+  education: 'MBA, Business Administration',
+  specialization: 'Entrepreneurship & Marketing',
+  experience: '8 years in Business Consulting',
+  bio: 'Sarah has extensive experience helping startups and young entrepreneurs develop successful business strategies. She specializes in marketing and product development, with a focus on sustainability and social entrepreneurship.',
+  joined: 'March 2022',
+  stats: {
+    students: 32,
+    activeBatches: 3,
+    avgRating: 4.8,
+    rank: 3,
+    nationalRank: 17
+  },
+  recentActivities: [
+    { id: 1, action: 'Reviewed student task', details: 'Business plan for Alex Johnson', date: '2 hours ago' },
+    { id: 2, action: 'Conducted session', details: 'Marketing strategies with Batch 2', date: '2 days ago' },
+    { id: 3, action: 'Provided feedback', details: 'Product design for Emma Wilson', date: '3 days ago' },
+  ]
+};
 
 const MentorProfile = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    name: 'Sarah Johnson',
-    email: 'sarah.johnson@example.com',
-    phone: '+1 (555) 123-4567',
-    address: '123 Main St, San Francisco, CA 94105',
-    bio: 'Experienced business mentor with over 10 years of experience in entrepreneurship and startup coaching. Specialized in helping young entrepreneurs turn their ideas into successful businesses.',
-    expertise: ['Business Strategy', 'Marketing', 'Finance'],
-    education: 'MBA, Stanford University',
-    experience: '10+ years in business consulting',
-    preferredContact: 'email',
-    notifyNewStudent: true,
-    notifySessionChanges: true,
-    notifyEarnings: true
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editedProfile, setEditedProfile] = useState({
+    name: profileData.name,
+    email: profileData.email,
+    phone: profileData.phone,
+    location: profileData.location,
+    education: profileData.education,
+    specialization: profileData.specialization,
+    experience: profileData.experience,
+    bio: profileData.bio
   });
-  
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setEditedProfile(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
-  
-  const handleSwitchChange = (field: string, value: boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-  
+
   const handleSaveProfile = () => {
-    setIsEditing(false);
+    // In a real app, this would save to backend
+    setIsEditModalOpen(false);
     toast({
       title: "Profile updated",
-      description: "Your profile information has been updated successfully.",
+      description: "Your profile has been successfully updated.",
     });
   };
 
@@ -51,326 +87,283 @@ const MentorProfile = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">My Profile</h1>
-        <Button 
-          variant={isEditing ? "outline" : "default"}
-          onClick={() => isEditing ? handleSaveProfile() : setIsEditing(true)}
-        >
-          {isEditing ? 'Save Changes' : (
-            <>
-              <PencilIcon className="h-4 w-4 mr-2" />
-              Edit Profile
-            </>
-          )}
+        <Button variant="outline" size="sm" onClick={() => setIsEditModalOpen(true)}>
+          <Edit size={16} className="mr-2" />
+          Edit Profile
         </Button>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Profile Card */}
-        <Card className="md:col-span-1">
-          <CardHeader className="text-center pb-2">
-            <div className="flex justify-center mb-4">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src="/placeholder.svg" alt="Profile" />
-                <AvatarFallback className="text-2xl">SJ</AvatarFallback>
-              </Avatar>
-            </div>
-            <CardTitle>{formData.name}</CardTitle>
-            <div className="flex justify-center mt-2 gap-2">
-              <Badge variant="outline" className="bg-primary/10 text-primary">
-                Mentor
-              </Badge>
-              <Badge variant="outline" className="bg-muted">
-                Since 2022
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="text-center">
-            <div className="grid gap-1">
-              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <BadgeCheck className="h-4 w-4" />
-                Verified Teacher
+
+      {/* Profile Overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Profile Info Card */}
+        <Card className="lg:col-span-1 animate-fade-in">
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-24 h-24 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold mb-4">
+                {profileData.name.split(' ').map(n => n[0]).join('')}
               </div>
-              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <Shield className="h-4 w-4" />
-                Top Performer 2023
+              
+              <h2 className="text-xl font-bold">{profileData.name}</h2>
+              <p className="text-muted-foreground mb-2">{profileData.role}</p>
+              <div className="flex items-center gap-1 mb-6">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    size={16}
+                    className={
+                      i < Math.floor(profileData.stats.avgRating)
+                        ? "text-yellow-500 fill-yellow-500"
+                        : i < profileData.stats.avgRating
+                        ? "text-yellow-500 fill-yellow-500 opacity-50"
+                        : "text-gray-300"
+                    }
+                  />
+                ))}
+                <span className="text-sm font-medium ml-1">{profileData.stats.avgRating}</span>
+              </div>
+              
+              <div className="w-full space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                    <Mail size={14} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs text-muted-foreground">Email</p>
+                    <p className="text-sm font-medium">{profileData.email}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                    <Phone size={14} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs text-muted-foreground">Phone</p>
+                    <p className="text-sm font-medium">{profileData.phone}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                    <MapPin size={14} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs text-muted-foreground">Location</p>
+                    <p className="text-sm font-medium">{profileData.location}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                    <School size={14} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs text-muted-foreground">Education</p>
+                    <p className="text-sm font-medium">{profileData.education}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                    <Briefcase size={14} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs text-muted-foreground">Experience</p>
+                    <p className="text-sm font-medium">{profileData.experience}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-center gap-4">
-            <Button size="sm" variant="outline" className="gap-2">
-              <Mail className="h-4 w-4" />
-              Message
-            </Button>
-            <Button size="sm" variant="outline" className="gap-2">
-              <ExternalLink className="h-4 w-4" />
-              Share
-            </Button>
-          </CardFooter>
         </Card>
         
-        {/* Tabs Content */}
-        <div className="md:col-span-2">
-          <Tabs defaultValue="personal" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="personal">Personal</TabsTrigger>
-              <TabsTrigger value="professional">Professional</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
-            </TabsList>
+        {/* Stats & Biography */}
+        <Card className="lg:col-span-2 animate-fade-in" style={{animationDelay: '0.1s'}}>
+          <CardHeader>
+            <CardTitle>Mentor Overview</CardTitle>
+            <CardDescription>Your performance and details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div>
+                <p className="text-sm text-muted-foreground">Students</p>
+                <p className="text-2xl font-bold">{profileData.stats.students}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Active Batches</p>
+                <p className="text-2xl font-bold">{profileData.stats.activeBatches}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Mentor Rank</p>
+                <p className="text-2xl font-bold">#{profileData.stats.rank}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">National Rank</p>
+                <p className="text-2xl font-bold">#{profileData.stats.nationalRank}</p>
+              </div>
+            </div>
             
-            <TabsContent value="personal" className="pt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Personal Information</CardTitle>
-                  <CardDescription>
-                    {isEditing ? 'Edit your personal details below' : 'Your personal information and contact details'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    {isEditing ? (
-                      <Input 
-                        id="name" 
-                        value={formData.name} 
-                        onChange={(e) => handleInputChange('name', e.target.value)} 
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2 text-sm">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        {formData.name}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    {isEditing ? (
-                      <Input 
-                        id="email" 
-                        type="email" 
-                        value={formData.email} 
-                        onChange={(e) => handleInputChange('email', e.target.value)} 
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
-                        {formData.email}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    {isEditing ? (
-                      <Input 
-                        id="phone" 
-                        value={formData.phone} 
-                        onChange={(e) => handleInputChange('phone', e.target.value)} 
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Phone className="h-4 w-4 text-muted-foreground" />
-                        {formData.phone}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="address">Address</Label>
-                    {isEditing ? (
-                      <Textarea 
-                        id="address" 
-                        value={formData.address} 
-                        onChange={(e) => handleInputChange('address', e.target.value)} 
-                      />
-                    ) : (
-                      <div className="flex items-start gap-2 text-sm">
-                        <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                        {formData.address}
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="professional" className="pt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Professional Information</CardTitle>
-                  <CardDescription>
-                    {isEditing ? 'Edit your professional details below' : 'Your professional background and expertise'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="bio">Bio</Label>
-                    {isEditing ? (
-                      <Textarea 
-                        id="bio" 
-                        className="min-h-[100px]" 
-                        value={formData.bio} 
-                        onChange={(e) => handleInputChange('bio', e.target.value)} 
-                      />
-                    ) : (
-                      <div className="text-sm">{formData.bio}</div>
-                    )}
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="expertise">Areas of Expertise</Label>
-                    {isEditing ? (
-                      <Input 
-                        id="expertise" 
-                        value={formData.expertise.join(', ')} 
-                        onChange={(e) => handleInputChange('expertise', e.target.value)} 
-                        placeholder="e.g. Marketing, Finance, Strategy (separated by commas)"
-                      />
-                    ) : (
-                      <div className="flex flex-wrap gap-2">
-                        {formData.expertise.map((skill, index) => (
-                          <Badge key={index} variant="outline">{skill}</Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="education">Education</Label>
-                    {isEditing ? (
-                      <Input 
-                        id="education" 
-                        value={formData.education} 
-                        onChange={(e) => handleInputChange('education', e.target.value)} 
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        {formData.education}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="experience">Experience</Label>
-                    {isEditing ? (
-                      <Input 
-                        id="experience" 
-                        value={formData.experience} 
-                        onChange={(e) => handleInputChange('experience', e.target.value)} 
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        {formData.experience}
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="settings" className="pt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Account Settings</CardTitle>
-                  <CardDescription>
-                    Manage your account preferences and notifications
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="preferred-contact">Preferred Contact Method</Label>
-                    {isEditing ? (
-                      <Select 
-                        defaultValue={formData.preferredContact}
-                        onValueChange={(value) => handleInputChange('preferredContact', value)}
-                      >
-                        <SelectTrigger id="preferred-contact">
-                          <SelectValue placeholder="Select contact method" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="email">Email</SelectItem>
-                          <SelectItem value="phone">Phone</SelectItem>
-                          <SelectItem value="both">Both Email and Phone</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <div className="text-sm">
-                        {formData.preferredContact === 'email' ? 'Email' : 
-                         formData.preferredContact === 'phone' ? 'Phone' : 'Both Email and Phone'}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-4 pt-4">
-                    <h3 className="text-sm font-medium flex items-center gap-2">
-                      <Bell className="h-4 w-4" />
-                      Notification Preferences
-                    </h3>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="new-student">New Student Notifications</Label>
-                        <div className="text-sm text-muted-foreground">
-                          Get notified when a new student joins your batch
-                        </div>
-                      </div>
-                      <Switch 
-                        id="new-student"
-                        checked={formData.notifyNewStudent}
-                        onCheckedChange={(checked) => handleSwitchChange('notifyNewStudent', checked)}
-                        disabled={!isEditing}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="session-changes">Session Change Notifications</Label>
-                        <div className="text-sm text-muted-foreground">
-                          Get notified about session reschedules or cancellations
-                        </div>
-                      </div>
-                      <Switch 
-                        id="session-changes"
-                        checked={formData.notifySessionChanges}
-                        onCheckedChange={(checked) => handleSwitchChange('notifySessionChanges', checked)}
-                        disabled={!isEditing}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="earnings">Earnings Notifications</Label>
-                        <div className="text-sm text-muted-foreground">
-                          Get notified when you receive new earnings
-                        </div>
-                      </div>
-                      <Switch 
-                        id="earnings"
-                        checked={formData.notifyEarnings}
-                        onCheckedChange={(checked) => handleSwitchChange('notifyEarnings', checked)}
-                        disabled={!isEditing}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="pt-4">
-                    <h3 className="text-sm font-medium flex items-center gap-2 mb-4">
-                      <Lock className="h-4 w-4" />
-                      Security
-                    </h3>
-                    
-                    <Button variant="outline">
-                      Change Password
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-medium mb-2">Biography</h3>
+                <p className="text-muted-foreground">{profileData.bio}</p>
+              </div>
+              
+              <div>
+                <h3 className="font-medium mb-2">Specialization</h3>
+                <p className="text-muted-foreground">{profileData.specialization}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Recent Activity */}
+      <Card className="animate-fade-in" style={{animationDelay: '0.2s'}}>
+        <CardHeader>
+          <CardTitle>Recent Activity</CardTitle>
+          <CardDescription>Latest actions and reviews</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {profileData.recentActivities.map(activity => (
+              <div 
+                key={activity.id}
+                className="flex items-start gap-3 p-3 rounded-lg border"
+              >
+                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                  <Check size={14} />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium">{activity.action}</p>
+                  <p className="text-sm text-muted-foreground">{activity.details}</p>
+                </div>
+                <div className="text-xs text-muted-foreground">{activity.date}</div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Edit Profile Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+            <DialogDescription>
+              Update your profile information
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                value={editedProfile.name}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="email" className="text-right">
+                Email
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                value={editedProfile.email}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="phone" className="text-right">
+                Phone
+              </Label>
+              <Input
+                id="phone"
+                name="phone"
+                value={editedProfile.phone}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="location" className="text-right">
+                Location
+              </Label>
+              <Input
+                id="location"
+                name="location"
+                value={editedProfile.location}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="education" className="text-right">
+                Education
+              </Label>
+              <Input
+                id="education"
+                name="education"
+                value={editedProfile.education}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="specialization" className="text-right">
+                Specialization
+              </Label>
+              <Input
+                id="specialization"
+                name="specialization"
+                value={editedProfile.specialization}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="experience" className="text-right">
+                Experience
+              </Label>
+              <Input
+                id="experience"
+                name="experience"
+                value={editedProfile.experience}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="bio" className="text-right">
+                Biography
+              </Label>
+              <Textarea
+                id="bio"
+                name="bio"
+                value={editedProfile.bio}
+                onChange={handleInputChange}
+                rows={4}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleSaveProfile}>
+              <Save className="h-4 w-4 mr-2" />
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
