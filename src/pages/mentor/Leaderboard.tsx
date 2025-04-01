@@ -8,8 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import UserAvatar from '@/components/ui-custom/UserAvatar';
 
-// Mock data
-const studentLeaderboard = [
+// Mock data for national leaderboard
+const nationalStudentLeaderboard = [
   { id: 1, name: 'Alex Johnson', points: 1250, earnings: 345, school: 'Lincoln High School', rank: 1, nationalRank: 15 },
   { id: 2, name: 'Samantha Lee', points: 1100, earnings: 290, school: 'Washington Academy', rank: 2, nationalRank: 23 },
   { id: 3, name: 'Miguel Santos', points: 950, earnings: 210, school: 'Riverside Prep', rank: 3, nationalRank: 42 },
@@ -22,7 +22,17 @@ const studentLeaderboard = [
   { id: 10, name: 'Ava Martinez', points: 650, earnings: 95, school: 'Westlake Academy', rank: 10, nationalRank: 203 },
 ];
 
-const mentorLeaderboard = [
+// Mock data for batch leaderboard
+const batchStudentLeaderboard = [
+  { id: 3, name: 'Miguel Santos', points: 950, earnings: 210, school: 'Riverside Prep', rank: 1, nationalRank: 42 },
+  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, school: 'Riverside Prep', rank: 2, nationalRank: 112 },
+  { id: 11, name: 'Lucas Wright', points: 620, earnings: 105, school: 'Riverside Prep', rank: 3, nationalRank: 231 },
+  { id: 12, name: 'Isabella Kim', points: 580, earnings: 95, school: 'Riverside Prep', rank: 4, nationalRank: 267 },
+  { id: 13, name: 'Mason Zhang', points: 540, earnings: 85, school: 'Riverside Prep', rank: 5, nationalRank: 302 },
+  { id: 14, name: 'Zoe Thompson', points: 510, earnings: 80, school: 'Riverside Prep', rank: 6, nationalRank: 348 },
+];
+
+const nationalMentorLeaderboard = [
   { id: 1, name: 'Jennifer Smith', points: 2200, students: 12, rating: 4.9, rank: 1, nationalRank: 5 },
   { id: 2, name: 'David Chen', points: 2050, students: 10, rating: 4.8, rank: 2, nationalRank: 12 },
   { id: 3, name: 'Sarah Johnson', points: 1950, students: 11, rating: 4.7, rank: 3, nationalRank: 17 },
@@ -33,12 +43,22 @@ const mentorLeaderboard = [
   { id: 8, name: 'Robert Garcia', points: 1550, students: 6, rating: 4.8, rank: 8, nationalRank: 48 },
 ];
 
+// Mock data for batch mentor leaderboard
+const batchMentorLeaderboard = [
+  { id: 3, name: 'Sarah Johnson', points: 1950, students: 11, rating: 4.7, rank: 1, nationalRank: 17 },
+  { id: 5, name: 'Emma Rodriguez', points: 1700, students: 8, rating: 4.6, rank: 2, nationalRank: 29 },
+  { id: 7, name: 'Sophia Nguyen', points: 1600, students: 8, rating: 4.5, rank: 3, nationalRank: 41 },
+  { id: 9, name: 'Daniel Park', points: 1480, students: 7, rating: 4.4, rank: 4, nationalRank: 56 },
+];
+
 // Current user data (for highlighting and showing in the top stats)
 const currentMentorId = 3; // Sarah Johnson
 
 const MentorLeaderboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
+  const [leaderboardType, setLeaderboardType] = useState<'national' | 'batch'>('national');
+  const [userType, setUserType] = useState<'students' | 'mentors'>('students');
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -48,14 +68,25 @@ const MentorLeaderboard = () => {
     setFilterVisible(!filterVisible);
   };
 
-  const filteredStudents = studentLeaderboard.filter(student => 
+  const filteredNationalStudents = nationalStudentLeaderboard.filter(student => 
     student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     student.school.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredMentors = mentorLeaderboard.filter(mentor => 
+  const filteredBatchStudents = batchStudentLeaderboard.filter(student => 
+    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.school.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredNationalMentors = nationalMentorLeaderboard.filter(mentor => 
     mentor.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const filteredBatchMentors = batchMentorLeaderboard.filter(mentor => 
+    mentor.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const currentMentor = nationalMentorLeaderboard.find(mentor => mentor.id === currentMentorId);
 
   return (
     <div className="space-y-6">
@@ -82,6 +113,33 @@ const MentorLeaderboard = () => {
           </Button>
         </div>
       </div>
+
+      {/* Mentor's rank highlight card */}
+      {currentMentor && userType === 'mentors' && (
+        <Card className="bg-primary/5 border-primary/20 animate-fade-in">
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold">
+                  {leaderboardType === 'national' 
+                    ? currentMentor.rank 
+                    : batchMentorLeaderboard.find(m => m.id === currentMentor.id)?.rank || '-'}
+                </div>
+                <div>
+                  <h3 className="font-medium">Your Ranking</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {currentMentor.name} • {currentMentor.points} points
+                  </p>
+                </div>
+              </div>
+              <div className="bg-background rounded-lg px-4 py-2 text-center">
+                <p className="text-sm text-muted-foreground">National Rank</p>
+                <p className="text-xl font-bold">#{currentMentor.nationalRank}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {filterVisible && (
         <Card className="animate-fade-in">
@@ -116,133 +174,267 @@ const MentorLeaderboard = () => {
         </Card>
       )}
 
-      <Tabs defaultValue="students" className="animate-fade-in">
-        <TabsList className="grid w-full max-w-md grid-cols-2 mx-auto">
-          <TabsTrigger value="students">Students</TabsTrigger>
-          <TabsTrigger value="mentors">Mentors</TabsTrigger>
-        </TabsList>
+      <div className="flex flex-col gap-4">
+        <Tabs defaultValue="national" onValueChange={(value) => setLeaderboardType(value as 'national' | 'batch')}>
+          <TabsList className="grid w-full max-w-md grid-cols-2 mx-auto">
+            <TabsTrigger value="national">National Leaderboard</TabsTrigger>
+            <TabsTrigger value="batch">Batch Leaderboard</TabsTrigger>
+          </TabsList>
+        </Tabs>
         
-        <TabsContent value="students" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Student Leaderboard</CardTitle>
-              <CardDescription>Based on points earned from sales and achievements</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
-                  <div className="col-span-1 text-center">Rank</div>
-                  <div className="col-span-4 sm:col-span-3">Student</div>
-                  <div className="col-span-4 hidden sm:block">School</div>
-                  <div className="col-span-2 hidden md:block text-right">National Rank</div>
-                  <div className="col-span-3 sm:col-span-2 text-right">Points</div>
-                  <div className="col-span-4 sm:col-span-2 text-right">Earnings</div>
-                </div>
-                
-                {filteredStudents.map((student) => (
-                  <div 
-                    key={student.id}
-                    className="grid grid-cols-12 py-3 px-4 items-center border-b last:border-0 hover:bg-muted/20 transition-colors"
-                  >
-                    <div className="col-span-1 text-center font-semibold">
-                      {student.rank <= 3 ? (
-                        <div className={`
-                          w-6 h-6 mx-auto rounded-full flex items-center justify-center text-white
-                          ${student.rank === 1 ? 'bg-yellow-500' : 
-                            student.rank === 2 ? 'bg-gray-400' : 'bg-amber-700'}
-                        `}>
-                          {student.rank}
-                        </div>
-                      ) : (
-                        student.rank
-                      )}
-                    </div>
-                    <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
-                      <UserAvatar name={student.name} size="sm" />
-                      <span className="font-medium truncate">{student.name}</span>
-                    </div>
-                    <div className="col-span-4 hidden sm:block truncate">{student.school}</div>
-                    <div className="col-span-2 hidden md:block text-right font-semibold">#{student.nationalRank}</div>
-                    <div className="col-span-3 sm:col-span-2 text-right font-semibold">{student.points}</div>
-                    <div className="col-span-4 sm:col-span-2 text-right text-success font-semibold">${student.earnings}</div>
-                  </div>
-                ))}
-                
-                {filteredStudents.length === 0 && (
-                  <div className="py-8 text-center text-muted-foreground">
-                    No students found matching your search.
-                  </div>
-                )}
+        <Tabs defaultValue="students" onValueChange={(value) => setUserType(value as 'students' | 'mentors')}>
+          <TabsList className="grid w-full max-w-md grid-cols-2 mx-auto">
+            <TabsTrigger value="students">Students</TabsTrigger>
+            <TabsTrigger value="mentors">Mentors</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+      
+      {/* National Students Content */}
+      {leaderboardType === 'national' && userType === 'students' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>National Student Leaderboard</CardTitle>
+            <CardDescription>Based on points earned from sales and achievements across all batches</CardDescription>
+          </CardHeader>
+          <CardContent className="overflow-x-auto">
+            <div className="rounded-md border min-w-[600px] sm:min-w-full">
+              <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
+                <div className="col-span-1 text-center">Rank</div>
+                <div className="col-span-4 sm:col-span-3">Student</div>
+                <div className="col-span-4 hidden sm:block">School</div>
+                <div className="col-span-2 hidden md:block text-right">National Rank</div>
+                <div className="col-span-3 sm:col-span-2 text-right">Points</div>
+                <div className="col-span-4 sm:col-span-2 text-right">Earnings</div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="mentors" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Mentor Leaderboard</CardTitle>
-              <CardDescription>Based on student success and mentorship quality</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
-                  <div className="col-span-1 text-center">Rank</div>
-                  <div className="col-span-5 sm:col-span-3">Mentor</div>
-                  <div className="col-span-3 hidden sm:block">Students</div>
-                  <div className="col-span-2 hidden md:block text-right">National Rank</div>
-                  <div className="col-span-3 hidden sm:block text-right">Rating</div>
-                  <div className="col-span-6 sm:col-span-2 text-right">Points</div>
-                </div>
-                
-                {filteredMentors.map((mentor) => (
-                  <div 
-                    key={mentor.id}
-                    className={`grid grid-cols-12 py-3 px-4 items-center border-b last:border-0 hover:bg-muted/20 transition-colors ${mentor.id === currentMentorId ? 'bg-primary/5 border-l-4 border-l-primary' : ''}`}
-                  >
-                    <div className="col-span-1 text-center font-semibold">
-                      {mentor.rank <= 3 ? (
-                        <div className={`
-                          w-6 h-6 mx-auto rounded-full flex items-center justify-center text-white
-                          ${mentor.rank === 1 ? 'bg-yellow-500' : 
-                            mentor.rank === 2 ? 'bg-gray-400' : 'bg-amber-700'}
-                        `}>
-                          {mentor.rank}
-                        </div>
-                      ) : (
-                        mentor.rank
-                      )}
-                    </div>
-                    <div className="col-span-5 sm:col-span-3 flex items-center gap-3">
-                      <UserAvatar 
-                        name={mentor.name} 
-                        size="sm" 
-                        highlight={mentor.id === currentMentorId}
-                      />
-                      <span className="font-medium truncate">{mentor.name}</span>
-                    </div>
-                    <div className="col-span-3 hidden sm:block">{mentor.students} students</div>
-                    <div className="col-span-2 hidden md:block text-right font-semibold">#{mentor.nationalRank}</div>
-                    <div className="col-span-3 hidden sm:block text-right">
-                      <div className="flex items-center gap-1 justify-end">
-                        <span>{mentor.rating}</span>
-                        <div className="text-yellow-500">★</div>
+              
+              {filteredNationalStudents.map((student) => (
+                <div 
+                  key={student.id}
+                  className="grid grid-cols-12 py-3 px-4 items-center border-b last:border-0 hover:bg-muted/20 transition-colors"
+                >
+                  <div className="col-span-1 text-center font-semibold">
+                    {student.rank <= 3 ? (
+                      <div className={`
+                        w-6 h-6 mx-auto rounded-full flex items-center justify-center text-white
+                        ${student.rank === 1 ? 'bg-yellow-500' : 
+                          student.rank === 2 ? 'bg-gray-400' : 'bg-amber-700'}
+                      `}>
+                        {student.rank}
                       </div>
-                    </div>
-                    <div className="col-span-6 sm:col-span-2 text-right font-semibold">{mentor.points}</div>
+                    ) : (
+                      student.rank
+                    )}
                   </div>
-                ))}
-                
-                {filteredMentors.length === 0 && (
-                  <div className="py-8 text-center text-muted-foreground">
-                    No mentors found matching your search.
+                  <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
+                    <UserAvatar name={student.name} size="sm" />
+                    <span className="font-medium truncate">{student.name}</span>
                   </div>
-                )}
+                  <div className="col-span-4 hidden sm:block truncate">{student.school}</div>
+                  <div className="col-span-2 hidden md:block text-right font-semibold">#{student.nationalRank}</div>
+                  <div className="col-span-3 sm:col-span-2 text-right font-semibold">{student.points}</div>
+                  <div className="col-span-4 sm:col-span-2 text-right text-success font-semibold">${student.earnings}</div>
+                </div>
+              ))}
+              
+              {filteredNationalStudents.length === 0 && (
+                <div className="py-8 text-center text-muted-foreground">
+                  No students found matching your search.
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
+      {/* Batch Students Content */}
+      {leaderboardType === 'batch' && userType === 'students' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Batch Student Leaderboard</CardTitle>
+            <CardDescription>Based on points earned from sales and achievements within your current batch</CardDescription>
+          </CardHeader>
+          <CardContent className="overflow-x-auto">
+            <div className="rounded-md border min-w-[600px] sm:min-w-full">
+              <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
+                <div className="col-span-1 text-center">Rank</div>
+                <div className="col-span-4 sm:col-span-3">Student</div>
+                <div className="col-span-4 hidden sm:block">School</div>
+                <div className="col-span-2 hidden md:block text-right">National Rank</div>
+                <div className="col-span-3 sm:col-span-2 text-right">Points</div>
+                <div className="col-span-4 sm:col-span-2 text-right">Earnings</div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              
+              {filteredBatchStudents.map((student) => (
+                <div 
+                  key={student.id}
+                  className="grid grid-cols-12 py-3 px-4 items-center border-b last:border-0 hover:bg-muted/20 transition-colors"
+                >
+                  <div className="col-span-1 text-center font-semibold">
+                    {student.rank <= 3 ? (
+                      <div className={`
+                        w-6 h-6 mx-auto rounded-full flex items-center justify-center text-white
+                        ${student.rank === 1 ? 'bg-yellow-500' : 
+                          student.rank === 2 ? 'bg-gray-400' : 'bg-amber-700'}
+                      `}>
+                        {student.rank}
+                      </div>
+                    ) : (
+                      student.rank
+                    )}
+                  </div>
+                  <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
+                    <UserAvatar name={student.name} size="sm" />
+                    <span className="font-medium truncate">{student.name}</span>
+                  </div>
+                  <div className="col-span-4 hidden sm:block truncate">{student.school}</div>
+                  <div className="col-span-2 hidden md:block text-right font-semibold">#{student.nationalRank}</div>
+                  <div className="col-span-3 sm:col-span-2 text-right font-semibold">{student.points}</div>
+                  <div className="col-span-4 sm:col-span-2 text-right text-success font-semibold">${student.earnings}</div>
+                </div>
+              ))}
+              
+              {filteredBatchStudents.length === 0 && (
+                <div className="py-8 text-center text-muted-foreground">
+                  No students found matching your search.
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
+      {/* National Mentors Content */}
+      {leaderboardType === 'national' && userType === 'mentors' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>National Mentor Leaderboard</CardTitle>
+            <CardDescription>Based on student success and mentorship quality across all regions</CardDescription>
+          </CardHeader>
+          <CardContent className="overflow-x-auto">
+            <div className="rounded-md border min-w-[600px] sm:min-w-full">
+              <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
+                <div className="col-span-1 text-center">Rank</div>
+                <div className="col-span-5 sm:col-span-3">Mentor</div>
+                <div className="col-span-3 hidden sm:block">Students</div>
+                <div className="col-span-2 hidden md:block text-right">National Rank</div>
+                <div className="col-span-3 hidden sm:block text-right">Rating</div>
+                <div className="col-span-6 sm:col-span-2 text-right">Points</div>
+              </div>
+              
+              {filteredNationalMentors.map((mentor) => (
+                <div 
+                  key={mentor.id}
+                  className={`grid grid-cols-12 py-3 px-4 items-center border-b last:border-0 hover:bg-muted/20 transition-colors ${mentor.id === currentMentorId ? 'bg-primary/5 border-l-4 border-l-primary' : ''}`}
+                >
+                  <div className="col-span-1 text-center font-semibold">
+                    {mentor.rank <= 3 ? (
+                      <div className={`
+                        w-6 h-6 mx-auto rounded-full flex items-center justify-center text-white
+                        ${mentor.rank === 1 ? 'bg-yellow-500' : 
+                          mentor.rank === 2 ? 'bg-gray-400' : 'bg-amber-700'}
+                      `}>
+                        {mentor.rank}
+                      </div>
+                    ) : (
+                      mentor.rank
+                    )}
+                  </div>
+                  <div className="col-span-5 sm:col-span-3 flex items-center gap-3">
+                    <UserAvatar 
+                      name={mentor.name} 
+                      size="sm" 
+                      highlight={mentor.id === currentMentorId}
+                    />
+                    <span className="font-medium truncate">{mentor.name}</span>
+                  </div>
+                  <div className="col-span-3 hidden sm:block">{mentor.students} students</div>
+                  <div className="col-span-2 hidden md:block text-right font-semibold">#{mentor.nationalRank}</div>
+                  <div className="col-span-3 hidden sm:block text-right">
+                    <div className="flex items-center gap-1 justify-end">
+                      <span>{mentor.rating}</span>
+                      <div className="text-yellow-500">★</div>
+                    </div>
+                  </div>
+                  <div className="col-span-6 sm:col-span-2 text-right font-semibold">{mentor.points}</div>
+                </div>
+              ))}
+              
+              {filteredNationalMentors.length === 0 && (
+                <div className="py-8 text-center text-muted-foreground">
+                  No mentors found matching your search.
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
+      {/* Batch Mentors Content */}
+      {leaderboardType === 'batch' && userType === 'mentors' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Batch Mentor Leaderboard</CardTitle>
+            <CardDescription>Based on student success and mentorship quality in your region</CardDescription>
+          </CardHeader>
+          <CardContent className="overflow-x-auto">
+            <div className="rounded-md border min-w-[600px] sm:min-w-full">
+              <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
+                <div className="col-span-1 text-center">Rank</div>
+                <div className="col-span-5 sm:col-span-3">Mentor</div>
+                <div className="col-span-3 hidden sm:block">Students</div>
+                <div className="col-span-2 hidden md:block text-right">National Rank</div>
+                <div className="col-span-3 hidden sm:block text-right">Rating</div>
+                <div className="col-span-6 sm:col-span-2 text-right">Points</div>
+              </div>
+              
+              {filteredBatchMentors.map((mentor) => (
+                <div 
+                  key={mentor.id}
+                  className={`grid grid-cols-12 py-3 px-4 items-center border-b last:border-0 hover:bg-muted/20 transition-colors ${mentor.id === currentMentorId ? 'bg-primary/5 border-l-4 border-l-primary' : ''}`}
+                >
+                  <div className="col-span-1 text-center font-semibold">
+                    {mentor.rank <= 3 ? (
+                      <div className={`
+                        w-6 h-6 mx-auto rounded-full flex items-center justify-center text-white
+                        ${mentor.rank === 1 ? 'bg-yellow-500' : 
+                          mentor.rank === 2 ? 'bg-gray-400' : 'bg-amber-700'}
+                      `}>
+                        {mentor.rank}
+                      </div>
+                    ) : (
+                      mentor.rank
+                    )}
+                  </div>
+                  <div className="col-span-5 sm:col-span-3 flex items-center gap-3">
+                    <UserAvatar 
+                      name={mentor.name} 
+                      size="sm" 
+                      highlight={mentor.id === currentMentorId}
+                    />
+                    <span className="font-medium truncate">{mentor.name}</span>
+                  </div>
+                  <div className="col-span-3 hidden sm:block">{mentor.students} students</div>
+                  <div className="col-span-2 hidden md:block text-right font-semibold">#{mentor.nationalRank}</div>
+                  <div className="col-span-3 hidden sm:block text-right">
+                    <div className="flex items-center gap-1 justify-end">
+                      <span>{mentor.rating}</span>
+                      <div className="text-yellow-500">★</div>
+                    </div>
+                  </div>
+                  <div className="col-span-6 sm:col-span-2 text-right font-semibold">{mentor.points}</div>
+                </div>
+              ))}
+              
+              {filteredBatchMentors.length === 0 && (
+                <div className="py-8 text-center text-muted-foreground">
+                  No mentors found matching your search.
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

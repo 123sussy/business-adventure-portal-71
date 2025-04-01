@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { FileUpload, Mail, Phone, User, MapPin, Briefcase, Calendar, Shield, Edit } from 'lucide-react';
+import { Upload, Mail, Phone, User, MapPin, Briefcase, Calendar, Shield, Edit } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const AdminProfile = () => {

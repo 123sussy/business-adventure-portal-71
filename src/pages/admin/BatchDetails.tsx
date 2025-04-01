@@ -1,686 +1,976 @@
-
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
+import { useParams } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { 
-  Users, 
-  Book, 
   Calendar, 
   Clock, 
-  DollarSign, 
-  School, 
-  Edit
+  Download, 
+  Edit, 
+  Eye, 
+  FileText, 
+  MoreHorizontal, 
+  Plus, 
+  Search, 
+  Send, 
+  Trash, 
+  Upload, 
+  Users 
 } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
-// Mock data for batches (would normally fetch this from API)
-const batchesData = [
-  { 
-    id: 1, 
-    name: "Business Bootcamp - Batch 1", 
-    status: "ongoing", 
-    startDate: "2023-05-01",
-    endDate: "2023-07-30", 
-    students: 15,
-    teacher: "Jamie Smith",
-    teacherEmail: "jamie.smith@example.com",
-    teacherPhone: "+1 (555) 123-4567",
-    earnings: 1200,
-    teacherEarnings: 240, // 20% of earnings
-    ollShare: 360, // 30% of earnings
-    studentShare: 600, // 50% of earnings
-    nextSession: "2023-06-16T15:00:00",
-    daysPerWeek: ["Monday", "Wednesday", "Friday"],
-    time: "3:00 PM - 5:00 PM",
-    topics: [
-      "Introduction to Business",
-      "Marketing Fundamentals",
-      "Financial Planning",
-      "Business Strategy",
-      "Pitch Development",
-      "Customer Acquisition",
-      "Sales Techniques",
-      "Team Building"
+// Mock data for batch details
+const batchData = {
+  id: "B-2023-001",
+  name: "Summer Entrepreneurship Bootcamp 2023",
+  status: "active",
+  startDate: "2023-06-15",
+  endDate: "2023-08-30",
+  description: "A 10-week intensive program designed to help high school students develop entrepreneurial skills and launch their own business ideas.",
+  mentors: [
+    { id: 1, name: "Sarah Johnson", email: "sarah.j@example.com", role: "Lead Mentor", avatar: "/avatars/mentor1.png" },
+    { id: 2, name: "Michael Chen", email: "michael.c@example.com", role: "Business Mentor", avatar: "/avatars/mentor2.png" },
+  ],
+  students: [
+    { id: 1, name: "Alex Rodriguez", email: "alex.r@example.com", progress: 85, avatar: "/avatars/student1.png", status: "active" },
+    { id: 2, name: "Emma Wilson", email: "emma.w@example.com", progress: 92, avatar: "/avatars/student2.png", status: "active" },
+    { id: 3, name: "Jamal Thompson", email: "jamal.t@example.com", progress: 78, avatar: "/avatars/student3.png", status: "active" },
+    { id: 4, name: "Sophia Garcia", email: "sophia.g@example.com", progress: 65, avatar: "/avatars/student4.png", status: "active" },
+    { id: 5, name: "Ethan Miller", email: "ethan.m@example.com", progress: 90, avatar: "/avatars/student5.png", status: "active" },
+    { id: 6, name: "Olivia Davis", email: "olivia.d@example.com", progress: 88, avatar: "/avatars/student6.png", status: "active" },
+    { id: 7, name: "Noah Brown", email: "noah.b@example.com", progress: 72, avatar: "/avatars/student7.png", status: "inactive" },
+  ],
+  sessions: [
+    { 
+      id: 1, 
+      title: "Introduction to Entrepreneurship", 
+      date: "2023-06-15", 
+      time: "10:00 AM - 12:00 PM", 
+      status: "completed",
+      attendance: 95,
+      recording: "https://example.com/recording1",
+      materials: [
+        { id: 1, name: "Intro Slides.pdf", size: "2.4 MB" },
+        { id: 2, name: "Business Canvas Template.docx", size: "1.1 MB" }
+      ]
+    },
+    { 
+      id: 2, 
+      title: "Market Research Fundamentals", 
+      date: "2023-06-22", 
+      time: "10:00 AM - 12:00 PM", 
+      status: "completed",
+      attendance: 90,
+      recording: "https://example.com/recording2",
+      materials: [
+        { id: 3, name: "Market Research Guide.pdf", size: "3.2 MB" },
+        { id: 4, name: "Customer Interview Template.docx", size: "0.9 MB" }
+      ]
+    },
+    { 
+      id: 3, 
+      title: "Business Model Development", 
+      date: "2023-06-29", 
+      time: "10:00 AM - 12:00 PM", 
+      status: "completed",
+      attendance: 88,
+      recording: "https://example.com/recording3",
+      materials: [
+        { id: 5, name: "Business Models Explained.pdf", size: "4.1 MB" }
+      ]
+    },
+    { 
+      id: 4, 
+      title: "Financial Planning Basics", 
+      date: "2023-07-06", 
+      time: "10:00 AM - 12:00 PM", 
+      status: "upcoming",
+      materials: [
+        { id: 6, name: "Financial Planning Worksheet.xlsx", size: "1.8 MB" }
+      ]
+    },
+  ],
+  assignments: [
+    {
+      id: 1,
+      title: "Business Idea Submission",
+      description: "Submit a 1-page description of your business idea, including the problem it solves and target market.",
+      dueDate: "2023-06-22",
+      status: "completed",
+      submissions: 7,
+      maxPoints: 100
+    },
+    {
+      id: 2,
+      title: "Market Research Report",
+      description: "Conduct interviews with 5 potential customers and summarize your findings in a 2-page report.",
+      dueDate: "2023-06-29",
+      status: "completed",
+      submissions: 6,
+      maxPoints: 150
+    },
+    {
+      id: 3,
+      title: "Business Model Canvas",
+      description: "Complete the Business Model Canvas for your startup idea.",
+      dueDate: "2023-07-06",
+      status: "active",
+      submissions: 4,
+      maxPoints: 200
+    },
+    {
+      id: 4,
+      title: "Financial Projections",
+      description: "Create a 6-month financial projection for your business using the provided template.",
+      dueDate: "2023-07-13",
+      status: "upcoming",
+      submissions: 0,
+      maxPoints: 200
+    },
+  ],
+  submissions: [
+    {
+      id: 1,
+      assignmentId: 1,
+      studentId: 1,
+      studentName: "Alex Rodriguez",
+      submittedAt: "2023-06-21T14:30:00Z",
+      status: "graded",
+      grade: 95,
+      feedback: "Excellent work! Your business idea is well-defined and addresses a clear market need.",
+      files: [
+        { id: 1, name: "Business_Idea_Alex.pdf", size: "1.2 MB" }
+      ]
+    },
+    {
+      id: 2,
+      assignmentId: 1,
+      studentId: 2,
+      studentName: "Emma Wilson",
+      submittedAt: "2023-06-20T09:15:00Z",
+      status: "graded",
+      grade: 90,
+      feedback: "Great job identifying the problem and target market. Consider expanding on your competitive advantage.",
+      files: [
+        { id: 2, name: "Business_Idea_Emma.docx", size: "950 KB" }
+      ]
+    },
+    {
+      id: 3,
+      assignmentId: 2,
+      studentId: 1,
+      studentName: "Alex Rodriguez",
+      submittedAt: "2023-06-28T16:45:00Z",
+      status: "graded",
+      grade: 88,
+      feedback: "Good research findings. Your interview questions were well-structured, but try to dig deeper in future interviews.",
+      files: [
+        { id: 3, name: "Market_Research_Alex.pdf", size: "2.1 MB" },
+        { id: 4, name: "Interview_Recordings.zip", size: "15.4 MB" }
+      ]
+    },
+    {
+      id: 4,
+      assignmentId: 3,
+      studentId: 1,
+      studentName: "Alex Rodriguez",
+      submittedAt: "2023-07-05T11:20:00Z",
+      status: "submitted",
+      files: [
+        { id: 5, name: "Business_Canvas_Alex.pdf", size: "1.8 MB" }
+      ]
+    },
+    {
+      id: 5,
+      assignmentId: 3,
+      studentId: 2,
+      studentName: "Emma Wilson",
+      submittedAt: "2023-07-04T13:10:00Z",
+      status: "submitted",
+      files: [
+        { id: 6, name: "Business_Canvas_Emma.pdf", size: "1.5 MB" }
+      ]
+    },
+  ],
+  leaderboard: {
+    national: [
+      { id: 1, name: "Alex Rodriguez", points: 1250, earnings: 345, school: "Lincoln High School", rank: 1, nationalRank: 15 },
+      { id: 2, name: "Emma Wilson", points: 1100, earnings: 290, school: "Washington Academy", rank: 2, nationalRank: 23 },
+      { id: 3, name: "Jamal Thompson", points: 950, earnings: 210, school: "Riverside Prep", rank: 3, nationalRank: 42 },
+      { id: 4, name: "Sophia Garcia", points: 900, earnings: 185, school: "Oakwood High", rank: 4, nationalRank: 56 },
+      { id: 5, name: "Ethan Miller", points: 850, earnings: 170, school: "Lincoln High School", rank: 5, nationalRank: 78 },
     ],
-    sessions: [
-      {
-        id: 1,
-        date: "2023-05-01",
-        time: "3:00 PM - 5:00 PM",
-        topic: "Introduction to Business",
-        attendance: 15,
-        completed: true
-      },
-      {
-        id: 2,
-        date: "2023-05-03",
-        time: "3:00 PM - 5:00 PM",
-        topic: "Marketing Fundamentals",
-        attendance: 14,
-        completed: true
-      },
-      {
-        id: 3,
-        date: "2023-05-05",
-        time: "3:00 PM - 5:00 PM",
-        topic: "Financial Planning",
-        attendance: 15,
-        completed: true
-      },
-      {
-        id: 4,
-        date: "2023-05-08",
-        time: "3:00 PM - 5:00 PM",
-        topic: "Business Strategy",
-        attendance: 13,
-        completed: true
-      },
-      {
-        id: 5,
-        date: "2023-05-10",
-        time: "3:00 PM - 5:00 PM",
-        topic: "Pitch Development",
-        attendance: 15,
-        completed: false
-      },
-      {
-        id: 6,
-        date: "2023-05-12",
-        time: "3:00 PM - 5:00 PM",
-        topic: "Customer Acquisition",
-        attendance: 0,
-        completed: false
-      },
-      {
-        id: 7,
-        date: "2023-05-15",
-        time: "3:00 PM - 5:00 PM",
-        topic: "Sales Techniques",
-        attendance: 0,
-        completed: false
-      },
-      {
-        id: 8,
-        date: "2023-05-17",
-        time: "3:00 PM - 5:00 PM",
-        topic: "Team Building",
-        attendance: 0,
-        completed: false
-      }
-    ],
-    students: [
-      { 
-        id: 1, 
-        name: "John Doe", 
-        email: "john.doe@example.com",
-        phone: "+1 (555) 987-6543",
-        attendance: 90,
-        progress: 85,
-        school: "City High School"
-      },
-      { 
-        id: 2, 
-        name: "Jane Smith", 
-        email: "jane.smith@example.com",
-        phone: "+1 (555) 876-5432",
-        attendance: 95,
-        progress: 92,
-        school: "Metro University"
-      },
-      { 
-        id: 3, 
-        name: "Ahmed Hassan", 
-        email: "ahmed.hassan@example.com",
-        phone: "+1 (555) 765-4321",
-        attendance: 85,
-        progress: 78,
-        school: "Valley High School"
-      },
-      { 
-        id: 4, 
-        name: "Sarah Johnson", 
-        email: "sarah.johnson@example.com",
-        phone: "+1 (555) 654-3210",
-        attendance: 100,
-        progress: 95,
-        school: "City High School"
-      },
-      { 
-        id: 5, 
-        name: "Michael Brown", 
-        email: "michael.brown@example.com",
-        phone: "+1 (555) 543-2109",
-        attendance: 80,
-        progress: 72,
-        school: "Metro University"
-      }
+    batch: [
+      { id: 1, name: "Alex Rodriguez", points: 183, earnings: 45, rank: 1 },
+      { id: 2, name: "Emma Wilson", points: 175, earnings: 40, rank: 2 },
+      { id: 5, name: "Ethan Miller", points: 168, earnings: 38, rank: 3 },
+      { id: 3, name: "Jamal Thompson", points: 152, earnings: 35, rank: 4 },
+      { id: 4, name: "Sophia Garcia", points: 145, earnings: 32, rank: 5 },
     ]
   }
-];
-
-// Mock data for teachers
-const teachersData = [
-  { id: 1, name: "Jamie Smith" },
-  { id: 2, name: "Alex Rodriguez" },
-  { id: 3, name: "Sarah Johnson" },
-  { id: 4, name: "Michael Brown" }
-];
+};
 
 const AdminBatchDetails = () => {
-  const { batchId } = useParams();
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
-  const [showEditBatchDialog, setShowEditBatchDialog] = useState(false);
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const { batchId } = useParams<{ batchId: string }>();
+  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [gradeValue, setGradeValue] = useState('');
+  const [leaderboardType, setLeaderboardType] = useState<'national' | 'batch'>('batch');
   
-  // Find batch by ID from mock data
-  const batch = batchesData.find(b => b.id === Number(batchId));
+  // Filter students based on search term
+  const filteredStudents = batchData.students.filter(student => 
+    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  // Filter sessions based on search term
+  const filteredSessions = batchData.sessions.filter(session => 
+    session.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  // Filter assignments based on search term
+  const filteredAssignments = batchData.assignments.filter(assignment => 
+    assignment.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  // Filter submissions based on search term
+  const filteredSubmissions = batchData.submissions.filter(submission => 
+    submission.studentName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const form = useForm({
-    defaultValues: {
-      batchName: batch?.name || '',
-      startDate: batch?.startDate || '',
-      endDate: batch?.endDate || '',
-      teacher: batch?.teacher || '',
-      time: batch?.time || '',
-      topics: batch?.topics?.join('\n') || ''
+  const handleGradeSubmission = () => {
+    if (!gradeValue || isNaN(Number(gradeValue)) || Number(gradeValue) < 0 || Number(gradeValue) > 100) {
+      toast({
+        title: "Invalid grade",
+        description: "Please enter a valid grade between 0 and 100",
+        variant: "destructive"
+      });
+      return;
     }
-  });
-
-  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-  const handleDayToggle = (day: string) => {
-    if (selectedDays.includes(day)) {
-      setSelectedDays(selectedDays.filter(d => d !== day));
-    } else {
-      setSelectedDays([...selectedDays, day]);
-    }
-  };
-
-  const handleEditBatch = () => {
-    if (batch) {
-      setSelectedDays(batch.daysPerWeek);
-      setShowEditBatchDialog(true);
-    }
-  };
-
-  const handleUpdateBatch = (data: any) => {
-    console.log("Updated batch data:", { ...data, daysPerWeek: selectedDays });
+    
     toast({
-      title: "Batch updated",
-      description: "Batch has been successfully updated"
+      title: "Submission graded",
+      description: `You've graded ${selectedSubmission.studentName}'s submission with ${gradeValue} points.`
     });
-    setShowEditBatchDialog(false);
+    
+    setSelectedSubmission(null);
+    setFeedbackText('');
+    setGradeValue('');
   };
-
-  if (!batch) {
-    return (
-      <div className="p-6 text-center">
-        <h2 className="text-xl font-semibold mb-4">Batch not found</h2>
-        <Button variant="outline" onClick={() => navigate('/admin/batches')}>
-          Back to Batches
-        </Button>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">{batch.name}</h1>
-          <p className="text-muted-foreground">
-            {batch.startDate} to {batch.endDate}
-          </p>
+          <h1 className="text-2xl font-bold">{batchData.name}</h1>
+          <p className="text-muted-foreground">Batch ID: {batchData.id}</p>
         </div>
         
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate('/admin/batches')}>
-            Back to Batches
-          </Button>
-          <Button onClick={handleEditBatch}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit Batch
-          </Button>
+        <div className="flex items-center gap-2">
+          <Badge variant={batchData.status === 'active' ? 'default' : 'secondary'} className="capitalize">
+            {batchData.status}
+          </Badge>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <MoreHorizontal size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Batch Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Edit size={16} className="mr-2" />
+                Edit Batch
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Users size={16} className="mr-2" />
+                Manage Students
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Calendar size={16} className="mr-2" />
+                Schedule Session
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive">
+                <Trash size={16} className="mr-2" />
+                Archive Batch
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
-
-      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 mb-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="sessions">Sessions</TabsTrigger>
-          <TabsTrigger value="students">Students</TabsTrigger>
-          <TabsTrigger value="financials">Financials</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Batch Details</CardTitle>
-              <CardDescription>Key information about this batch</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Status</p>
-                  <p className="text-lg">{batch.status}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Number of Students</p>
-                  <p className="text-lg flex items-center">
-                    <Users className="h-5 w-5 mr-2 text-muted-foreground" />
-                    {batch.students.length}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Teacher</p>
-                  <p className="text-lg flex items-center">
-                    <School className="h-5 w-5 mr-2 text-muted-foreground" />
-                    {batch.teacher}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Teacher Contact</p>
-                  <div>
-                    <p className="text-sm">{batch.teacherEmail}</p>
-                    <p className="text-sm">{batch.teacherPhone}</p>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Schedule</p>
-                  <div>
-                    <p className="text-base flex items-center">
-                      <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                      {batch.daysPerWeek.join(', ')}
-                    </p>
-                    <p className="text-base flex items-center mt-1">
-                      <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                      {batch.time}
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Next Session</p>
-                  <p className="text-lg">
-                    {batch.nextSession ? new Date(batch.nextSession).toLocaleString() : 'No upcoming session'}
-                  </p>
-                </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Duration</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              <div className="text-sm">
+                {new Date(batchData.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - 
+                {new Date(batchData.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Students</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              <div className="text-2xl font-bold">{batchData.students.filter(s => s.status === 'active').length}</div>
+              <div className="text-sm text-muted-foreground">active</div>
+              {batchData.students.some(s => s.status === 'inactive') && (
+                <>
+                  <div className="text-sm text-muted-foreground mx-1">•</div>
+                  <div className="text-sm text-muted-foreground">
+                    {batchData.students.filter(s => s.status === 'inactive').length} inactive
+                  </div>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Average Progress</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-primary" />
+              <div className="text-2xl font-bold">
+                {Math.round(batchData.students.reduce((sum, student) => sum + student.progress, 0) / batchData.students.length)}%
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Batch Description</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>{batchData.description}</p>
+        </CardContent>
+      </Card>
+      
+      <div className="relative">
+        <div className="absolute right-0 top-0">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search..."
+              className="pl-8 w-[250px]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+        
+        <Tabs defaultValue="students" className="mt-6">
+          <TabsList className="w-full max-w-md grid grid-cols-4">
+            <TabsTrigger value="students">Students</TabsTrigger>
+            <TabsTrigger value="sessions">Sessions</TabsTrigger>
+            <TabsTrigger value="assignments">Assignments</TabsTrigger>
+            <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
+          </TabsList>
           
-          <Card>
-            <CardHeader>
-              <CardTitle>Course Content</CardTitle>
-              <CardDescription>Topics covered in this batch</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {batch.topics.map((topic, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <Book className="h-5 w-5 text-muted-foreground mt-0.5" />
-                    <span>{topic}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="sessions" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Session Schedule</CardTitle>
-              <CardDescription>All sessions for this batch</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <TabsContent value="students" className="mt-6 space-y-4">
+            <div className="rounded-md border overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Topic</TableHead>
-                    <TableHead>Attendance</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {batch.sessions.map((session) => (
-                    <TableRow key={session.id}>
-                      <TableCell>{session.date}</TableCell>
-                      <TableCell>{session.time}</TableCell>
-                      <TableCell>{session.topic}</TableCell>
-                      <TableCell>
-                        {session.completed 
-                          ? `${session.attendance}/${batch.students.length}` 
-                          : '-'}
-                      </TableCell>
-                      <TableCell>
-                        {session.completed ? (
-                          <span className="text-green-600">Completed</span>
-                        ) : (
-                          <span className="text-blue-600">Scheduled</span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="students" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <div>
-                  <CardTitle>Enrolled Students</CardTitle>
-                  <CardDescription>List of students in this batch</CardDescription>
-                </div>
-                <Button variant="outline" onClick={() => navigate('/admin/students')}>
-                  Manage Students
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Student</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>School</TableHead>
-                    <TableHead>Attendance</TableHead>
                     <TableHead>Progress</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {batch.students.map((student) => (
-                    <TableRow key={student.id}>
-                      <TableCell className="font-medium">{student.name}</TableCell>
-                      <TableCell>{student.email}</TableCell>
-                      <TableCell>{student.phone}</TableCell>
-                      <TableCell>{student.school}</TableCell>
-                      <TableCell>{student.attendance}%</TableCell>
-                      <TableCell>{student.progress}%</TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => navigate(`/admin/students/${student.id}`)}
-                        >
-                          View
-                        </Button>
+                  {filteredStudents.length > 0 ? (
+                    filteredStudents.map((student) => (
+                      <TableRow key={student.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={student.avatar} alt={student.name} />
+                              <AvatarFallback>{student.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                            </Avatar>
+                            <span className="font-medium">{student.name}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{student.email}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-primary" 
+                                style={{ width: `${student.progress}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-xs">{student.progress}%</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={student.status === 'active' ? 'outline' : 'secondary'} className="capitalize">
+                            {student.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="sm">View Details</Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                        No students found matching your search.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="financials" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Financial Overview</CardTitle>
-              <CardDescription>Revenue and earnings distribution</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="border rounded-lg p-4 bg-gray-50">
-                  <div className="flex items-center mb-2">
-                    <DollarSign className="h-5 w-5 mr-2 text-green-600" />
-                    <p className="font-medium">Total Revenue</p>
-                  </div>
-                  <p className="text-2xl font-bold">${batch.earnings}</p>
-                  <p className="text-sm text-muted-foreground">From {batch.students.length} students</p>
-                </div>
-                
-                <div className="border rounded-lg p-4 bg-blue-50">
-                  <div className="flex items-center mb-2">
-                    <DollarSign className="h-5 w-5 mr-2 text-blue-600" />
-                    <p className="font-medium">Teacher's Share (20%)</p>
-                  </div>
-                  <p className="text-2xl font-bold">${batch.teacherEarnings}</p>
-                  <p className="text-sm text-muted-foreground">Paid to {batch.teacher}</p>
-                </div>
-                
-                <div className="border rounded-lg p-4 bg-purple-50">
-                  <div className="flex items-center mb-2">
-                    <DollarSign className="h-5 w-5 mr-2 text-purple-600" />
-                    <p className="font-medium">OLL Share (30%)</p>
-                  </div>
-                  <p className="text-2xl font-bold">${batch.ollShare}</p>
-                  <p className="text-sm text-muted-foreground">Platform fee</p>
-                </div>
-              </div>
-              
-              <div className="border rounded-lg p-4 bg-orange-50">
-                <div className="flex items-center mb-2">
-                  <DollarSign className="h-5 w-5 mr-2 text-orange-600" />
-                  <p className="font-medium">Students' Share (50%)</p>
-                </div>
-                <p className="text-2xl font-bold">${batch.studentShare}</p>
-                <p className="text-sm text-muted-foreground">Distributed among students based on performance</p>
-              </div>
-              
-              <Card className="border-dashed">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Payment Status</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Teacher payout</span>
-                      <span className="text-green-600">Paid on May 31, 2023</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Student earnings distribution</span>
-                      <span className="text-blue-600">Pending batch completion</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Edit Batch Dialog */}
-      <Dialog open={showEditBatchDialog} onOpenChange={setShowEditBatchDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Edit Batch</DialogTitle>
-            <DialogDescription>
-              Update batch information below.
-            </DialogDescription>
-          </DialogHeader>
+            </div>
+            
+            <div className="flex justify-end">
+              <Button className="gap-1">
+                <Plus size={16} />
+                Add Student
+              </Button>
+            </div>
+          </TabsContent>
           
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleUpdateBatch)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="batchName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Batch Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter batch name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+          <TabsContent value="sessions" className="mt-6 space-y-4">
+            <div className="rounded-md border overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Session</TableHead>
+                    <TableHead>Date & Time</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Attendance</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredSessions.length > 0 ? (
+                    filteredSessions.map((session) => (
+                      <TableRow key={session.id}>
+                        <TableCell>
+                          <div className="font-medium">{session.title}</div>
+                        </TableCell>
+                        <TableCell>
+                          <div>{new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                          <div className="text-xs text-muted-foreground">{session.time}</div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant={
+                              session.status === 'completed' ? 'outline' : 
+                              session.status === 'upcoming' ? 'secondary' : 'default'
+                            } 
+                            className="capitalize"
+                          >
+                            {session.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {session.status === 'completed' ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-primary" 
+                                  style={{ width: `${session.attendance}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-xs">{session.attendance}%</span>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MoreHorizontal size={16} />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>
+                                <Edit size={16} className="mr-2" />
+                                Edit Session
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Eye size={16} className="mr-2" />
+                                View Details
+                              </DropdownMenuItem>
+                              {session.status === 'completed' && (
+                                <DropdownMenuItem>
+                                  <Download size={16} className="mr-2" />
+                                  Download Recording
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="text-destructive">
+                                <Trash size={16} className="mr-2" />
+                                Cancel Session
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                        No sessions found matching your search.
+                      </TableCell>
+                    </TableRow>
                   )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="teacher"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Teacher</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a teacher" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {teachersData.map(teacher => (
-                            <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                              {teacher.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="startDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Start Date</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="endDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>End Date</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div>
-                <FormLabel>Schedule Days</FormLabel>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {daysOfWeek.map(day => (
-                    <Button
-                      key={day}
-                      type="button"
-                      variant={selectedDays.includes(day) ? "default" : "outline"}
-                      onClick={() => handleDayToggle(day)}
-                      className="flex-1"
-                    >
-                      {day.substring(0, 3)}
-                    </Button>
-                  ))}
-                </div>
-                {selectedDays.length === 0 && (
-                  <p className="text-sm text-destructive mt-1">Please select at least one day</p>
-                )}
-              </div>
-
-              <FormField
-                control={form.control}
-                name="time"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Session Time</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., 3:00 PM - 5:00 PM" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="topics"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Session Topics</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Enter topics to be covered in this batch, one per line"
-                        className="min-h-[100px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Enter one topic per line. These will be used to create session schedules.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                </TableBody>
+              </Table>
+            </div>
+            
+            <div className="flex justify-end">
+              <Button className="gap-1">
+                <Plus size={16} />
+                Schedule Session
+              </Button>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="assignments" className="mt-6 space-y-4">
+            <Tabs defaultValue="assignments">
+              <TabsList className="w-full max-w-md grid grid-cols-2">
+                <TabsTrigger value="assignments">Assignments</TabsTrigger>
+                <TabsTrigger value="submissions">Submissions</TabsTrigger>
+              </TabsList>
               
-              <DialogFooter>
-                <Button variant="outline" type="button" onClick={() => setShowEditBatchDialog(false)}>
-                  Cancel
+              <TabsContent value="assignments" className="mt-4 space-y-4">
+                <div className="rounded-md border overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Assignment</TableHead>
+                        <TableHead>Due Date</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Submissions</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredAssignments.length > 0 ? (
+                        filteredAssignments.map((assignment) => (
+                          <TableRow key={assignment.id}>
+                            <TableCell>
+                              <div className="font-medium">{assignment.title}</div>
+                              <div className="text-xs text-muted-foreground truncate max-w-[300px]">
+                                {assignment.description}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {new Date(assignment.dueDate).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                              })}
+                            </TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={
+                                  assignment.status === 'completed' ? 'outline' : 
+                                  assignment.status === 'active' ? 'default' : 'secondary'
+                                } 
+                                className="capitalize"
+                              >
+                                {assignment.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <span>{assignment.submissions}</span>
+                                <span className="text-xs text-muted-foreground">/ {batchData.students.length}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button variant="ghost" size="sm">View Details</Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                            No assignments found matching your search.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+                
+                <div className="flex justify-end">
+                  <Button className="gap-1">
+                    <Plus size={16} />
+                    Create Assignment
+                  </Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="submissions" className="mt-4 space-y-4">
+                <div className="rounded-md border overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Student</TableHead>
+                        <TableHead>Assignment</TableHead>
+                        <TableHead>Submitted</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredSubmissions.length > 0 ? (
+                        filteredSubmissions.map((submission) => {
+                          const assignment = batchData.assignments.find(a => a.id === submission.assignmentId);
+                          return (
+                            <TableRow key={submission.id}>
+                              <TableCell>
+                                <div className="font-medium">{submission.studentName}</div>
+                              </TableCell>
+                              <TableCell>{assignment?.title}</TableCell>
+                              <TableCell>
+                                {new Date(submission.submittedAt).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric'
+                                })}
+                                <div className="text-xs text-muted-foreground">
+                                  {new Date(submission.submittedAt).toLocaleTimeString('en-US', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge 
+                                  variant={
+                                    submission.status === 'graded' ? 'outline' : 
+                                    submission.status === 'submitted' ? 'default' : 'secondary'
+                                  } 
+                                  className="capitalize"
+                                >
+                                  {submission.status}
+                                </Badge>
+                                {submission.status === 'graded' && (
+                                  <div className="text-xs mt-1">
+                                    Grade: <span className="font-medium">{submission.grade}</span>
+                                    <span className="text-muted-foreground">/{assignment?.maxPoints}</span>
+                                  </div>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedSubmission(submission);
+                                    setFeedbackText(submission.feedback || '');
+                                    setGradeValue(submission.grade?.toString() || '');
+                                  }}
+                                >
+                                  {submission.status === 'submitted' ? 'Grade' : 'View'}
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                            No submissions found matching your search.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+          
+          <TabsContent value="leaderboard" className="mt-6 space-y-4">
+            <Tabs 
+              defaultValue="batch" 
+              onValueChange={(value) => setLeaderboardType(value as 'national' | 'batch')}
+            >
+              <TabsList className="w-full max-w-md grid grid-cols-2">
+                <TabsTrigger value="batch">Batch Leaderboard</TabsTrigger>
+                <TabsTrigger value="national">National Leaderboard</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="batch" className="mt-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Batch Leaderboard</CardTitle>
+                    <CardDescription>Top performing students in this batch</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="rounded-md border overflow-hidden">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-[80px] text-center">Rank</TableHead>
+                            <TableHead>Student</TableHead>
+                            <TableHead className="text-right">Points</TableHead>
+                            <TableHead className="text-right">Earnings</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {batchData.leaderboard.batch.map((student) => (
+                            <TableRow key={student.id}>
+                              <TableCell className="text-center font-semibold">
+                                {student.rank <= 3 ? (
+                                  <div className={`
+                                    w-6 h-6 mx-auto rounded-full flex items-center justify-center text-white
+                                    ${student.rank === 1 ? 'bg-yellow-500' : 
+                                      student.rank === 2 ? 'bg-gray-400' : 'bg-amber-700'}
+                                  `}>
+                                    {student.rank}
+                                  </div>
+                                ) : (
+                                  student.rank
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-3">
+                                  <Avatar className="h-8 w-8">
+                                    <AvatarFallback>{student.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                                  </Avatar>
+                                  <span className="font-medium">{student.name}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-right font-semibold">{student.points}</TableCell>
+                              <TableCell className="text-right text-success font-semibold">${student.earnings}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="national" className="mt-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>National Leaderboard</CardTitle>
+                    <CardDescription>How batch students rank nationally</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="rounded-md border overflow-hidden">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-[80px] text-center">Rank</TableHead>
+                            <TableHead>Student</TableHead>
+                            <TableHead>School</TableHead>
+                            <TableHead className="text-right">National Rank</TableHead>
+                            <TableHead className="text-right">Points</TableHead>
+                            <TableHead className="text-right">Earnings</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {batchData.leaderboard.national.map((student) => (
+                            <TableRow key={student.id}>
+                              <TableCell className="text-center font-semibold">
+                                {student.rank <= 3 ? (
+                                  <div className={`
+                                    w-6 h-6 mx-auto rounded-full flex items-center justify-center text-white
+                                    ${student.rank === 1 ? 'bg-yellow-500' : 
+                                      student.rank === 2 ? 'bg-gray-400' : 'bg-amber-700'}
+                                  `}>
+                                    {student.rank}
+                                  </div>
+                                ) : (
+                                  student.rank
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-3">
+                                  <Avatar className="h-8 w-8">
+                                    <AvatarFallback>{student.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                                  </Avatar>
+                                  <span className="font-medium">{student.name}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>{student.school}</TableCell>
+                              <TableCell className="text-right font-semibold">#{student.nationalRank}</TableCell>
+                              <TableCell className="text-right font-semibold">{student.points}</TableCell>
+                              <TableCell className="text-right text-success font-semibold">${student.earnings}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+        </Tabs>
+      </div>
+      
+      {/* Submission Review Dialog */}
+      {selectedSubmission && (
+        <Dialog open={!!selectedSubmission} onOpenChange={() => setSelectedSubmission(null)}>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>
+                {selectedSubmission.status === 'submitted' ? 'Grade Submission' : 'View Submission'}
+              </DialogTitle>
+              <DialogDescription>
+                {batchData.assignments.find(a => a.id === selectedSubmission.assignmentId)?.title} - 
+                Submitted by {selectedSubmission.studentName} on {' '}
+                {new Date(selectedSubmission.submittedAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 my-2">
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium">Attached Files</h3>
+                <div className="border rounded-md overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>File Name</TableHead>
+                        <TableHead>Size</TableHead>
+                        <TableHead></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {selectedSubmission.files.map((file: any) => (
+                        <TableRow key={file.id}>
+                          <TableCell className="flex items-center gap-2">
+                            <FileText size={16} className="text-muted-foreground" />
+                            {file.name}
+                          </TableCell>
+                          <TableCell>{file.size}</TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm">Download</Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+              
+              {selectedSubmission.status === 'submitted' ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="grade">Grade (out of {batchData.assignments.find(a => a.id === selectedSubmission.assignmentId)?.maxPoints})</Label>
+                    <Input
+                      id="grade"
+                      type="number"
+                      min="0"
+                      max={batchData.assignments.find(a => a.id === selectedSubmission.assignmentId)?.maxPoints}
+                      value={gradeValue}
+                      onChange={(e) => setGradeValue(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="feedback">Feedback</Label>
+                    <Textarea
+                      id="feedback"
+                      placeholder="Provide feedback to the student..."
+                      value={feedbackText}
+                      onChange={(e) => setFeedbackText(e.target.value)}
+                      rows={5}
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium">Grade</h3>
+                    <div className="flex items-center gap-2">
+                      <div className="text-xl font-bold">{selectedSubmission.grade}</div>
+                      <div className="text-muted-foreground">/ {batchData.assignments.find(a => a.id === selectedSubmission.assignmentId)?.maxPoints}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium">Feedback</h3>
+                    <div className="p-3 bg-muted rounded-md text-sm">
+                      {selectedSubmission.feedback}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setSelectedSubmission(null)}>
+                Cancel
+              </Button>
+              {selectedSubmission.status === 'submitted' && (
+                <Button onClick={handleGradeSubmission} className="gap-1">
+                  <Send size={16} />
+                  Submit Grade
                 </Button>
-                <Button type="submit">Update Batch</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
