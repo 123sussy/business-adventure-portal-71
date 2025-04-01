@@ -22,13 +22,36 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 
+// Define the task type to ensure consistency
+type TaskStatus = 'pending' | 'submitted' | 'completed' | 'overdue' | 'resubmit';
+
+interface TaskAttachment {
+  id: number;
+  name: string;
+  size: string;
+  url: string;
+}
+
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  deadline: string;
+  submittedAt?: string;
+  feedback?: string;
+  rating?: number;
+  points: number;
+  attachments?: TaskAttachment[];
+}
+
 // Mock data for student tasks
-const studentTasks = [
+const studentTasks: Task[] = [
   {
     id: 1, 
     title: 'Create a Business Plan', 
     description: 'Draft a comprehensive business plan for your product idea.', 
-    status: 'completed' as const, 
+    status: 'completed', 
     deadline: '2023-09-30',
     submittedAt: '2023-09-28',
     feedback: 'Excellent work! Your business plan is well-structured and shows great potential.', 
@@ -43,7 +66,7 @@ const studentTasks = [
     id: 2, 
     title: 'Design Product Packaging', 
     description: 'Create eco-friendly packaging designs for your product.', 
-    status: 'resubmit' as const, 
+    status: 'resubmit', 
     deadline: '2023-10-10',
     submittedAt: '2023-10-08',
     feedback: 'Good start, but please consider making the design more sustainable. Review materials section.',
@@ -56,7 +79,7 @@ const studentTasks = [
     id: 3, 
     title: 'Marketing Strategy', 
     description: 'Develop a marketing strategy to promote your product.', 
-    status: 'submitted' as const, 
+    status: 'submitted', 
     deadline: '2023-10-15',
     submittedAt: '2023-10-14',
     points: 0,
@@ -69,7 +92,7 @@ const studentTasks = [
     id: 4, 
     title: 'Financial Projection', 
     description: 'Create a financial projection for your business for the next 6 months.', 
-    status: 'pending' as const, 
+    status: 'pending', 
     deadline: '2023-10-25',
     points: 0
   },
@@ -77,7 +100,7 @@ const studentTasks = [
     id: 5, 
     title: 'Sales Pitch', 
     description: 'Prepare a 5-minute sales pitch for your product.', 
-    status: 'pending' as const, 
+    status: 'pending', 
     deadline: '2023-11-05',
     points: 0
   },
@@ -85,7 +108,7 @@ const studentTasks = [
     id: 6, 
     title: 'Customer Feedback Analysis', 
     description: 'Collect and analyze feedback from at least 10 potential customers.', 
-    status: 'overdue' as const, 
+    status: 'overdue', 
     deadline: '2023-10-05',
     points: 0
   },
@@ -100,9 +123,9 @@ const studentStats = {
 };
 
 const Tasks = () => {
-  const [tasks, setTasks] = useState(studentTasks);
+  const [tasks, setTasks] = useState<Task[]>(studentTasks);
   const { toast } = useToast();
-  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [submissionText, setSubmissionText] = useState('');
   const [attachmentName, setAttachmentName] = useState('');
   
@@ -125,7 +148,7 @@ const Tasks = () => {
   
   const statusCounts = getStatusCounts();
 
-  const handleViewSubmission = (task: any) => {
+  const handleViewSubmission = (task: Task) => {
     setSelectedTask(task);
   };
 
@@ -142,20 +165,26 @@ const Tasks = () => {
     // Find the task and update its status
     const updatedTasks = tasks.map(task => {
       if (task.id === taskId) {
-        return {
+        const newTask: Task = {
           ...task,
-          status: 'submitted' as const,
+          status: 'submitted',
           submittedAt: new Date().toISOString().split('T')[0],
-          attachments: attachmentName ? [
+        };
+        
+        // Add attachment if provided
+        if (attachmentName) {
+          newTask.attachments = [
             ...(task.attachments || []),
             { 
-              id: Math.random(), 
+              id: Math.floor(Math.random() * 10000), 
               name: attachmentName, 
               size: '1.2 MB', 
               url: '#' 
             }
-          ] : task.attachments
-        };
+          ];
+        }
+        
+        return newTask;
       }
       return task;
     });
@@ -561,11 +590,11 @@ const Tasks = () => {
             <DialogHeader>
               <DialogTitle>Task Submission: {selectedTask.title}</DialogTitle>
               <DialogDescription>
-                Submitted on {new Date(selectedTask.submittedAt).toLocaleDateString('en-US', {
+                Submitted on {selectedTask.submittedAt ? new Date(selectedTask.submittedAt).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
-                })}
+                }) : 'Not submitted yet'}
               </DialogDescription>
             </DialogHeader>
             
@@ -581,7 +610,7 @@ const Tasks = () => {
                     <div className="flex items-center gap-1 text-yellow-500">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <span key={i}>
-                          {i < selectedTask.rating ? '★' : '☆'}
+                          {i < selectedTask.rating! ? '★' : '☆'}
                         </span>
                       ))}
                     </div>
@@ -602,7 +631,7 @@ const Tasks = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {selectedTask.attachments.map((attachment: any) => (
+                        {selectedTask.attachments.map((attachment) => (
                           <TableRow key={attachment.id}>
                             <TableCell className="flex items-center gap-2">
                               <FileText size={16} className="text-muted-foreground" />

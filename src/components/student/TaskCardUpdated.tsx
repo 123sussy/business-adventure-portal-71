@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,10 +19,13 @@ interface TaskProps {
     submittedAt?: string;
     feedback?: string;
     rating?: number;
+    points?: number;
+    attachments?: { id: number; name: string; size: string; url: string; }[];
   };
+  actions?: React.ReactNode; // Add the actions prop to the interface
 }
 
-const TaskCardUpdated: React.FC<TaskProps> = ({ task }) => {
+const TaskCardUpdated: React.FC<TaskProps> = ({ task, actions }) => {
   const [taskStatus, setTaskStatus] = useState<TaskStatus>(task.status);
   const [submittedAt, setSubmittedAt] = useState<string | undefined>(task.submittedAt);
   const [feedback, setFeedback] = useState<string | undefined>(task.feedback);
@@ -141,23 +145,29 @@ const TaskCardUpdated: React.FC<TaskProps> = ({ task }) => {
       </CardContent>
       
       <CardFooter className="px-5 py-3 bg-muted/20 flex justify-end">
-        {taskStatus === 'pending' || taskStatus === 'overdue' ? (
-          <TaskSubmission 
-            taskId={task.id}
-            taskTitle={task.title}
-            onSubmissionComplete={handleSubmissionComplete}
-          />
-        ) : isViewableStatus(taskStatus) ? (
-          <TaskView
-            taskId={task.id}
-            taskTitle={task.title}
-            taskStatus={taskStatus}
-            submittedAt={submittedAt}
-            feedback={feedback}
-            rating={rating}
-            onResubmit={handleResubmit}
-          />
-        ) : null}
+        {actions ? (
+          actions
+        ) : (
+          <>
+            {taskStatus === 'pending' || taskStatus === 'overdue' ? (
+              <TaskSubmission 
+                taskId={task.id}
+                taskTitle={task.title}
+                onSubmissionComplete={handleSubmissionComplete}
+              />
+            ) : isViewableStatus(taskStatus) ? (
+              <TaskView
+                taskId={task.id}
+                taskTitle={task.title}
+                taskStatus={taskStatus}
+                submittedAt={submittedAt}
+                feedback={feedback}
+                rating={rating}
+                onResubmit={handleResubmit}
+              />
+            ) : null}
+          </>
+        )}
       </CardFooter>
     </Card>
   );
