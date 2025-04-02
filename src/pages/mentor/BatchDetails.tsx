@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,10 +11,10 @@ import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogD
 import { Badge } from '@/components/ui/badge';
 import TaskManager from '@/components/mentor/TaskManager';
 import TaskSubmissionViewer from '@/components/mentor/TaskSubmissionViewer';
-import { Calendar, Clock, DollarSign, Users, School, Check, Plus, File, Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar, Clock, DollarSign, Users, School, Check, Plus, File, Calendar as CalendarIcon, Video } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
-// You would typically fetch this data based on the batchId
 const mockBatchData = {
   id: 1,
   name: 'School Entrepreneurship - Batch 1',
@@ -40,11 +39,56 @@ const mockBatchData = {
   ]
 };
 
-// Mock tasks
 const initialTasks = [
   { id: 1, title: 'Create School Plan', dueDate: '2023-10-15', status: 'completed', description: 'Develop a comprehensive school plan outlining your product/service, target market, and competitive advantage.' },
   { id: 2, title: 'Market Research', dueDate: '2023-10-30', status: 'in-progress', description: 'Conduct market research to identify your target audience and understand their needs and preferences.' },
   { id: 3, title: 'Financial Projections', dueDate: '2023-11-15', status: 'not-started', description: 'Create financial projections for your school, including revenue forecasts, expenses, and break-even analysis.' }
+];
+
+const mockSessions = [
+  { 
+    id: 1, 
+    title: "Business Idea Brainstorming", 
+    date: "2023-09-05",
+    time: "3:00 PM - 5:00 PM",
+    status: "completed", 
+    attendanceRate: 92,
+    notes: "Students developed initial business concepts through guided ideation exercises."
+  },
+  { 
+    id: 2, 
+    title: "Marketing Fundamentals", 
+    date: "2023-09-12",
+    time: "3:00 PM - 5:00 PM",
+    status: "completed", 
+    attendanceRate: 88,
+    notes: "Covered target market identification, value proposition, and basic marketing channels."
+  },
+  { 
+    id: 3, 
+    title: "Financial Planning", 
+    date: "2023-09-19",
+    time: "3:00 PM - 5:00 PM",
+    status: "completed", 
+    attendanceRate: 96,
+    notes: "Reviewed pricing strategies, cost structures, and profit margin calculation."
+  },
+  { 
+    id: 4, 
+    title: "Product Development", 
+    date: "2023-09-26",
+    time: "3:00 PM - 5:00 PM",
+    status: "upcoming",
+    notes: "Will cover prototyping, minimum viable product, and iteration techniques."
+  },
+  { 
+    id: 5, 
+    title: "Sales Techniques", 
+    date: "2023-10-03",
+    time: "3:00 PM - 5:00 PM",
+    status: "upcoming",
+    notes: "Will focus on persuasion, objection handling, and closing techniques."
+  }
 ];
 
 const BatchDetails = () => {
@@ -59,7 +103,6 @@ const BatchDetails = () => {
   const [activeSubmissionTab, setActiveSubmissionTab] = useState<'tasks' | 'submissions'>('tasks');
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<number | null>(null);
   
-  // Mock submissions data
   const mockSubmissions = [
     { id: 1, studentName: 'Alex Johnson', taskTitle: 'Create School Plan', submittedAt: '2023-10-14T09:30:00', status: 'pending_review' },
     { id: 2, studentName: 'Morgan Smith', taskTitle: 'Market Research', submittedAt: '2023-10-08T14:15:00', status: 'approved' },
@@ -615,7 +658,71 @@ const BatchDetails = () => {
         </TabsContent>
         
         <TabsContent value="sessions" className="mt-6">
-          <TaskManager />
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle>Batch Sessions</CardTitle>
+              <Button variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Schedule Session
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {mockSessions.map(session => (
+                  <Card key={session.id} className="overflow-hidden">
+                    <CardContent className="p-6">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              session.status === 'completed' ? 'bg-green-100 text-green-700' :
+                              'bg-blue-100 text-blue-700'
+                            }`}>
+                              <Video className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <h4 className="font-medium">{session.title}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {session.date} • {session.time}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {session.notes && (
+                            <p className="text-sm mt-3 text-muted-foreground">{session.notes}</p>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-col gap-2">
+                          <Badge variant={
+                            session.status === 'completed' ? 'default' : 'outline'
+                          } className={
+                            session.status === 'completed' ? 'bg-green-500 hover:bg-green-600' : ''
+                          }>
+                            {session.status === 'completed' ? 'Completed' : 'Upcoming'}
+                          </Badge>
+                          
+                          {session.status === 'completed' && session.attendanceRate && (
+                            <div className="text-xs text-muted-foreground">
+                              Attendance: {session.attendanceRate}%
+                            </div>
+                          )}
+                          
+                          <div className="flex gap-2 mt-2">
+                            {session.status === 'completed' ? (
+                              <Button size="sm" variant="outline">View Details</Button>
+                            ) : (
+                              <Button size="sm">Start Session</Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

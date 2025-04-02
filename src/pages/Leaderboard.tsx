@@ -10,27 +10,27 @@ import UserAvatar from '@/components/ui-custom/UserAvatar';
 
 // Mock data
 const studentLeaderboard = [
-  { id: 1, name: 'Alex Johnson', points: 1250, earnings: 345, business: 'Eco Crafts', rank: 1 },
-  { id: 2, name: 'Samantha Lee', points: 1100, earnings: 290, business: 'Digital Art Prints', rank: 2 },
-  { id: 3, name: 'Miguel Santos', points: 950, earnings: 210, business: 'Handmade Jewelry', rank: 3 },
-  { id: 4, name: 'Emma Wilson', points: 900, earnings: 185, business: 'Custom Stickers', rank: 4 },
-  { id: 5, name: 'Jayden Brown', points: 850, earnings: 170, business: 'Healthy Snacks', rank: 5 },
-  { id: 6, name: 'Sophia Chen', points: 820, earnings: 165, business: 'Mobile Phone Cases', rank: 6 },
-  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, business: 'Sustainable Bags', rank: 7 },
-  { id: 8, name: 'Olivia Davis', points: 750, earnings: 120, business: 'Personalized Notebooks', rank: 8 },
-  { id: 9, name: 'Noah Garcia', points: 700, earnings: 110, business: 'Pet Accessories', rank: 9 },
-  { id: 10, name: 'Ava Martinez', points: 650, earnings: 95, business: 'Custom T-shirts', rank: 10 },
+  { id: 1, name: 'Alex Johnson', points: 1250, earnings: 345, business: 'Eco Crafts', rank: 1, taskCompletion: 95, attendance: 98 },
+  { id: 2, name: 'Samantha Lee', points: 1100, earnings: 290, business: 'Digital Art Prints', rank: 2, taskCompletion: 92, attendance: 95 },
+  { id: 3, name: 'Miguel Santos', points: 950, earnings: 210, business: 'Handmade Jewelry', rank: 3, taskCompletion: 88, attendance: 90 },
+  { id: 4, name: 'Emma Wilson', points: 900, earnings: 185, business: 'Custom Stickers', rank: 4, taskCompletion: 85, attendance: 92 },
+  { id: 5, name: 'Jayden Brown', points: 850, earnings: 170, business: 'Healthy Snacks', rank: 5, taskCompletion: 83, attendance: 88 },
+  { id: 6, name: 'Sophia Chen', points: 820, earnings: 165, business: 'Mobile Phone Cases', rank: 6, taskCompletion: 80, attendance: 85 },
+  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, business: 'Sustainable Bags', rank: 7, taskCompletion: 78, attendance: 82 },
+  { id: 8, name: 'Olivia Davis', points: 750, earnings: 120, business: 'Personalized Notebooks', rank: 8, taskCompletion: 75, attendance: 80 },
+  { id: 9, name: 'Noah Garcia', points: 700, earnings: 110, business: 'Pet Accessories', rank: 9, taskCompletion: 72, attendance: 78 },
+  { id: 10, name: 'Ava Martinez', points: 650, earnings: 95, business: 'Custom T-shirts', rank: 10, taskCompletion: 70, attendance: 75 },
 ];
 
 const mentorLeaderboard = [
-  { id: 1, name: 'Jennifer Smith', points: 2200, students: 12, rating: 4.9, rank: 1 },
-  { id: 2, name: 'David Chen', points: 2050, students: 10, rating: 4.8, rank: 2 },
-  { id: 3, name: 'Sarah Johnson', points: 1950, students: 11, rating: 4.7, rank: 3 },
-  { id: 4, name: 'Michael Lee', points: 1850, students: 9, rating: 4.8, rank: 4 },
-  { id: 5, name: 'Emma Rodriguez', points: 1700, students: 8, rating: 4.6, rank: 5 },
-  { id: 6, name: 'James Wilson', points: 1650, students: 7, rating: 4.7, rank: 6 },
-  { id: 7, name: 'Sophia Nguyen', points: 1600, students: 8, rating: 4.5, rank: 7 },
-  { id: 8, name: 'Robert Garcia', points: 1550, students: 6, rating: 4.8, rank: 8 },
+  { id: 1, name: 'Jennifer Smith', points: 2200, students: 12, rating: 4.9, rank: 1, taskCompletion: 96, attendance: 98, earnings: 1500 },
+  { id: 2, name: 'David Chen', points: 2050, students: 10, rating: 4.8, rank: 2, taskCompletion: 94, attendance: 97, earnings: 1350 },
+  { id: 3, name: 'Sarah Johnson', points: 1950, students: 11, rating: 4.7, rank: 3, taskCompletion: 92, attendance: 95, earnings: 1200 },
+  { id: 4, name: 'Michael Lee', points: 1850, students: 9, rating: 4.8, rank: 4, taskCompletion: 90, attendance: 94, earnings: 1100 },
+  { id: 5, name: 'Emma Rodriguez', points: 1700, students: 8, rating: 4.6, rank: 5, taskCompletion: 88, attendance: 92, earnings: 950 },
+  { id: 6, name: 'James Wilson', points: 1650, students: 7, rating: 4.7, rank: 6, taskCompletion: 87, attendance: 90, earnings: 900 },
+  { id: 7, name: 'Sophia Nguyen', points: 1600, students: 8, rating: 4.5, rank: 7, taskCompletion: 85, attendance: 88, earnings: 850 },
+  { id: 8, name: 'Robert Garcia', points: 1550, students: 6, rating: 4.8, rank: 8, taskCompletion: 83, attendance: 85, earnings: 800 },
 ];
 
 const Leaderboard = () => {
@@ -129,10 +129,12 @@ const Leaderboard = () => {
               <div className="rounded-md border">
                 <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
                   <div className="col-span-1 text-center">Rank</div>
-                  <div className="col-span-4 sm:col-span-3">Student</div>
-                  <div className="col-span-4 hidden sm:block">Business</div>
-                  <div className="col-span-3 sm:col-span-2 text-right">Points</div>
-                  <div className="col-span-4 sm:col-span-2 text-right">Earnings</div>
+                  <div className="col-span-3 sm:col-span-2">Student</div>
+                  <div className="col-span-3 hidden md:block">Business</div>
+                  <div className="col-span-2 text-right">Tasks</div>
+                  <div className="col-span-2 text-right">Attendance</div>
+                  <div className="col-span-2 text-right">Points</div>
+                  <div className="col-span-2 text-right">Earnings</div>
                 </div>
                 
                 {filteredStudents.map((student) => (
@@ -153,13 +155,15 @@ const Leaderboard = () => {
                         student.rank
                       )}
                     </div>
-                    <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
+                    <div className="col-span-3 sm:col-span-2 flex items-center gap-3">
                       <UserAvatar name={student.name} size="sm" />
                       <span className="font-medium truncate">{student.name}</span>
                     </div>
-                    <div className="col-span-4 hidden sm:block truncate">{student.business}</div>
-                    <div className="col-span-3 sm:col-span-2 text-right font-semibold">{student.points}</div>
-                    <div className="col-span-4 sm:col-span-2 text-right text-success font-semibold">${student.earnings}</div>
+                    <div className="col-span-3 hidden md:block truncate">{student.business}</div>
+                    <div className="col-span-2 text-right font-medium">{student.taskCompletion}%</div>
+                    <div className="col-span-2 text-right font-medium">{student.attendance}%</div>
+                    <div className="col-span-2 text-right font-semibold">{student.points}</div>
+                    <div className="col-span-2 text-right text-success font-semibold">${student.earnings}</div>
                   </div>
                 ))}
                 
@@ -183,10 +187,12 @@ const Leaderboard = () => {
               <div className="rounded-md border">
                 <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
                   <div className="col-span-1 text-center">Rank</div>
-                  <div className="col-span-5 sm:col-span-3">Mentor</div>
-                  <div className="col-span-3 hidden sm:block">Students</div>
-                  <div className="col-span-3 hidden sm:block">Rating</div>
-                  <div className="col-span-6 sm:col-span-2 text-right">Points</div>
+                  <div className="col-span-2">Mentor</div>
+                  <div className="col-span-1 text-center">Students</div>
+                  <div className="col-span-2 text-center">Rating</div>
+                  <div className="col-span-2 text-right">Tasks</div>
+                  <div className="col-span-2 text-right">Attendance</div>
+                  <div className="col-span-2 text-right">Earnings</div>
                 </div>
                 
                 {filteredMentors.map((mentor) => (
@@ -207,18 +213,20 @@ const Leaderboard = () => {
                         mentor.rank
                       )}
                     </div>
-                    <div className="col-span-5 sm:col-span-3 flex items-center gap-3">
+                    <div className="col-span-2 flex items-center gap-3">
                       <UserAvatar name={mentor.name} size="sm" />
                       <span className="font-medium truncate">{mentor.name}</span>
                     </div>
-                    <div className="col-span-3 hidden sm:block">{mentor.students} students</div>
-                    <div className="col-span-3 hidden sm:block">
-                      <div className="flex items-center gap-1">
+                    <div className="col-span-1 text-center">{mentor.students}</div>
+                    <div className="col-span-2 text-center">
+                      <div className="flex items-center justify-center gap-1">
                         <span>{mentor.rating}</span>
                         <div className="text-yellow-500">★</div>
                       </div>
                     </div>
-                    <div className="col-span-6 sm:col-span-2 text-right font-semibold">{mentor.points}</div>
+                    <div className="col-span-2 text-right font-medium">{mentor.taskCompletion}%</div>
+                    <div className="col-span-2 text-right font-medium">{mentor.attendance}%</div>
+                    <div className="col-span-2 text-right font-semibold text-success">${mentor.earnings}</div>
                   </div>
                 ))}
                 
