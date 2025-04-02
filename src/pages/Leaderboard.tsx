@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Trophy, Filter, Search, CheckCircle, Clock, DollarSign } from 'lucide-react';
+import { Trophy, Filter, Search, CheckCircle, Clock, IndianRupee } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import UserAvatar from '@/components/ui-custom/UserAvatar';
 
-// Mock data
 const studentLeaderboard = [
   { id: 1, name: 'Alex Johnson', points: 1250, earnings: 345, business: 'Eco Crafts', rank: 1, taskCompletion: 95, attendance: 98 },
   { id: 2, name: 'Samantha Lee', points: 1100, earnings: 290, business: 'Digital Art Prints', rank: 2, taskCompletion: 92, attendance: 95 },
@@ -131,15 +129,15 @@ const Leaderboard = () => {
                   <div className="col-span-1 text-center">Rank</div>
                   <div className="col-span-3 sm:col-span-2">Student</div>
                   <div className="col-span-3 hidden md:block">Business</div>
-                  <div className="col-span-2 text-center flex items-center justify-center">
+                  <div className="col-span-2 sm:col-span-1 md:col-span-2 text-center flex items-center justify-center">
                     <CheckCircle size={16} className="mr-1" /> Tasks
                   </div>
-                  <div className="col-span-2 text-center flex items-center justify-center">
+                  <div className="col-span-2 sm:col-span-1 md:col-span-2 text-center flex items-center justify-center">
                     <Clock size={16} className="mr-1" /> Attend.
                   </div>
-                  <div className="col-span-2 text-center">Points</div>
+                  <div className="col-span-2 sm:col-span-1 text-center">Points</div>
                   <div className="col-span-2 text-right">
-                    <DollarSign size={16} className="inline mr-1" /> Earnings
+                    <IndianRupee size={16} className="inline mr-1" /> Earnings
                   </div>
                 </div>
                 
@@ -166,20 +164,20 @@ const Leaderboard = () => {
                       <span className="font-medium truncate">{student.name}</span>
                     </div>
                     <div className="col-span-3 hidden md:block truncate">{student.business}</div>
-                    <div className="col-span-2 text-center">
+                    <div className="col-span-2 sm:col-span-1 md:col-span-2 text-center">
                       <span className={`font-medium ${student.taskCompletion >= 90 ? 'text-success' : 
                         student.taskCompletion >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
                         {student.taskCompletion}%
                       </span>
                     </div>
-                    <div className="col-span-2 text-center">
+                    <div className="col-span-2 sm:col-span-1 md:col-span-2 text-center">
                       <span className={`font-medium ${student.attendance >= 90 ? 'text-success' : 
                         student.attendance >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
                         {student.attendance}%
                       </span>
                     </div>
-                    <div className="col-span-2 text-center font-semibold">{student.points}</div>
-                    <div className="col-span-2 text-right text-success font-semibold">${student.earnings}</div>
+                    <div className="col-span-2 sm:col-span-1 text-center font-semibold">{student.points}</div>
+                    <div className="col-span-2 text-right text-success font-semibold">₹{student.earnings}</div>
                   </div>
                 ))}
                 
@@ -205,16 +203,16 @@ const Leaderboard = () => {
                   <div className="col-span-1 text-center">Rank</div>
                   <div className="col-span-3 sm:col-span-2">Mentor</div>
                   <div className="col-span-1 text-center">Students</div>
-                  <div className="col-span-2 text-center">Rating</div>
-                  <div className="col-span-2 text-center flex items-center justify-center">
+                  <div className="col-span-1 md:col-span-2 text-center">Rating</div>
+                  <div className="col-span-2 sm:col-span-1 md:col-span-2 text-center flex items-center justify-center">
                     <CheckCircle size={16} className="mr-1" /> Tasks
                   </div>
-                  <div className="col-span-2 text-center flex items-center justify-center">
+                  <div className="col-span-2 sm:col-span-1 md:col-span-2 text-center flex items-center justify-center">
                     <Clock size={16} className="mr-1" /> Attend.
                   </div>
                   <div className="col-span-1 text-center">Points</div>
                   <div className="col-span-2 text-right">
-                    <DollarSign size={16} className="inline mr-1" /> Earnings
+                    <IndianRupee size={16} className="inline mr-1" /> Earnings
                   </div>
                 </div>
                 
@@ -241,26 +239,26 @@ const Leaderboard = () => {
                       <span className="font-medium truncate">{mentor.name}</span>
                     </div>
                     <div className="col-span-1 text-center">{mentor.students}</div>
-                    <div className="col-span-2 text-center">
+                    <div className="col-span-1 md:col-span-2 text-center">
                       <div className="flex items-center justify-center gap-1">
                         <span>{mentor.rating}</span>
                         <div className="text-yellow-500">★</div>
                       </div>
                     </div>
-                    <div className="col-span-2 text-center">
+                    <div className="col-span-2 sm:col-span-1 md:col-span-2 text-center">
                       <span className={`font-medium ${mentor.taskCompletion >= 90 ? 'text-success' : 
                         mentor.taskCompletion >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
                         {mentor.taskCompletion}%
                       </span>
                     </div>
-                    <div className="col-span-2 text-center">
+                    <div className="col-span-2 sm:col-span-1 md:col-span-2 text-center">
                       <span className={`font-medium ${mentor.attendance >= 90 ? 'text-success' : 
                         mentor.attendance >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
                         {mentor.attendance}%
                       </span>
                     </div>
                     <div className="col-span-1 text-center font-semibold">{mentor.points}</div>
-                    <div className="col-span-2 text-right text-success font-semibold">${mentor.earnings}</div>
+                    <div className="col-span-2 text-right text-success font-semibold">₹{mentor.earnings}</div>
                   </div>
                 ))}
                 

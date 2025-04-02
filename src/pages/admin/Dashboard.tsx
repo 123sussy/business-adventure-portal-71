@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
-  DollarSign, 
+  IndianRupee, 
   Users, 
   School, 
   TrendingUp, 
@@ -85,8 +85,8 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-success" />
-                <div className="text-2xl font-bold">${totalRevenue}</div>
+                <IndianRupee className="h-5 w-5 text-success" />
+                <div className="text-2xl font-bold">₹{totalRevenue}</div>
               </div>
               <div className="flex items-center text-xs font-medium text-success">
                 <ArrowUpRight className="h-3 w-3 mr-1" />
@@ -168,12 +168,12 @@ const AdminDashboard = () => {
                   axisLine={false}
                 />
                 <YAxis 
-                  tickFormatter={(value) => `$${value}`}
+                  tickFormatter={(value) => `₹${value}`}
                   tickLine={false}
                   axisLine={false}
                   width={60}
                 />
-                <Tooltip formatter={(value) => [`$${value}`, 'Revenue']} />
+                <Tooltip formatter={(value) => [`₹${value}`, 'Revenue']} />
                 <Area 
                   type="monotone" 
                   dataKey="value" 
@@ -230,15 +230,15 @@ const AdminDashboard = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <div className="p-4 border rounded-md">
               <div className="text-sm text-muted-foreground mb-1">Student Earnings (50%)</div>
-              <div className="text-2xl font-bold">${revenueSplit.studentTotal}</div>
+              <div className="text-2xl font-bold">₹{revenueSplit.studentTotal}</div>
             </div>
             <div className="p-4 border rounded-md">
               <div className="text-sm text-muted-foreground mb-1">Teacher Earnings (20%)</div>
-              <div className="text-2xl font-bold">${revenueSplit.teacherTotal}</div>
+              <div className="text-2xl font-bold">₹{revenueSplit.teacherTotal}</div>
             </div>
             <div className="p-4 border rounded-md">
               <div className="text-sm text-muted-foreground mb-1">OLL Share (30%)</div>
-              <div className="text-2xl font-bold">${revenueSplit.ollTotal}</div>
+              <div className="text-2xl font-bold">₹{revenueSplit.ollTotal}</div>
             </div>
           </div>
           
@@ -259,10 +259,10 @@ const AdminDashboard = () => {
                   <tr key={batch.id} className="border-b transition-colors hover:bg-muted/20">
                     <td className="p-4 align-middle font-medium">{batch.name}</td>
                     <td className="p-4 align-middle text-center">{batch.students}</td>
-                    <td className="p-4 align-middle text-right">${batch.revenue}</td>
-                    <td className="p-4 align-middle text-right">${batch.revenue - batch.teacherEarning - batch.ollShare}</td>
-                    <td className="p-4 align-middle text-right">${batch.teacherEarning}</td>
-                    <td className="p-4 align-middle text-right">${batch.ollShare}</td>
+                    <td className="p-4 align-middle text-right">₹{batch.revenue}</td>
+                    <td className="p-4 align-middle text-right">₹{batch.revenue - batch.teacherEarning - batch.ollShare}</td>
+                    <td className="p-4 align-middle text-right">₹{batch.teacherEarning}</td>
+                    <td className="p-4 align-middle text-right">₹{batch.ollShare}</td>
                   </tr>
                 ))}
               </tbody>
