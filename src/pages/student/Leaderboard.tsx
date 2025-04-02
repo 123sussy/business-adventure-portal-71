@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Trophy, Filter, Search, Star } from 'lucide-react';
+import { Trophy, Filter, Search, Star, CheckCircle, Clock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,26 +10,26 @@ import UserAvatar from '@/components/ui-custom/UserAvatar';
 
 // Mock data for national leaderboard
 const nationalStudentLeaderboard = [
-  { id: 1, name: 'Alex Johnson', points: 1250, earnings: 345, school: 'Lincoln High School', rank: 1, nationalRank: 15 },
-  { id: 2, name: 'Samantha Lee', points: 1100, earnings: 290, school: 'Washington Academy', rank: 2, nationalRank: 23 },
-  { id: 3, name: 'Miguel Santos', points: 950, earnings: 210, school: 'Riverside Prep', rank: 3, nationalRank: 42 },
-  { id: 4, name: 'Emma Wilson', points: 900, earnings: 185, school: 'Oakwood High', rank: 4, nationalRank: 56 },
-  { id: 5, name: 'Jayden Brown', points: 850, earnings: 170, school: 'Lincoln High School', rank: 5, nationalRank: 78 },
-  { id: 6, name: 'Sophia Chen', points: 820, earnings: 165, school: 'Westlake Academy', rank: 6, nationalRank: 95 },
-  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, school: 'Riverside Prep', rank: 7, nationalRank: 112 },
-  { id: 8, name: 'Olivia Davis', points: 750, earnings: 120, school: 'Washington Academy', rank: 8, nationalRank: 143 },
-  { id: 9, name: 'Noah Garcia', points: 700, earnings: 110, school: 'Oakwood High', rank: 9, nationalRank: 187 },
-  { id: 10, name: 'Ava Martinez', points: 650, earnings: 95, school: 'Westlake Academy', rank: 10, nationalRank: 203 },
+  { id: 1, name: 'Alex Johnson', points: 1250, earnings: 345, school: 'Lincoln High School', rank: 1, nationalRank: 15, taskCompletion: 95, attendance: 98 },
+  { id: 2, name: 'Samantha Lee', points: 1100, earnings: 290, school: 'Washington Academy', rank: 2, nationalRank: 23, taskCompletion: 92, attendance: 95 },
+  { id: 3, name: 'Miguel Santos', points: 950, earnings: 210, school: 'Riverside Prep', rank: 3, nationalRank: 42, taskCompletion: 88, attendance: 90 },
+  { id: 4, name: 'Emma Wilson', points: 900, earnings: 185, school: 'Oakwood High', rank: 4, nationalRank: 56, taskCompletion: 85, attendance: 92 },
+  { id: 5, name: 'Jayden Brown', points: 850, earnings: 170, school: 'Lincoln High School', rank: 5, nationalRank: 78, taskCompletion: 82, attendance: 88 },
+  { id: 6, name: 'Sophia Chen', points: 820, earnings: 165, school: 'Westlake Academy', rank: 6, nationalRank: 95, taskCompletion: 80, attendance: 86 },
+  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, school: 'Riverside Prep', rank: 7, nationalRank: 112, taskCompletion: 78, attendance: 85 },
+  { id: 8, name: 'Olivia Davis', points: 750, earnings: 120, school: 'Washington Academy', rank: 8, nationalRank: 143, taskCompletion: 75, attendance: 84 },
+  { id: 9, name: 'Noah Garcia', points: 700, earnings: 110, school: 'Oakwood High', rank: 9, nationalRank: 187, taskCompletion: 72, attendance: 82 },
+  { id: 10, name: 'Ava Martinez', points: 650, earnings: 95, school: 'Westlake Academy', rank: 10, nationalRank: 203, taskCompletion: 70, attendance: 80 },
 ];
 
 // Mock data for batch leaderboard (smaller, more focused list)
 const batchStudentLeaderboard = [
-  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, school: 'Riverside Prep', rank: 1, nationalRank: 112 },
-  { id: 11, name: 'Lucas Wright', points: 620, earnings: 105, school: 'Riverside Prep', rank: 2, nationalRank: 231 },
-  { id: 12, name: 'Isabella Kim', points: 580, earnings: 95, school: 'Riverside Prep', rank: 3, nationalRank: 267 },
-  { id: 13, name: 'Mason Zhang', points: 540, earnings: 85, school: 'Riverside Prep', rank: 4, nationalRank: 302 },
-  { id: 14, name: 'Zoe Thompson', points: 510, earnings: 80, school: 'Riverside Prep', rank: 5, nationalRank: 348 },
-  { id: 15, name: 'Dylan Jackson', points: 480, earnings: 75, school: 'Riverside Prep', rank: 6, nationalRank: 392 },
+  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, school: 'Riverside Prep', rank: 1, nationalRank: 112, taskCompletion: 78, attendance: 85 },
+  { id: 11, name: 'Lucas Wright', points: 620, earnings: 105, school: 'Riverside Prep', rank: 2, nationalRank: 231, taskCompletion: 68, attendance: 79 },
+  { id: 12, name: 'Isabella Kim', points: 580, earnings: 95, school: 'Riverside Prep', rank: 3, nationalRank: 267, taskCompletion: 65, attendance: 76 },
+  { id: 13, name: 'Mason Zhang', points: 540, earnings: 85, school: 'Riverside Prep', rank: 4, nationalRank: 302, taskCompletion: 62, attendance: 74 },
+  { id: 14, name: 'Zoe Thompson', points: 510, earnings: 80, school: 'Riverside Prep', rank: 5, nationalRank: 348, taskCompletion: 60, attendance: 72 },
+  { id: 15, name: 'Dylan Jackson', points: 480, earnings: 75, school: 'Riverside Prep', rank: 6, nationalRank: 392, taskCompletion: 58, attendance: 71 },
 ];
 
 // Current user data (for highlighting and showing in the top stats)
@@ -164,14 +164,20 @@ const StudentLeaderboard = () => {
               <CardDescription>Based on points earned from sales and achievements across all batches</CardDescription>
             </CardHeader>
             <CardContent className="overflow-x-auto">
-              <div className="rounded-md border min-w-[600px] sm:min-w-full">
+              <div className="rounded-md border min-w-[800px] sm:min-w-full">
                 <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
                   <div className="col-span-1 text-center">Rank</div>
-                  <div className="col-span-4 sm:col-span-3">Student</div>
-                  <div className="col-span-4 hidden sm:block">School</div>
-                  <div className="col-span-2 hidden md:block text-right">National Rank</div>
-                  <div className="col-span-3 sm:col-span-2 text-right">Points</div>
-                  <div className="col-span-4 sm:col-span-2 text-right">Earnings</div>
+                  <div className="col-span-3 sm:col-span-2">Student</div>
+                  <div className="col-span-2 hidden sm:block">School</div>
+                  <div className="col-span-1 hidden md:block text-center">Natl. Rank</div>
+                  <div className="col-span-2 sm:col-span-1 text-center flex items-center justify-center">
+                    <CheckCircle size={16} className="mr-1" /> Tasks
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-center flex items-center justify-center">
+                    <Clock size={16} className="mr-1" /> Attend.
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-center">Points</div>
+                  <div className="col-span-2 text-center">Earnings</div>
                 </div>
                 
                 {filteredNationalStudents.map((student) => (
@@ -192,7 +198,7 @@ const StudentLeaderboard = () => {
                         student.rank
                       )}
                     </div>
-                    <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
+                    <div className="col-span-3 sm:col-span-2 flex items-center gap-3">
                       <UserAvatar 
                         name={student.name} 
                         size="sm" 
@@ -200,10 +206,22 @@ const StudentLeaderboard = () => {
                       />
                       <span className="font-medium truncate">{student.name}</span>
                     </div>
-                    <div className="col-span-4 hidden sm:block truncate">{student.school}</div>
-                    <div className="col-span-2 hidden md:block text-right font-semibold">#{student.nationalRank}</div>
-                    <div className="col-span-3 sm:col-span-2 text-right font-semibold">{student.points}</div>
-                    <div className="col-span-4 sm:col-span-2 text-right text-success font-semibold">${student.earnings}</div>
+                    <div className="col-span-2 hidden sm:block truncate">{student.school}</div>
+                    <div className="col-span-1 hidden md:block text-center font-semibold">#{student.nationalRank}</div>
+                    <div className="col-span-2 sm:col-span-1 text-center">
+                      <span className={`font-medium ${student.taskCompletion >= 90 ? 'text-success' : 
+                        student.taskCompletion >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
+                        {student.taskCompletion}%
+                      </span>
+                    </div>
+                    <div className="col-span-2 sm:col-span-1 text-center">
+                      <span className={`font-medium ${student.attendance >= 90 ? 'text-success' : 
+                        student.attendance >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
+                        {student.attendance}%
+                      </span>
+                    </div>
+                    <div className="col-span-2 sm:col-span-1 text-center font-semibold">{student.points}</div>
+                    <div className="col-span-2 text-center text-success font-semibold">${student.earnings}</div>
                   </div>
                 ))}
                 
@@ -224,14 +242,20 @@ const StudentLeaderboard = () => {
               <CardDescription>Based on points earned from sales and achievements within your current batch</CardDescription>
             </CardHeader>
             <CardContent className="overflow-x-auto">
-              <div className="rounded-md border min-w-[600px] sm:min-w-full">
+              <div className="rounded-md border min-w-[800px] sm:min-w-full">
                 <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
                   <div className="col-span-1 text-center">Rank</div>
-                  <div className="col-span-4 sm:col-span-3">Student</div>
-                  <div className="col-span-4 hidden sm:block">School</div>
-                  <div className="col-span-2 hidden md:block text-right">National Rank</div>
-                  <div className="col-span-3 sm:col-span-2 text-right">Points</div>
-                  <div className="col-span-4 sm:col-span-2 text-right">Earnings</div>
+                  <div className="col-span-3 sm:col-span-2">Student</div>
+                  <div className="col-span-2 hidden sm:block">School</div>
+                  <div className="col-span-1 hidden md:block text-center">Natl. Rank</div>
+                  <div className="col-span-2 sm:col-span-1 text-center flex items-center justify-center">
+                    <CheckCircle size={16} className="mr-1" /> Tasks
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-center flex items-center justify-center">
+                    <Clock size={16} className="mr-1" /> Attend.
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-center">Points</div>
+                  <div className="col-span-2 text-center">Earnings</div>
                 </div>
                 
                 {filteredBatchStudents.map((student) => (
@@ -252,7 +276,7 @@ const StudentLeaderboard = () => {
                         student.rank
                       )}
                     </div>
-                    <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
+                    <div className="col-span-3 sm:col-span-2 flex items-center gap-3">
                       <UserAvatar 
                         name={student.name} 
                         size="sm" 
@@ -260,10 +284,22 @@ const StudentLeaderboard = () => {
                       />
                       <span className="font-medium truncate">{student.name}</span>
                     </div>
-                    <div className="col-span-4 hidden sm:block truncate">{student.school}</div>
-                    <div className="col-span-2 hidden md:block text-right font-semibold">#{student.nationalRank}</div>
-                    <div className="col-span-3 sm:col-span-2 text-right font-semibold">{student.points}</div>
-                    <div className="col-span-4 sm:col-span-2 text-right text-success font-semibold">${student.earnings}</div>
+                    <div className="col-span-2 hidden sm:block truncate">{student.school}</div>
+                    <div className="col-span-1 hidden md:block text-center font-semibold">#{student.nationalRank}</div>
+                    <div className="col-span-2 sm:col-span-1 text-center">
+                      <span className={`font-medium ${student.taskCompletion >= 90 ? 'text-success' : 
+                        student.taskCompletion >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
+                        {student.taskCompletion}%
+                      </span>
+                    </div>
+                    <div className="col-span-2 sm:col-span-1 text-center">
+                      <span className={`font-medium ${student.attendance >= 90 ? 'text-success' : 
+                        student.attendance >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
+                        {student.attendance}%
+                      </span>
+                    </div>
+                    <div className="col-span-2 sm:col-span-1 text-center font-semibold">{student.points}</div>
+                    <div className="col-span-2 text-center text-success font-semibold">${student.earnings}</div>
                   </div>
                 ))}
                 

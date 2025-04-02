@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,7 +55,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from '@/hooks/use-toast';
 
-// Mock data for batches
 const batchesData = [
   { 
     id: 1, 
@@ -120,7 +118,6 @@ const batchesData = [
   }
 ];
 
-// Mock data for teachers
 const teachersData = [
   { id: 1, name: "Jamie Smith" },
   { id: 2, name: "Alex Rodriguez" },
@@ -326,7 +323,7 @@ const AdminBatches = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center">
-                            <DollarSign className="h-4 w-4 mr-2 text-green-500" />
+                            <DollarSign className="h-4 w-4 mr-2 text-purple-500" />
                             ${batch.ollShare}
                           </div>
                         </TableCell>
@@ -377,7 +374,6 @@ const AdminBatches = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Add Batch Dialog */}
       <Dialog open={showAddBatchDialog} onOpenChange={setShowAddBatchDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -542,7 +538,6 @@ const AdminBatches = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Batch Dialog */}
       <Dialog open={showEditBatchDialog} onOpenChange={setShowEditBatchDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>

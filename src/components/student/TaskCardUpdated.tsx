@@ -7,9 +7,9 @@ import TaskSubmission from './TaskSubmission';
 import TaskView from './TaskView';
 import { toast } from '@/hooks/use-toast';
 
-type TaskStatus = 'pending' | 'submitted' | 'completed' | 'overdue' | 'resubmit';
+export type TaskStatus = 'pending' | 'submitted' | 'completed' | 'overdue' | 'resubmit';
 
-interface TaskProps {
+export interface TaskProps {
   task: {
     id: number;
     title: string;
@@ -22,7 +22,7 @@ interface TaskProps {
     points?: number;
     attachments?: { id: number; name: string; size: string; url: string; }[];
   };
-  actions?: React.ReactNode; // Add the actions prop to the interface
+  actions?: React.ReactNode;
 }
 
 const TaskCardUpdated: React.FC<TaskProps> = ({ task, actions }) => {

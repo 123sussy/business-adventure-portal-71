@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import TaskManager from '@/components/mentor/TaskManager';
+import TaskSubmissionViewer from '@/components/mentor/TaskSubmissionViewer';
 import { Calendar, Clock, DollarSign, Users, School, Check, Plus, File, Calendar as CalendarIcon } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -55,6 +56,15 @@ const BatchDetails = () => {
     dueDate: '',
     description: ''
   });
+  const [activeSubmissionTab, setActiveSubmissionTab] = useState<'tasks' | 'submissions'>('tasks');
+  const [selectedSubmissionId, setSelectedSubmissionId] = useState<number | null>(null);
+  
+  // Mock submissions data
+  const mockSubmissions = [
+    { id: 1, studentName: 'Alex Johnson', taskTitle: 'Create School Plan', submittedAt: '2023-10-14T09:30:00', status: 'pending_review' },
+    { id: 2, studentName: 'Morgan Smith', taskTitle: 'Market Research', submittedAt: '2023-10-08T14:15:00', status: 'approved' },
+    { id: 3, studentName: 'Jamie Lee', taskTitle: 'Create School Plan', submittedAt: '2023-10-13T11:45:00', status: 'needs_revision' },
+  ];
   
   const handleAddTask = () => {
     if (!newTask.title || !newTask.dueDate) {
@@ -82,6 +92,11 @@ const BatchDetails = () => {
       title: "Task added",
       description: "New task has been successfully added to the batch."
     });
+  };
+  
+  const handleViewSubmission = (submissionId: number) => {
+    setSelectedSubmissionId(submissionId);
+    setActiveSubmissionTab('submissions');
   };
   
   return (
@@ -414,50 +429,137 @@ const BatchDetails = () => {
             </Button>
           </div>
           
-          <div className="space-y-4">
-            {tasks.map(task => (
-              <Card key={task.id}>
-                <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          task.status === 'completed' ? 'bg-green-100 text-green-700' :
-                          task.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
-                          'bg-gray-100 text-gray-700'
-                        }`}>
-                          {task.status === 'completed' ? (
-                            <Check className="h-4 w-4" />
-                          ) : (
-                            <File className="h-4 w-4" />
-                          )}
+          <Tabs value={activeSubmissionTab} onValueChange={(value) => setActiveSubmissionTab(value as 'tasks' | 'submissions')}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="tasks">Tasks</TabsTrigger>
+              <TabsTrigger value="submissions">Submissions</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="tasks">
+              <div className="space-y-4">
+                {tasks.map(task => (
+                  <Card key={task.id}>
+                    <CardContent className="p-6">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              task.status === 'completed' ? 'bg-green-100 text-green-700' :
+                              task.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
+                              'bg-gray-100 text-gray-700'
+                            }`}>
+                              {task.status === 'completed' ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                <File className="h-4 w-4" />
+                              )}
+                            </div>
+                            <div>
+                              <h4 className="font-medium">{task.title}</h4>
+                              <p className="text-sm text-muted-foreground">Due: {task.dueDate}</p>
+                            </div>
+                          </div>
+                          <p className="text-sm mt-3">{task.description}</p>
                         </div>
-                        <div>
-                          <h4 className="font-medium">{task.title}</h4>
-                          <p className="text-sm text-muted-foreground">Due: {task.dueDate}</p>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={
+                            task.status === 'completed' ? 'default' :
+                            task.status === 'in-progress' ? 'outline' :
+                            'secondary'
+                          } className={
+                            task.status === 'completed' ? 'bg-green-500 hover:bg-green-600' : ''
+                          }>
+                            {task.status === 'completed' ? 'Completed' : 
+                             task.status === 'in-progress' ? 'In Progress' : 
+                             'Not Started'}
+                          </Badge>
+                          <Button variant="outline" size="sm">Edit</Button>
+                          <Button variant="outline" size="sm" onClick={() => setActiveSubmissionTab('submissions')}>
+                            View Submissions
+                          </Button>
                         </div>
                       </div>
-                      <p className="text-sm mt-3">{task.description}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={
-                        task.status === 'completed' ? 'default' :
-                        task.status === 'in-progress' ? 'outline' :
-                        'secondary'
-                      } className={
-                        task.status === 'completed' ? 'bg-green-500 hover:bg-green-600' : ''
-                      }>
-                        {task.status === 'completed' ? 'Completed' : 
-                         task.status === 'in-progress' ? 'In Progress' : 
-                         'Not Started'}
-                      </Badge>
-                      <Button variant="outline" size="sm">Edit</Button>
-                    </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="submissions">
+              {selectedSubmissionId ? (
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => {
+                        setSelectedSubmissionId(null);
+                        setActiveSubmissionTab('tasks');
+                      }}
+                    >
+                      Back to Tasks
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  <TaskSubmissionViewer submissionId={selectedSubmissionId} />
+                </div>
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Task Submissions</CardTitle>
+                    <CardDescription>
+                      Review and grade student task submissions
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Student</TableHead>
+                          <TableHead>Task</TableHead>
+                          <TableHead>Submitted</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {mockSubmissions.map(submission => (
+                          <TableRow key={submission.id}>
+                            <TableCell className="font-medium">{submission.studentName}</TableCell>
+                            <TableCell>{submission.taskTitle}</TableCell>
+                            <TableCell>
+                              {new Date(submission.submittedAt).toLocaleString()}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={
+                                submission.status === 'approved' ? 'default' :
+                                submission.status === 'needs_revision' ? 'outline' :
+                                'secondary'
+                              } className={
+                                submission.status === 'approved' ? 'bg-green-500 hover:bg-green-600' : 
+                                submission.status === 'needs_revision' ? 'bg-amber-500 hover:bg-amber-600' : ''
+                              }>
+                                {submission.status === 'approved' ? 'Approved' : 
+                                 submission.status === 'needs_revision' ? 'Needs Revision' : 
+                                 'Pending Review'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button 
+                                size="sm" 
+                                onClick={() => handleViewSubmission(submission.id)}
+                              >
+                                Review
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          </Tabs>
           
           <Dialog open={showAddTaskDialog} onOpenChange={setShowAddTaskDialog}>
             <DialogContent>

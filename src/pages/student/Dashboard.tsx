@@ -10,8 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format } from 'date-fns';
 import { Link as RouterLink } from 'react-router-dom';
+import SaleForm from '@/components/student/SaleForm';
 
-// Define the task type to match TaskCard props
 type TaskStatus = 'pending' | 'submitted' | 'completed' | 'overdue' | 'resubmit';
 
 interface Task {
@@ -25,7 +25,6 @@ interface Task {
   rating?: number;
 }
 
-// Mock data for dashboard
 const mockEarnings = 425.50;
 const mockTasks: Task[] = [
   { id: 1, title: "Business Idea Submission", description: "Submit your initial business concept", status: "pending", deadline: "2025-07-10" },
@@ -38,7 +37,7 @@ const mockTasks: Task[] = [
 const mockNextSession = {
   id: 1,
   title: "Product Innovation Workshop",
-  date: new Date(2025, 6, 15, 15, 0), // July 15, 2025, 3:00 PM
+  date: new Date(2025, 6, 15, 15, 0),
   link: "https://zoom.us/j/1234567890"
 };
 
@@ -60,13 +59,9 @@ const StudentDashboard = () => {
       description: "You're joining the session in a new tab."
     });
   };
-  
-  const handleAddSale = () => {
-    toast({
-      title: "Add New Sale",
-      description: "Opening the sales form."
-    });
-    // In a real app, this would navigate to the sales form or open a modal
+
+  const handleSaleAdded = (saleData: any) => {
+    console.log("Sale added to dashboard:", saleData);
   };
 
   return (
@@ -76,7 +71,6 @@ const StudentDashboard = () => {
         <Badge variant="outline" className="font-normal">Summer 2025</Badge>
       </div>
 
-      {/* Main Stats Card */}
       <Card className="bg-gradient-to-br from-blue-50 to-white">
         <CardHeader className="pb-3">
           <CardTitle>My Earnings</CardTitle>
@@ -92,18 +86,12 @@ const StudentDashboard = () => {
               </div>
             </div>
             <div>
-              <Button size="sm" asChild className="gap-1">
-                <RouterLink to="/student/sales">
-                  <DollarSign size={16} />
-                  Record Sale
-                </RouterLink>
-              </Button>
+              <SaleForm onSaleAdded={handleSaleAdded} />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Next Session */}
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -128,7 +116,6 @@ const StudentDashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <ProgressCard
           title="Attendance"
@@ -153,7 +140,6 @@ const StudentDashboard = () => {
         />
       </div>
 
-      {/* Tasks Section */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
@@ -182,16 +168,9 @@ const StudentDashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Add Sale Button - Fixed at bottom right */}
-      <Button 
-        asChild
-        size="icon" 
-        className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg"
-      >
-        <RouterLink to="/student/sales">
-          <Plus size={24} />
-        </RouterLink>
-      </Button>
+      <div className="fixed bottom-8 right-8">
+        <SaleForm buttonSize="icon" buttonText="" buttonVariant="default" className="h-14 w-14 rounded-full shadow-lg" />
+      </div>
     </div>
   );
 };
