@@ -28,13 +28,15 @@ interface SaleFormProps {
   buttonText?: string;
   buttonVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   buttonSize?: "default" | "sm" | "lg" | "icon";
+  className?: string;
 }
 
 const SaleForm: React.FC<SaleFormProps> = ({ 
   onSaleAdded,
   buttonText = "Record Sale", 
   buttonVariant = "default",
-  buttonSize = "default"
+  buttonSize = "default",
+  className
 }) => {
   const [open, setOpen] = useState(false);
   const [saleData, setSaleData] = useState({
@@ -112,7 +114,7 @@ const SaleForm: React.FC<SaleFormProps> = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={buttonVariant} size={buttonSize} className="gap-1">
+        <Button variant={buttonVariant} size={buttonSize} className={className}>
           <DollarSign size={16} />
           {buttonText}
         </Button>

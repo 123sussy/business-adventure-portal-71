@@ -50,7 +50,7 @@ const Index = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{animationDelay: '0.3s'}}>
             <Button size="lg" asChild>
-              <Link to="/login">
+              <Link to="/register">
                 Get Started <ArrowRight className="ml-2" size={16} />
               </Link>
             </Button>
