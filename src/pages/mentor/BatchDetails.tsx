@@ -415,7 +415,7 @@ const BatchDetails = () => {
                           <div className="w-full max-w-24">
                             <div className="h-2 w-full bg-muted rounded-full">
                               <div 
-                                className={`h-full rounded-full ${
+                                className={`h-full bg-muted rounded-full ${
                                   student.attendance >= 90 ? 'bg-green-500' : 
                                   student.attendance >= 75 ? 'bg-amber-500' : 
                                   'bg-destructive'
@@ -432,7 +432,7 @@ const BatchDetails = () => {
                           <div className="w-full max-w-24">
                             <div className="h-2 w-full bg-muted rounded-full">
                               <div 
-                                className={`h-full rounded-full ${
+                                className={`h-full bg-muted rounded-full ${
                                   student.taskCompletion >= 90 ? 'bg-green-500' : 
                                   student.taskCompletion >= 75 ? 'bg-amber-500' : 
                                   'bg-destructive'

@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Trophy, Filter, Search, Star } from 'lucide-react';
+import { Trophy, Filter, Search, Star, CheckCircle, Clock, DollarSign } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,45 +9,45 @@ import UserAvatar from '@/components/ui-custom/UserAvatar';
 
 // Mock data for national leaderboard
 const nationalStudentLeaderboard = [
-  { id: 1, name: 'Alex Johnson', points: 1250, earnings: 345, school: 'Lincoln High School', rank: 1, nationalRank: 15 },
-  { id: 2, name: 'Samantha Lee', points: 1100, earnings: 290, school: 'Washington Academy', rank: 2, nationalRank: 23 },
-  { id: 3, name: 'Miguel Santos', points: 950, earnings: 210, school: 'Riverside Prep', rank: 3, nationalRank: 42 },
-  { id: 4, name: 'Emma Wilson', points: 900, earnings: 185, school: 'Oakwood High', rank: 4, nationalRank: 56 },
-  { id: 5, name: 'Jayden Brown', points: 850, earnings: 170, school: 'Lincoln High School', rank: 5, nationalRank: 78 },
-  { id: 6, name: 'Sophia Chen', points: 820, earnings: 165, school: 'Westlake Academy', rank: 6, nationalRank: 95 },
-  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, school: 'Riverside Prep', rank: 7, nationalRank: 112 },
-  { id: 8, name: 'Olivia Davis', points: 750, earnings: 120, school: 'Washington Academy', rank: 8, nationalRank: 143 },
-  { id: 9, name: 'Noah Garcia', points: 700, earnings: 110, school: 'Oakwood High', rank: 9, nationalRank: 187 },
-  { id: 10, name: 'Ava Martinez', points: 650, earnings: 95, school: 'Westlake Academy', rank: 10, nationalRank: 203 },
+  { id: 1, name: 'Alex Johnson', points: 1250, earnings: 345, school: 'Lincoln High School', rank: 1, nationalRank: 15, taskCompletion: 95, attendance: 98 },
+  { id: 2, name: 'Samantha Lee', points: 1100, earnings: 290, school: 'Washington Academy', rank: 2, nationalRank: 23, taskCompletion: 92, attendance: 95 },
+  { id: 3, name: 'Miguel Santos', points: 950, earnings: 210, school: 'Riverside Prep', rank: 3, nationalRank: 42, taskCompletion: 88, attendance: 90 },
+  { id: 4, name: 'Emma Wilson', points: 900, earnings: 185, school: 'Oakwood High', rank: 4, nationalRank: 56, taskCompletion: 85, attendance: 92 },
+  { id: 5, name: 'Jayden Brown', points: 850, earnings: 170, school: 'Lincoln High School', rank: 5, nationalRank: 78, taskCompletion: 82, attendance: 88 },
+  { id: 6, name: 'Sophia Chen', points: 820, earnings: 165, school: 'Westlake Academy', rank: 6, nationalRank: 95, taskCompletion: 80, attendance: 86 },
+  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, school: 'Riverside Prep', rank: 7, nationalRank: 112, taskCompletion: 78, attendance: 85 },
+  { id: 8, name: 'Olivia Davis', points: 750, earnings: 120, school: 'Washington Academy', rank: 8, nationalRank: 143, taskCompletion: 75, attendance: 84 },
+  { id: 9, name: 'Noah Garcia', points: 700, earnings: 110, school: 'Oakwood High', rank: 9, nationalRank: 187, taskCompletion: 72, attendance: 82 },
+  { id: 10, name: 'Ava Martinez', points: 650, earnings: 95, school: 'Westlake Academy', rank: 10, nationalRank: 203, taskCompletion: 70, attendance: 80 },
 ];
 
 // Mock data for batch leaderboard
 const batchStudentLeaderboard = [
-  { id: 3, name: 'Miguel Santos', points: 950, earnings: 210, school: 'Riverside Prep', rank: 1, nationalRank: 42 },
-  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, school: 'Riverside Prep', rank: 2, nationalRank: 112 },
-  { id: 11, name: 'Lucas Wright', points: 620, earnings: 105, school: 'Riverside Prep', rank: 3, nationalRank: 231 },
-  { id: 12, name: 'Isabella Kim', points: 580, earnings: 95, school: 'Riverside Prep', rank: 4, nationalRank: 267 },
-  { id: 13, name: 'Mason Zhang', points: 540, earnings: 85, school: 'Riverside Prep', rank: 5, nationalRank: 302 },
-  { id: 14, name: 'Zoe Thompson', points: 510, earnings: 80, school: 'Riverside Prep', rank: 6, nationalRank: 348 },
+  { id: 3, name: 'Miguel Santos', points: 950, earnings: 210, school: 'Riverside Prep', rank: 1, nationalRank: 42, taskCompletion: 88, attendance: 90 },
+  { id: 7, name: 'Ethan Miller', points: 780, earnings: 140, school: 'Riverside Prep', rank: 2, nationalRank: 112, taskCompletion: 78, attendance: 85 },
+  { id: 11, name: 'Lucas Wright', points: 620, earnings: 105, school: 'Riverside Prep', rank: 3, nationalRank: 231, taskCompletion: 68, attendance: 79 },
+  { id: 12, name: 'Isabella Kim', points: 580, earnings: 95, school: 'Riverside Prep', rank: 4, nationalRank: 267, taskCompletion: 65, attendance: 76 },
+  { id: 13, name: 'Mason Zhang', points: 540, earnings: 85, school: 'Riverside Prep', rank: 5, nationalRank: 302, taskCompletion: 62, attendance: 74 },
+  { id: 14, name: 'Zoe Thompson', points: 510, earnings: 80, school: 'Riverside Prep', rank: 6, nationalRank: 348, taskCompletion: 60, attendance: 72 },
 ];
 
 const nationalMentorLeaderboard = [
-  { id: 1, name: 'Jennifer Smith', points: 2200, students: 12, rating: 4.9, rank: 1, nationalRank: 5 },
-  { id: 2, name: 'David Chen', points: 2050, students: 10, rating: 4.8, rank: 2, nationalRank: 12 },
-  { id: 3, name: 'Sarah Johnson', points: 1950, students: 11, rating: 4.7, rank: 3, nationalRank: 17 },
-  { id: 4, name: 'Michael Lee', points: 1850, students: 9, rating: 4.8, rank: 4, nationalRank: 22 },
-  { id: 5, name: 'Emma Rodriguez', points: 1700, students: 8, rating: 4.6, rank: 5, nationalRank: 29 },
-  { id: 6, name: 'James Wilson', points: 1650, students: 7, rating: 4.7, rank: 6, nationalRank: 35 },
-  { id: 7, name: 'Sophia Nguyen', points: 1600, students: 8, rating: 4.5, rank: 7, nationalRank: 41 },
-  { id: 8, name: 'Robert Garcia', points: 1550, students: 6, rating: 4.8, rank: 8, nationalRank: 48 },
+  { id: 1, name: 'Jennifer Smith', points: 2200, students: 12, rating: 4.9, rank: 1, nationalRank: 5, taskCompletion: 96, attendance: 98, earnings: 1500 },
+  { id: 2, name: 'David Chen', points: 2050, students: 10, rating: 4.8, rank: 2, nationalRank: 12, taskCompletion: 94, attendance: 97, earnings: 1350 },
+  { id: 3, name: 'Sarah Johnson', points: 1950, students: 11, rating: 4.7, rank: 3, nationalRank: 17, taskCompletion: 92, attendance: 95, earnings: 1200 },
+  { id: 4, name: 'Michael Lee', points: 1850, students: 9, rating: 4.8, rank: 4, nationalRank: 22, taskCompletion: 90, attendance: 94, earnings: 1100 },
+  { id: 5, name: 'Emma Rodriguez', points: 1700, students: 8, rating: 4.6, rank: 5, nationalRank: 29, taskCompletion: 88, attendance: 92, earnings: 950 },
+  { id: 6, name: 'James Wilson', points: 1650, students: 7, rating: 4.7, rank: 6, nationalRank: 35, taskCompletion: 87, attendance: 90, earnings: 900 },
+  { id: 7, name: 'Sophia Nguyen', points: 1600, students: 8, rating: 4.5, rank: 7, nationalRank: 41, taskCompletion: 85, attendance: 88, earnings: 850 },
+  { id: 8, name: 'Robert Garcia', points: 1550, students: 6, rating: 4.8, rank: 8, nationalRank: 48, taskCompletion: 83, attendance: 85, earnings: 800 },
 ];
 
 // Mock data for batch mentor leaderboard
 const batchMentorLeaderboard = [
-  { id: 3, name: 'Sarah Johnson', points: 1950, students: 11, rating: 4.7, rank: 1, nationalRank: 17 },
-  { id: 5, name: 'Emma Rodriguez', points: 1700, students: 8, rating: 4.6, rank: 2, nationalRank: 29 },
-  { id: 7, name: 'Sophia Nguyen', points: 1600, students: 8, rating: 4.5, rank: 3, nationalRank: 41 },
-  { id: 9, name: 'Daniel Park', points: 1480, students: 7, rating: 4.4, rank: 4, nationalRank: 56 },
+  { id: 3, name: 'Sarah Johnson', points: 1950, students: 11, rating: 4.7, rank: 1, nationalRank: 17, taskCompletion: 92, attendance: 95, earnings: 1200 },
+  { id: 5, name: 'Emma Rodriguez', points: 1700, students: 8, rating: 4.6, rank: 2, nationalRank: 29, taskCompletion: 88, attendance: 92, earnings: 950 },
+  { id: 7, name: 'Sophia Nguyen', points: 1600, students: 8, rating: 4.5, rank: 3, nationalRank: 41, taskCompletion: 85, attendance: 88, earnings: 850 },
+  { id: 9, name: 'Daniel Park', points: 1480, students: 7, rating: 4.4, rank: 4, nationalRank: 56, taskCompletion: 82, attendance: 86, earnings: 780 },
 ];
 
 // Current user data (for highlighting and showing in the top stats)
@@ -198,14 +197,22 @@ const MentorLeaderboard = () => {
             <CardDescription>Based on points earned from sales and achievements across all batches</CardDescription>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <div className="rounded-md border min-w-[600px] sm:min-w-full">
+            <div className="rounded-md border min-w-[800px] sm:min-w-full">
               <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
                 <div className="col-span-1 text-center">Rank</div>
-                <div className="col-span-4 sm:col-span-3">Student</div>
-                <div className="col-span-4 hidden sm:block">School</div>
-                <div className="col-span-2 hidden md:block text-right">National Rank</div>
-                <div className="col-span-3 sm:col-span-2 text-right">Points</div>
-                <div className="col-span-4 sm:col-span-2 text-right">Earnings</div>
+                <div className="col-span-3 sm:col-span-2">Student</div>
+                <div className="col-span-2 hidden sm:block">School</div>
+                <div className="col-span-1 hidden lg:block text-center">Natl. Rank</div>
+                <div className="col-span-2 sm:col-span-1 text-center flex items-center justify-center">
+                  <CheckCircle size={16} className="mr-1" /> Tasks
+                </div>
+                <div className="col-span-2 sm:col-span-1 text-center flex items-center justify-center">
+                  <Clock size={16} className="mr-1" /> Attend.
+                </div>
+                <div className="col-span-2 sm:col-span-1 text-center">Points</div>
+                <div className="col-span-2 text-center">
+                  <DollarSign size={16} className="inline mr-1" /> Earnings
+                </div>
               </div>
               
               {filteredNationalStudents.map((student) => (
@@ -226,14 +233,26 @@ const MentorLeaderboard = () => {
                       student.rank
                     )}
                   </div>
-                  <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
+                  <div className="col-span-3 sm:col-span-2 flex items-center gap-3">
                     <UserAvatar name={student.name} size="sm" />
                     <span className="font-medium truncate">{student.name}</span>
                   </div>
-                  <div className="col-span-4 hidden sm:block truncate">{student.school}</div>
-                  <div className="col-span-2 hidden md:block text-right font-semibold">#{student.nationalRank}</div>
-                  <div className="col-span-3 sm:col-span-2 text-right font-semibold">{student.points}</div>
-                  <div className="col-span-4 sm:col-span-2 text-right text-success font-semibold">${student.earnings}</div>
+                  <div className="col-span-2 hidden sm:block truncate">{student.school}</div>
+                  <div className="col-span-1 hidden lg:block text-center font-semibold">#{student.nationalRank}</div>
+                  <div className="col-span-2 sm:col-span-1 text-center">
+                    <span className={`font-medium ${student.taskCompletion >= 90 ? 'text-success' : 
+                      student.taskCompletion >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
+                      {student.taskCompletion}%
+                    </span>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-center">
+                    <span className={`font-medium ${student.attendance >= 90 ? 'text-success' : 
+                      student.attendance >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
+                      {student.attendance}%
+                    </span>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-center font-semibold">{student.points}</div>
+                  <div className="col-span-2 text-center text-success font-semibold">${student.earnings}</div>
                 </div>
               ))}
               
@@ -255,14 +274,22 @@ const MentorLeaderboard = () => {
             <CardDescription>Based on points earned from sales and achievements within your current batch</CardDescription>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <div className="rounded-md border min-w-[600px] sm:min-w-full">
+            <div className="rounded-md border min-w-[800px] sm:min-w-full">
               <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
                 <div className="col-span-1 text-center">Rank</div>
-                <div className="col-span-4 sm:col-span-3">Student</div>
-                <div className="col-span-4 hidden sm:block">School</div>
-                <div className="col-span-2 hidden md:block text-right">National Rank</div>
-                <div className="col-span-3 sm:col-span-2 text-right">Points</div>
-                <div className="col-span-4 sm:col-span-2 text-right">Earnings</div>
+                <div className="col-span-3 sm:col-span-2">Student</div>
+                <div className="col-span-2 hidden sm:block">School</div>
+                <div className="col-span-1 hidden lg:block text-center">Natl. Rank</div>
+                <div className="col-span-2 sm:col-span-1 text-center flex items-center justify-center">
+                  <CheckCircle size={16} className="mr-1" /> Tasks
+                </div>
+                <div className="col-span-2 sm:col-span-1 text-center flex items-center justify-center">
+                  <Clock size={16} className="mr-1" /> Attend.
+                </div>
+                <div className="col-span-2 sm:col-span-1 text-center">Points</div>
+                <div className="col-span-2 text-center">
+                  <DollarSign size={16} className="inline mr-1" /> Earnings
+                </div>
               </div>
               
               {filteredBatchStudents.map((student) => (
@@ -283,14 +310,26 @@ const MentorLeaderboard = () => {
                       student.rank
                     )}
                   </div>
-                  <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
+                  <div className="col-span-3 sm:col-span-2 flex items-center gap-3">
                     <UserAvatar name={student.name} size="sm" />
                     <span className="font-medium truncate">{student.name}</span>
                   </div>
-                  <div className="col-span-4 hidden sm:block truncate">{student.school}</div>
-                  <div className="col-span-2 hidden md:block text-right font-semibold">#{student.nationalRank}</div>
-                  <div className="col-span-3 sm:col-span-2 text-right font-semibold">{student.points}</div>
-                  <div className="col-span-4 sm:col-span-2 text-right text-success font-semibold">${student.earnings}</div>
+                  <div className="col-span-2 hidden sm:block truncate">{student.school}</div>
+                  <div className="col-span-1 hidden lg:block text-center font-semibold">#{student.nationalRank}</div>
+                  <div className="col-span-2 sm:col-span-1 text-center">
+                    <span className={`font-medium ${student.taskCompletion >= 90 ? 'text-success' : 
+                      student.taskCompletion >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
+                      {student.taskCompletion}%
+                    </span>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-center">
+                    <span className={`font-medium ${student.attendance >= 90 ? 'text-success' : 
+                      student.attendance >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
+                      {student.attendance}%
+                    </span>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-center font-semibold">{student.points}</div>
+                  <div className="col-span-2 text-center text-success font-semibold">${student.earnings}</div>
                 </div>
               ))}
               
@@ -312,14 +351,23 @@ const MentorLeaderboard = () => {
             <CardDescription>Based on student success and mentorship quality across all regions</CardDescription>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <div className="rounded-md border min-w-[600px] sm:min-w-full">
+            <div className="rounded-md border min-w-[800px] sm:min-w-full">
               <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
                 <div className="col-span-1 text-center">Rank</div>
-                <div className="col-span-5 sm:col-span-3">Mentor</div>
-                <div className="col-span-3 hidden sm:block">Students</div>
-                <div className="col-span-2 hidden md:block text-right">National Rank</div>
-                <div className="col-span-3 hidden sm:block text-right">Rating</div>
-                <div className="col-span-6 sm:col-span-2 text-right">Points</div>
+                <div className="col-span-2">Mentor</div>
+                <div className="col-span-1 hidden md:block">Students</div>
+                <div className="col-span-1 hidden lg:block text-right">Natl. Rank</div>
+                <div className="col-span-1 hidden md:block text-center">Rating</div>
+                <div className="col-span-2 sm:col-span-1 text-center flex items-center justify-center">
+                  <CheckCircle size={16} className="mr-1" /> Tasks
+                </div>
+                <div className="col-span-2 sm:col-span-1 text-center flex items-center justify-center">
+                  <Clock size={16} className="mr-1" /> Attend.
+                </div>
+                <div className="col-span-2 sm:col-span-1 text-center">Points</div>
+                <div className="col-span-2 text-center">
+                  <DollarSign size={16} className="inline mr-1" /> Earnings
+                </div>
               </div>
               
               {filteredNationalMentors.map((mentor) => (
@@ -340,7 +388,7 @@ const MentorLeaderboard = () => {
                       mentor.rank
                     )}
                   </div>
-                  <div className="col-span-5 sm:col-span-3 flex items-center gap-3">
+                  <div className="col-span-2 flex items-center gap-3">
                     <UserAvatar 
                       name={mentor.name} 
                       size="sm" 
@@ -348,15 +396,28 @@ const MentorLeaderboard = () => {
                     />
                     <span className="font-medium truncate">{mentor.name}</span>
                   </div>
-                  <div className="col-span-3 hidden sm:block">{mentor.students} students</div>
-                  <div className="col-span-2 hidden md:block text-right font-semibold">#{mentor.nationalRank}</div>
-                  <div className="col-span-3 hidden sm:block text-right">
-                    <div className="flex items-center gap-1 justify-end">
+                  <div className="col-span-1 hidden md:block">{mentor.students}</div>
+                  <div className="col-span-1 hidden lg:block text-right font-semibold">#{mentor.nationalRank}</div>
+                  <div className="col-span-1 hidden md:block text-center">
+                    <div className="flex items-center gap-1 justify-center">
                       <span>{mentor.rating}</span>
                       <div className="text-yellow-500">★</div>
                     </div>
                   </div>
-                  <div className="col-span-6 sm:col-span-2 text-right font-semibold">{mentor.points}</div>
+                  <div className="col-span-2 sm:col-span-1 text-center">
+                    <span className={`font-medium ${mentor.taskCompletion >= 90 ? 'text-success' : 
+                      mentor.taskCompletion >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
+                      {mentor.taskCompletion}%
+                    </span>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-center">
+                    <span className={`font-medium ${mentor.attendance >= 90 ? 'text-success' : 
+                      mentor.attendance >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
+                      {mentor.attendance}%
+                    </span>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-center font-semibold">{mentor.points}</div>
+                  <div className="col-span-2 text-center text-success font-semibold">${mentor.earnings}</div>
                 </div>
               ))}
               
@@ -378,14 +439,23 @@ const MentorLeaderboard = () => {
             <CardDescription>Based on student success and mentorship quality in your region</CardDescription>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <div className="rounded-md border min-w-[600px] sm:min-w-full">
+            <div className="rounded-md border min-w-[800px] sm:min-w-full">
               <div className="grid grid-cols-12 py-3 px-4 font-medium border-b bg-muted/50">
                 <div className="col-span-1 text-center">Rank</div>
-                <div className="col-span-5 sm:col-span-3">Mentor</div>
-                <div className="col-span-3 hidden sm:block">Students</div>
-                <div className="col-span-2 hidden md:block text-right">National Rank</div>
-                <div className="col-span-3 hidden sm:block text-right">Rating</div>
-                <div className="col-span-6 sm:col-span-2 text-right">Points</div>
+                <div className="col-span-2">Mentor</div>
+                <div className="col-span-1 hidden md:block">Students</div>
+                <div className="col-span-1 hidden lg:block text-right">Natl. Rank</div>
+                <div className="col-span-1 hidden md:block text-center">Rating</div>
+                <div className="col-span-2 sm:col-span-1 text-center flex items-center justify-center">
+                  <CheckCircle size={16} className="mr-1" /> Tasks
+                </div>
+                <div className="col-span-2 sm:col-span-1 text-center flex items-center justify-center">
+                  <Clock size={16} className="mr-1" /> Attend.
+                </div>
+                <div className="col-span-2 sm:col-span-1 text-center">Points</div>
+                <div className="col-span-2 text-center">
+                  <DollarSign size={16} className="inline mr-1" /> Earnings
+                </div>
               </div>
               
               {filteredBatchMentors.map((mentor) => (
@@ -406,7 +476,7 @@ const MentorLeaderboard = () => {
                       mentor.rank
                     )}
                   </div>
-                  <div className="col-span-5 sm:col-span-3 flex items-center gap-3">
+                  <div className="col-span-2 flex items-center gap-3">
                     <UserAvatar 
                       name={mentor.name} 
                       size="sm" 
@@ -414,15 +484,28 @@ const MentorLeaderboard = () => {
                     />
                     <span className="font-medium truncate">{mentor.name}</span>
                   </div>
-                  <div className="col-span-3 hidden sm:block">{mentor.students} students</div>
-                  <div className="col-span-2 hidden md:block text-right font-semibold">#{mentor.nationalRank}</div>
-                  <div className="col-span-3 hidden sm:block text-right">
-                    <div className="flex items-center gap-1 justify-end">
+                  <div className="col-span-1 hidden md:block">{mentor.students}</div>
+                  <div className="col-span-1 hidden lg:block text-right font-semibold">#{mentor.nationalRank}</div>
+                  <div className="col-span-1 hidden md:block text-center">
+                    <div className="flex items-center gap-1 justify-center">
                       <span>{mentor.rating}</span>
                       <div className="text-yellow-500">★</div>
                     </div>
                   </div>
-                  <div className="col-span-6 sm:col-span-2 text-right font-semibold">{mentor.points}</div>
+                  <div className="col-span-2 sm:col-span-1 text-center">
+                    <span className={`font-medium ${mentor.taskCompletion >= 90 ? 'text-success' : 
+                      mentor.taskCompletion >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
+                      {mentor.taskCompletion}%
+                    </span>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-center">
+                    <span className={`font-medium ${mentor.attendance >= 90 ? 'text-success' : 
+                      mentor.attendance >= 70 ? 'text-warning' : 'text-muted-foreground'}`}>
+                      {mentor.attendance}%
+                    </span>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-center font-semibold">{mentor.points}</div>
+                  <div className="col-span-2 text-center text-success font-semibold">${mentor.earnings}</div>
                 </div>
               ))}
               
