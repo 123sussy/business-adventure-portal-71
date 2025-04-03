@@ -42,7 +42,7 @@ const SaleForm: React.FC<SaleFormProps> = ({
   const [saleData, setSaleData] = useState({
     amount: '',
     customerName: '',
-    customerEmail: '',
+    customerSource: '',
     productName: '',
     productCategory: '',
     notes: '',
@@ -96,7 +96,7 @@ const SaleForm: React.FC<SaleFormProps> = ({
     setSaleData({
       amount: '',
       customerName: '',
-      customerEmail: '',
+      customerSource: '',
       productName: '',
       productCategory: '',
       notes: '',
@@ -194,13 +194,12 @@ const SaleForm: React.FC<SaleFormProps> = ({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="customerEmail">Customer Email</Label>
+              <Label htmlFor="customerSource">Customer Source</Label>
               <Input
-                id="customerEmail"
-                name="customerEmail"
-                type="email"
-                placeholder="Enter customer email"
-                value={saleData.customerEmail}
+                id="customerSource"
+                name="customerSource"
+                placeholder="Where did they come from?"
+                value={saleData.customerSource}
                 onChange={handleInputChange}
               />
             </div>
