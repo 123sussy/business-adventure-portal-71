@@ -20,7 +20,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { DollarSign, Plus, Upload } from 'lucide-react';
+import { IndianRupee, Plus, Upload } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface SaleFormProps {
@@ -115,7 +115,7 @@ const SaleForm: React.FC<SaleFormProps> = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={buttonVariant} size={buttonSize} className={className}>
-          <DollarSign size={16} />
+          <IndianRupee size={16} />
           {buttonText}
         </Button>
       </DialogTrigger>
@@ -130,9 +130,9 @@ const SaleForm: React.FC<SaleFormProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="amount" className="required">Sale Amount ($)</Label>
+              <Label htmlFor="amount" className="required">Sale Amount (₹)</Label>
               <div className="relative">
-                <DollarSign className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <IndianRupee className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="amount"
                   name="amount"
